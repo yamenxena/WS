@@ -4,6 +4,30 @@
 document.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('current-date').textContent = new Date().toISOString().split('T')[0];
 
+  // --- Mobile Sidebar Toggle ---
+  const hamburger = document.getElementById('hamburger');
+  const sidebar = document.getElementById('sidebar');
+  const overlay = document.getElementById('sidebar-overlay');
+
+  function openSidebar() {
+    sidebar.classList.add('open');
+    overlay.classList.add('open');
+  }
+  function closeSidebar() {
+    sidebar.classList.remove('open');
+    overlay.classList.remove('open');
+  }
+
+  hamburger.addEventListener('click', () => {
+    sidebar.classList.contains('open') ? closeSidebar() : openSidebar();
+  });
+
+  overlay.addEventListener('click', closeSidebar);
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeSidebar();
+  });
+
   // Navigation
   document.querySelectorAll('.nav-item[data-view]').forEach(item => {
     item.addEventListener('click', () => {
@@ -11,6 +35,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       item.classList.add('active');
       document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
       document.getElementById(`view-${item.dataset.view}`).classList.add('active');
+      closeSidebar(); // Auto-close sidebar on mobile after nav
     });
   });
 
