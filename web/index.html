@@ -16,7 +16,7 @@
   <button class="hamburger" id="hamburger" aria-label="Toggle navigation">☰</button>
   <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
-  <!-- Sidebar — 4 Large Action Buttons -->
+  <!-- Sidebar -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="logo">
@@ -28,102 +28,74 @@
       </div>
     </div>
 
-    <div class="sidebar-actions">
-      <button class="sidebar-btn active" data-panel="filters" id="btn-filters">
-        <span class="sidebar-btn-icon">⚙️</span>
-        <span class="sidebar-btn-label">Filters</span>
-      </button>
-      <button class="sidebar-btn" data-panel="flow" id="btn-flow">
-        <span class="sidebar-btn-icon">🔀</span>
-        <span class="sidebar-btn-label">Flow</span>
-      </button>
-      <button class="sidebar-btn" data-panel="timeline" id="btn-timeline">
-        <span class="sidebar-btn-icon">📅</span>
-        <span class="sidebar-btn-label">Timeline</span>
-      </button>
-    </div>
+    <nav class="nav">
+      <div class="nav-section">
+        <span class="nav-label">OVERVIEW</span>
+        <a class="nav-item active" data-view="dashboard" id="nav-dashboard">
+          <span class="nav-icon">📊</span> Dashboard
+        </a>
+      </div>
 
-    <div class="sidebar-spacer"></div>
+      <div class="nav-section">
+        <span class="nav-label">OPERATIONS</span>
+        <a class="nav-item" data-view="crm" id="nav-crm">
+          <span class="nav-icon">👥</span> CRM Pipeline
+          <span class="nav-badge badge-warning">3</span>
+        </a>
+        <a class="nav-item" data-view="projects" id="nav-projects">
+          <span class="nav-icon">📐</span> Projects
+          <span class="nav-badge badge-danger">180K</span>
+        </a>
+        <a class="nav-item" data-view="tasks" id="nav-tasks">
+          <span class="nav-icon">✅</span> Tasks
+          <span class="nav-badge badge-danger">3</span>
+        </a>
+        <a class="nav-item" data-view="supervision" id="nav-supervision">
+          <span class="nav-icon">🔍</span> Supervision
+        </a>
+        <a class="nav-item" data-view="content" id="nav-content">
+          <span class="nav-icon">📱</span> Content
+          <span class="nav-badge badge-warning">0/3</span>
+        </a>
+      </div>
 
-    <div class="sidebar-actions sidebar-actions-bottom">
-      <button class="sidebar-btn sidebar-btn-logout" id="btn-logout">
-        <span class="sidebar-btn-icon">🚪</span>
-        <span class="sidebar-btn-label">Logout</span>
-      </button>
-    </div>
+      <div class="nav-section">
+        <span class="nav-label">EXTERNAL</span>
+        <a class="nav-item" href="https://docs.google.com/spreadsheets/d/1tUOi9TsCRKXcELz1JK0WohKfeiDiQL3PQp0zvYLYmTk/edit?gid=1098074229#gid=1098074229" target="_blank" id="nav-sheets">
+          <span class="nav-icon">📗</span> Google Sheets
+          <span class="nav-external">↗</span>
+        </a>
+      </div>
+    </nav>
 
     <div class="sidebar-footer">
       <div class="footer-info">
-        <span class="footer-version">v1.7.0</span>
+        <span class="footer-version">v1.6.0</span>
         <span class="footer-date" id="current-date"></span>
       </div>
     </div>
   </aside>
 
-  <!-- Main Content Wrapper -->
-  <div class="main-wrapper">
-    <!-- Top Navbar -->
-    <header class="top-navbar" id="top-navbar">
-      <nav class="navbar-tabs" id="navbar-tabs">
-        <a class="navbar-tab active" data-view="dashboard" id="nav-dashboard">📊 Dashboard</a>
-        <a class="navbar-tab" data-view="crm" id="nav-crm">👥 CRM</a>
-        <a class="navbar-tab" data-view="projects" id="nav-projects">📐 Projects</a>
-        <a class="navbar-tab" data-view="tasks" id="nav-tasks">✅ Tasks</a>
-        <a class="navbar-tab" data-view="supervision" id="nav-supervision">🔍 Supervision</a>
-        <a class="navbar-tab" data-view="content" id="nav-content">📱 Content</a>
-        <a class="navbar-tab" href="https://docs.google.com/spreadsheets/d/1tUOi9TsCRKXcELz1JK0WohKfeiDiQL3PQp0zvYLYmTk/edit?gid=1098074229#gid=1098074229" target="_blank" id="nav-sheets">📗 Sheets ↗</a>
-      </nav>
-      <div class="navbar-search">
-        <span class="search-icon">🔍</span>
-        <input type="text" class="search-input" id="global-search" placeholder="Search leads, projects, tasks…" autocomplete="off" />
-        <kbd class="search-kbd">Esc</kbd>
-      </div>
-    </header>
+  <!-- Main Content -->
+  <main class="main" id="main-content">
+    <!-- Dashboard View -->
+    <section class="view active" id="view-dashboard"></section>
 
-    <!-- Search Results Overlay -->
-    <div class="search-results" id="search-results"></div>
+    <!-- CRM View -->
+    <section class="view" id="view-crm"></section>
 
-    <!-- Main Content -->
-    <main class="main" id="main-content">
-      <!-- Dashboard View -->
-      <section class="view active" id="view-dashboard"></section>
-      <!-- CRM View -->
-      <section class="view" id="view-crm"></section>
-      <!-- Projects View -->
-      <section class="view" id="view-projects"></section>
-      <!-- Tasks View -->
-      <section class="view" id="view-tasks"></section>
-      <!-- Supervision View -->
-      <section class="view" id="view-supervision"></section>
-      <!-- Content View -->
-      <section class="view" id="view-content"></section>
-    </main>
-  </div>
+    <!-- Projects View -->
+    <section class="view" id="view-projects"></section>
 
-  <!-- Side Panels (Filters / Flow / Timeline) -->
-  <div class="side-panel" id="panel-filters">
-    <div class="side-panel-header">
-      <h3>⚙️ Filters</h3>
-      <button class="side-panel-close" data-close-panel>&times;</button>
-    </div>
-    <div class="side-panel-body" id="filters-body"></div>
-  </div>
+    <!-- Tasks View -->
+    <section class="view" id="view-tasks"></section>
 
-  <div class="side-panel" id="panel-flow">
-    <div class="side-panel-header">
-      <h3>🔀 Flow</h3>
-      <button class="side-panel-close" data-close-panel>&times;</button>
-    </div>
-    <div class="side-panel-body" id="flow-body"></div>
-  </div>
+    <!-- Supervision View -->
+    <section class="view" id="view-supervision"></section>
 
-  <div class="side-panel" id="panel-timeline">
-    <div class="side-panel-header">
-      <h3>📅 Timeline</h3>
-      <button class="side-panel-close" data-close-panel>&times;</button>
-    </div>
-    <div class="side-panel-body" id="timeline-body"></div>
-  </div>
+    <!-- Content View -->
+    <section class="view" id="view-content"></section>
+  </main>
 
   <script src="js/data.js"></script>
   <script src="js/app.js"></script>
