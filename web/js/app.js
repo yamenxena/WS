@@ -24,19 +24,110 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   overlay.addEventListener('click', closeSidebar);
 
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape') closeSidebar();
+  // --- Navigation (top navbar tabs) ---
+  document.querySelectorAll('.navbar-tab[data-view]').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.navbar-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      document.getElementById(`view-${tab.dataset.view}`).classList.add('active');
+      closeSidebar();
+    });
   });
 
-  // Navigation
-  document.querySelectorAll('.nav-item[data-view]').forEach(item => {
-    item.addEventListener('click', () => {
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      item.classList.add('active');
-      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
-      document.getElementById(`view-${item.dataset.view}`).classList.add('active');
-      closeSidebar(); // Auto-close sidebar on mobile after nav
+  // --- Sidebar Action Buttons → Side Panels ---
+  document.querySelectorAll('.sidebar-btn[data-panel]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const panelId = `panel-${btn.dataset.panel}`;
+      const panel = document.getElementById(panelId);
+      const wasOpen = panel.classList.contains('open');
+
+      // Close all panels first
+      document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('open'));
+      document.querySelectorAll('.sidebar-btn[data-panel]').forEach(b => b.classList.remove('active'));
+
+      if (!wasOpen) {
+        panel.classList.add('open');
+        btn.classList.add('active');
+        renderPanel(btn.dataset.panel);
+      }
+      closeSidebar();
     });
+  });
+
+  // Close panel buttons
+  document.querySelectorAll('[data-close-panel]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.closest('.side-panel').classList.remove('open');
+      document.querySelectorAll('.sidebar-btn[data-panel]').forEach(b => b.classList.remove('active'));
+    });
+  });
+
+  // Logout button
+  document.getElementById('btn-logout').addEventListener('click', () => {
+    if (confirm('Logout from Majaz AI OS?')) {
+      window.location.reload();
+    }
+  });
+
+  // --- Global Search ---
+  const searchInput = document.getElementById('global-search');
+  const searchResults = document.getElementById('search-results');
+
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.trim().toLowerCase();
+    if (q.length < 2) {
+      searchResults.classList.remove('open');
+      searchResults.innerHTML = '';
+      return;
+    }
+    const results = searchAll(q);
+    if (results.length === 0) {
+      searchResults.innerHTML = '<div class="search-no-results">No results for "' + searchInput.value + '"</div>';
+    } else {
+      searchResults.innerHTML = results.map(r => `
+        <div class="search-result-item" data-goto-view="${r.view}" data-goto-idx="${r.idx}">
+          <span class="search-result-type ${r.typeClass}">${r.type}</span>
+          <span class="search-result-title">${highlightMatch(r.title, q)}</span>
+          <span class="search-result-detail">${r.detail}</span>
+        </div>
+      `).join('');
+
+      // Click to navigate
+      searchResults.querySelectorAll('.search-result-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const view = item.dataset.gotoView;
+          // Activate that view
+          document.querySelectorAll('.navbar-tab').forEach(t => t.classList.remove('active'));
+          const targetTab = document.querySelector(`.navbar-tab[data-view="${view}"]`);
+          if (targetTab) targetTab.classList.add('active');
+          document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+          document.getElementById(`view-${view}`).classList.add('active');
+          searchResults.classList.remove('open');
+          searchInput.value = '';
+        });
+      });
+    }
+    searchResults.classList.add('open');
+  });
+
+  // Escape key: clear search, close panels
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeSidebar();
+      searchResults.classList.remove('open');
+      searchInput.value = '';
+      searchInput.blur();
+      document.querySelectorAll('.side-panel').forEach(p => p.classList.remove('open'));
+      document.querySelectorAll('.sidebar-btn[data-panel]').forEach(b => b.classList.remove('active'));
+    }
+  });
+
+  // Close search when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.navbar-search') && !e.target.closest('.search-results')) {
+      searchResults.classList.remove('open');
+    }
   });
 
   // Load data then render
@@ -51,6 +142,212 @@ function showLoading() {
       <div style="font-size:32px">🏗️</div>
       <div style="color:var(--text-secondary)">Loading data...</div>
     </div>`;
+}
+
+// --- Global Search ---
+function searchAll(query) {
+  const results = [];
+  const q = query.toLowerCase();
+
+  // Search leads
+  STORE.leads.forEach((l, i) => {
+    const text = Object.values(l).join(' ').toLowerCase();
+    if (text.includes(q)) {
+      results.push({
+        type: 'Lead', typeClass: 'type-lead', view: 'crm', idx: i,
+        title: val(l, 'Client') || val(l, 'Lead ID'),
+        detail: val(l, 'Status') + ' · ' + val(l, 'Location'),
+      });
+    }
+  });
+
+  // Search projects
+  STORE.projects.forEach((p, i) => {
+    const text = Object.values(p).join(' ').toLowerCase();
+    if (text.includes(q)) {
+      results.push({
+        type: 'Project', typeClass: 'type-project', view: 'projects', idx: i,
+        title: val(p, 'Name') || val(p, 'Project ID'),
+        detail: val(p, 'Phase') + ' · ' + val(p, 'Client'),
+      });
+    }
+  });
+
+  // Search tasks
+  if (STORE.tasks) {
+    STORE.tasks.forEach((t, i) => {
+      const text = Object.values(t).join(' ').toLowerCase();
+      if (text.includes(q)) {
+        results.push({
+          type: 'Task', typeClass: 'type-task', view: 'tasks', idx: i,
+          title: t.title || 'Task',
+          detail: (t.priority || '') + ' · ' + (t.project || ''),
+        });
+      }
+    });
+  }
+
+  // Search supervision
+  STORE.supervision.forEach((s, i) => {
+    const text = Object.values(s).join(' ').toLowerCase();
+    if (text.includes(q)) {
+      results.push({
+        type: 'Finding', typeClass: 'type-finding', view: 'supervision', idx: i,
+        title: val(s, 'Finding') || val(s, 'Category'),
+        detail: val(s, 'Severity') + ' · ' + val(s, 'Project'),
+      });
+    }
+  });
+
+  return results.slice(0, 20); // cap at 20
+}
+
+function highlightMatch(text, query) {
+  if (!query) return text;
+  const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+  return text.replace(regex, '<mark style="background:var(--gold-dim);color:var(--gold);border-radius:2px;padding:0 2px">$1</mark>');
+}
+
+// --- Side Panel Content Renderers ---
+function renderPanel(panelName) {
+  if (panelName === 'filters') renderFiltersPanel();
+  else if (panelName === 'flow') renderFlowPanel();
+  else if (panelName === 'timeline') renderTimelinePanel();
+}
+
+function renderFiltersPanel() {
+  const body = document.getElementById('filters-body');
+  const statuses = ['New', 'Contacted', 'Qualified', 'Proposal Sent', 'Won', 'Lost'];
+  const phases = ['Proposal', 'Concept', 'Working Drawings', 'Municipality', 'Construction', 'Supervision', 'Handover', 'Completed'];
+  const sevs = ['Critical', 'Major', 'Minor', 'Observation'];
+  const sources = ['Instagram DM', 'Instagram/WhatsApp', 'WhatsApp', 'Referral', 'Direct', 'Website', 'LinkedIn'];
+
+  body.innerHTML = `
+    <div class="panel-section">
+      <div class="panel-section-title">Lead Status</div>
+      ${statuses.map(s => {
+        const count = STORE.leads.filter(l => val(l, 'Status') === s).length;
+        return `<span class="panel-pill" data-filter="status:${s}">${s} (${count})</span>`;
+      }).join('')}
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-title">Project Phase</div>
+      ${phases.map(p => {
+        const count = STORE.projects.filter(pr => val(pr, 'Phase') === p).length;
+        return `<span class="panel-pill" data-filter="phase:${p}">${p} (${count})</span>`;
+      }).join('')}
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-title">Severity</div>
+      ${sevs.map(s => {
+        const count = STORE.supervision.filter(sv => val(sv, 'Severity') === s).length;
+        return `<span class="panel-pill" data-filter="severity:${s}">${s} (${count})</span>`;
+      }).join('')}
+    </div>
+    <div class="panel-section">
+      <div class="panel-section-title">Lead Source</div>
+      ${sources.map(s => {
+        const count = STORE.leads.filter(l => val(l, 'Source') === s).length;
+        return count > 0 ? `<span class="panel-pill" data-filter="source:${s}">${s} (${count})</span>` : '';
+      }).join('')}
+    </div>
+  `;
+
+  // Pill click → navigate + filter search
+  body.querySelectorAll('.panel-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      pill.classList.toggle('active');
+      const filter = pill.dataset.filter;
+      const [type, value] = filter.split(':');
+      const searchInput = document.getElementById('global-search');
+      searchInput.value = value;
+      searchInput.dispatchEvent(new Event('input'));
+    });
+  });
+}
+
+function renderFlowPanel() {
+  const body = document.getElementById('flow-body');
+  const stages = ['New', 'Contacted', 'Qualified', 'Proposal Sent', 'Won', 'Lost'];
+  const total = STORE.leads.length || 1;
+
+  let html = '<div class="panel-section"><div class="panel-section-title">CRM Pipeline Flow</div>';
+  stages.forEach((stage, i) => {
+    const count = STORE.leads.filter(l => val(l, 'Status') === stage).length;
+    const pct = Math.round((count / total) * 100);
+    html += `
+      <div class="flow-stage">
+        <span class="flow-count">${count}</span>
+        <span class="flow-label">${stage}</span>
+        <div class="flow-bar"><div class="flow-bar-fill" style="width:${pct}%"></div></div>
+      </div>`;
+    if (i < stages.length - 1) html += '<div class="flow-arrow">↓</div>';
+  });
+  html += '</div>';
+
+  // Project phases
+  const phases = ['Proposal', 'Concept', 'Working Drawings', 'Municipality', 'Construction', 'Supervision', 'Handover', 'Completed'];
+  const totalP = STORE.projects.length || 1;
+  html += '<div class="panel-section" style="margin-top:24px"><div class="panel-section-title">Project Phases</div>';
+  phases.forEach((phase, i) => {
+    const count = STORE.projects.filter(p => val(p, 'Phase') === phase).length;
+    if (count > 0) {
+      const pct = Math.round((count / totalP) * 100);
+      html += `
+        <div class="flow-stage">
+          <span class="flow-count">${count}</span>
+          <span class="flow-label">${phase}</span>
+          <div class="flow-bar"><div class="flow-bar-fill" style="width:${pct}%"></div></div>
+        </div>`;
+    }
+  });
+  html += '</div>';
+  body.innerHTML = html;
+}
+
+function renderTimelinePanel() {
+  const body = document.getElementById('timeline-body');
+  const events = [];
+
+  // Collect events from leads
+  STORE.leads.forEach(l => {
+    events.push({
+      date: val(l, 'Date Added') || '—',
+      text: `Lead: ${val(l, 'Client')}`,
+      sub: `${val(l, 'Status')} · ${val(l, 'Source')}`,
+      dot: val(l, 'Notes').includes('⚠️') ? 'dot-red' : 'dot-blue',
+    });
+  });
+
+  // Collect events from supervision
+  STORE.supervision.forEach(s => {
+    events.push({
+      date: val(s, 'Date') || '—',
+      text: val(s, 'Finding'),
+      sub: `${val(s, 'Project')} · ${val(s, 'Severity')}`,
+      dot: val(s, 'Severity') === 'Critical' ? 'dot-red' : val(s, 'Severity') === 'Major' ? 'dot-orange' : 'dot-green',
+    });
+  });
+
+  // Sort by date descending
+  events.sort((a, b) => (b.date || '').localeCompare(a.date || ''));
+
+  body.innerHTML = `
+    <div class="panel-section">
+      <div class="panel-section-title">Activity Timeline</div>
+      ${events.length === 0 ? '<div class="search-no-results">No events</div>' :
+        events.map(e => `
+          <div class="timeline-item">
+            <div class="timeline-dot ${e.dot}"></div>
+            <div class="timeline-content">
+              <div class="timeline-date">${e.date}</div>
+              <div class="timeline-text">${e.text}</div>
+              <div class="timeline-text-sub">${e.sub}</div>
+            </div>
+          </div>
+        `).join('')}
+    </div>
+  `;
 }
 
 function renderAll() {
