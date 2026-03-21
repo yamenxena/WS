@@ -1,0 +1,8 @@
+Date,Project,Inspector,Category,Finding,Severity,Photo Ref,Action Required,Deadline,Status
+2026-03-21,Villa Saadiyat,Waseem,Structural,Column C7 rebar spacing 220mm (spec: 200mm),Major,GPS:24.5434_54.4345 IMG_0341.jpg,Verify structural calc — add bars if non-compliant,2026-03-23,Open
+2026-03-21,Villa Saadiyat,Waseem,Structural,Slab formwork — 3mm deflection at midspan,Minor,GPS:24.5434_54.4346 IMG_0342.jpg,Within tolerance (5mm) — monitor during pour,2026-03-22,Open
+2026-03-21,Villa Saadiyat,Waseem,Structural,Waterproofing membrane overlap — satisfactory,Observation,GPS:24.5433_54.4345 IMG_0343.jpg,None,—,Closed
+2026-03-18,Villa Saadiyat,Waseem,Structural,First floor column rebar — correct spacing confirmed,Observation,GPS:24.5434_54.4345 IMG_0338.jpg,None,—,Closed
+2026-03-15,Villa Saadiyat,Waseem,Structural,Ground floor slab pour — concrete grade C40 confirmed,Observation,GPS:24.5434_54.4345 IMG_0335.jpg,None,—,Closed
+2026-03-10,Villa Yas,Waseem,MEP,Fire alarm conduit routing conflicts with HVAC duct,Major,GPS:24.4654_54.6123 IMG_0330.jpg,MEP coordinator to resolve routing,2026-03-17,In Progress
+2026-03-08,Villa Yas,Waseem,Safety,Missing fire extinguisher on 2nd floor,Critical,GPS:24.4654_54.6124 IMG_0328.jpg,Contractor to install immediately,2026-03-09,Closed

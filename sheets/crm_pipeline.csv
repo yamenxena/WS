@@ -1,0 +1,11 @@
+Lead ID,Client,Source,Type,Status,ICP Score,Budget (AED),Location,Next Action,Date Added,Days Since Contact,Notes
+L001,Nasser Al-Suwaidi,Instagram DM,Villa,New,4,"3,500,000",Al Shamkha AD,Respond to DM — 2 DAYS OVERDUE,2026-03-19,2,⚠️ NO RESPONSE SENT
+L002,Layla Khoury,Referral (Fatima),Villa,New,3,"2,000,000",MBZ City AD,Initial call,2026-03-20,1,Referred by existing client
+L003,Rami Haddad,Website,Villa,New,2,"800,000",Al Ain,Qualify — below ICP?,2026-03-21,0,Budget below threshold
+L004,Ahmed Al-Khatib,Instagram/WhatsApp,Villa,Contacted,5,"4,500,000",Reem Island AD,Meeting confirmation — 48h wait,2026-03-18,3,⚠️ Waiting for reply
+L005,Diana Mostafa,Referral,Villa,Contacted,4,"3,000,000",Saadiyat AD,Send portfolio,2026-03-15,6,⚠️ 6 days no follow-up
+L006,Hassan Al-Blooshi,Direct,Villa,Qualified,5,"6,000,000",Saadiyat AD,Concept meeting Mar 25,2026-03-10,11,Premium lead
+L007,Aisha bin Zayed,Instagram,Villa,Qualified,4,"4,000,000",Yas Island AD,Send design brief questionnaire,2026-03-12,9,Design-focused client
+L008,Omar bin Rashid,Referral,Townhouse,Proposal Sent,4,"2,500,000",Khalifa City AD,Negotiate scope reduction,2026-02-01,48,Stalled — wants concept-only
+L009,Khalid Al-Mansouri,Direct,Villa,Won,5,"5,200,000",Reem Island AD,Active project (Villa Al-Reem),2026-01-15,65,Fee: 320K — 30% paid
+L010,Sarah Al-Falasi,Referral,Villa,Won,4,"4,800,000",Jumeirah Dubai,Active project (Villa Jumeirah),2026-03-10,11,Fee: 250K — 30% paid — FIRST DUBAI

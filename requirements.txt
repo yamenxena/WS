@@ -1,0 +1,4 @@
+python-dotenv>=1.0.0
+gspread>=6.0.0
+google-auth>=2.0.0
+## google-genai  # Optional — install when Gemini API is activated on your plan

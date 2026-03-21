@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Majaz AI OS — Dashboard</title>
+  <meta name="description" content="Majaz Engineering Consultancy — AI Operating System Dashboard. Real-time CRM, project tracking, supervision, and task management." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏗️</text></svg>" />
+</head>
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <span class="logo-icon">🏗️</span>
+        <div class="logo-text">
+          <span class="logo-name">MAJAZ</span>
+          <span class="logo-sub">AI OS</span>
+        </div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-section">
+        <span class="nav-label">OVERVIEW</span>
+        <a class="nav-item active" data-view="dashboard" id="nav-dashboard">
+          <span class="nav-icon">📊</span> Dashboard
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <span class="nav-label">OPERATIONS</span>
+        <a class="nav-item" data-view="crm" id="nav-crm">
+          <span class="nav-icon">👥</span> CRM Pipeline
+          <span class="nav-badge badge-warning">3</span>
+        </a>
+        <a class="nav-item" data-view="projects" id="nav-projects">
+          <span class="nav-icon">📐</span> Projects
+          <span class="nav-badge badge-danger">180K</span>
+        </a>
+        <a class="nav-item" data-view="tasks" id="nav-tasks">
+          <span class="nav-icon">✅</span> Tasks
+          <span class="nav-badge badge-danger">3</span>
+        </a>
+        <a class="nav-item" data-view="supervision" id="nav-supervision">
+          <span class="nav-icon">🔍</span> Supervision
+        </a>
+        <a class="nav-item" data-view="content" id="nav-content">
+          <span class="nav-icon">📱</span> Content
+          <span class="nav-badge badge-warning">0/3</span>
+        </a>
+      </div>
+
+      <div class="nav-section">
+        <span class="nav-label">EXTERNAL</span>
+        <a class="nav-item" href="https://docs.google.com/spreadsheets/d/1tUOi9TsCRKXcELz1JK0WohKfeiDiQL3PQp0zvYLYmTk/edit?gid=1098074229#gid=1098074229" target="_blank" id="nav-sheets">
+          <span class="nav-icon">📗</span> Google Sheets
+          <span class="nav-external">↗</span>
+        </a>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <div class="footer-info">
+        <span class="footer-version">v1.6.0</span>
+        <span class="footer-date" id="current-date"></span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main" id="main-content">
+    <!-- Dashboard View -->
+    <section class="view active" id="view-dashboard"></section>
+
+    <!-- CRM View -->
+    <section class="view" id="view-crm"></section>
+
+    <!-- Projects View -->
+    <section class="view" id="view-projects"></section>
+
+    <!-- Tasks View -->
+    <section class="view" id="view-tasks"></section>
+
+    <!-- Supervision View -->
+    <section class="view" id="view-supervision"></section>
+
+    <!-- Content View -->
+    <section class="view" id="view-content"></section>
+  </main>
+
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

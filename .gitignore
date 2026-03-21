@@ -1,0 +1,25 @@
+# Majaz AI OS — gitignore
+# Privacy-first: operational data stays local, governance is version-controlled.
+
+# Operational data (private)
+operations/
+_legacy/
+
+# Environment / secrets
+.env
+*.env
+
+# Session logs
+operations/logs/
+
+# Obsidian internals
+.obsidian/
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# OS files
+Thumbs.db
+.DS_Store
