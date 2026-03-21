@@ -828,3 +828,24 @@ textarea.form-input {
 
 /* --- Kanban cards clickable --- */
 .kanban-card { cursor: pointer; }
+
+/* --- Add Card Button (Obsidian-style) --- */
+.kanban-add-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  margin-top: 4px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  color: var(--text-faint);
+  font-size: 12px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.kanban-add-card:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: var(--gold-dim);
+}

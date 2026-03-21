@@ -203,29 +203,35 @@ function renderCRM() {
           <span class="kanban-lane-title">${stage}</span>
           <span class="kanban-lane-count">${items.length}</span>
         </div>
-        <div class="kanban-lane-body">${cards || '<div style="text-align:center;color:var(--text-faint);padding:20px;font-size:12px">Empty</div>'}</div>
+        <div class="kanban-lane-body">
+          ${cards || ''}
+          <div class="kanban-add-card" onclick="addLeadToStage('${stage}')">
+            <span>+ Add card</span>
+          </div>
+        </div>
       </div>`;
   }).join('');
 
   el.innerHTML = `
-    <div class="page-header" style="display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <h1>CRM Pipeline</h1>
-        <p>${leads.length} leads · Click a card to edit</p>
-      </div>
-      <button class="btn btn-primary" onclick="addLead()">+ Add Lead</button>
+    <div class="page-header">
+      <h1>CRM Pipeline</h1>
+      <p>${leads.length} leads · Click a card to edit</p>
     </div>
     <div class="kanban-board">${lanes}</div>
   `;
 }
 
-// Add Lead Modal
-function addLead() {
+// Add Lead Modal (from lane + button)
+function addLeadToStage(stage) {
+  addLead(stage);
+}
+
+function addLead(defaultStatus) {
   const html = `<div class="form-grid">
     ${formField('Client Name', 'Client', '', 'text')}
     ${formField('Source', 'Source', '', 'select', OPTIONS.source)}
     ${formField('Type', 'Type', 'Villa', 'select', OPTIONS.type)}
-    ${formField('Status', 'Status', 'New', 'select', OPTIONS.status)}
+    ${formField('Status', 'Status', defaultStatus || 'New', 'select', OPTIONS.status)}
     ${formField('ICP Score', 'ICP Score', '3', 'select', OPTIONS.icp)}
     ${formField('Budget (AED)', 'Budget (AED)', '', 'text')}
     ${formField('Location', 'Location', '', 'select', OPTIONS.location)}
@@ -407,42 +413,110 @@ function editProject(idx) {
 
 
 // ========================
-// TASKS VIEW
+// TASKS VIEW — Kanban (matching Obsidian)
 // ========================
 function renderTasks() {
   const el = document.getElementById('view-tasks');
-  // Build tasks from project data
-  const tasks = [];
-  STORE.leads.filter(l => val(l,'Notes').includes('⚠️')).forEach(l => {
-    tasks.push({ title: 'Respond: ' + val(l,'Client'), priority: 'P0', project: 'Lead', status: 'To Do', overdue: true, detail: val(l,'Notes') });
-  });
-  STORE.projects.filter(p => numVal(p,'Overdue Amount') > 0).forEach(p => {
-    tasks.push({ title: 'Follow up invoice — ' + val(p,'Name'), priority: 'P0', project: val(p,'Name'), status: 'To Do', overdue: true, detail: 'AED ' + val(p,'Overdue Amount') + ' overdue' });
-  });
-  STORE.projects.forEach(p => {
-    tasks.push({ title: val(p,'Current Activity'), priority: val(p,'Phase')==='Concept'?'P0':'P1', project: val(p,'Name'), status: 'In Progress', detail: val(p,'Issues') });
-  });
+  // Build tasks from project + lead data
+  if (!STORE.tasks) STORE.tasks = [];
+  if (STORE.tasks.length === 0) {
+    STORE.leads.filter(l => val(l,'Notes').includes('⚠️')).forEach(l => {
+      STORE.tasks.push({ title: 'Respond: ' + val(l,'Client'), priority: 'P0', project: 'Lead', status: 'To Do', overdue: true, detail: val(l,'Notes') });
+    });
+    STORE.projects.filter(p => numVal(p,'Overdue Amount') > 0).forEach(p => {
+      STORE.tasks.push({ title: 'Follow up invoice — ' + val(p,'Name'), priority: 'P0', project: val(p,'Name'), status: 'To Do', overdue: true, detail: 'AED ' + val(p,'Overdue Amount') + ' overdue' });
+    });
+    STORE.projects.forEach(p => {
+      STORE.tasks.push({ title: val(p,'Current Activity'), priority: val(p,'Phase')==='Concept'?'P0':'P1', project: val(p,'Name'), status: 'In Progress', detail: val(p,'Issues') });
+    });
+  }
 
-  const groups = ['To Do', 'In Progress'];
-  const sections = groups.map(g => {
-    const items = tasks.filter(t => t.status === g);
-    return `<div class="table-container">
-      <div class="table-header"><span class="table-title">${g}</span><span style="font-size:11px;color:var(--text-faint)">${items.length}</span></div>
-      <table><thead><tr><th style="width:50px">P</th><th>Task</th><th>Project</th></tr></thead>
-      <tbody>${items.map(t => `<tr>
-        <td><span class="priority-${t.priority.toLowerCase()}">${t.priority}</span></td>
-        <td style="font-weight:${t.overdue?'700':'500'};color:${t.overdue?'var(--red)':'var(--text-primary)'}">
-          ${t.title}${t.detail ? `<div style="font-size:11px;color:var(--text-secondary);margin-top:2px">${t.detail}</div>` : ''}
-        </td>
-        <td style="font-size:12px">${t.project}</td>
-      </tr>`).join('')}</tbody></table></div>`;
+  const columns = ['To Do', 'In Progress', 'Waiting', 'Done'];
+
+  const lanes = columns.map(col => {
+    const items = STORE.tasks.filter(t => t.status === col);
+    const cards = items.map((t, i) => {
+      const idx = STORE.tasks.indexOf(t);
+      return `
+      <div class="kanban-card ${t.overdue ? 'overdue' : ''}" onclick="editTask(${idx})">
+        <div class="kanban-card-title">
+          <span class="priority-${t.priority.toLowerCase()}" style="margin-right:6px">${t.priority}</span> ${t.title}
+        </div>
+        <div class="kanban-card-meta">
+          <span>📁 ${t.project}</span>
+          ${t.detail ? `<span style="color:${t.overdue ? 'var(--red)' : 'var(--text-secondary)'}">${t.detail}</span>` : ''}
+        </div>
+      </div>`;
+    }).join('');
+
+    return `
+      <div class="kanban-lane">
+        <div class="kanban-lane-header">
+          <span class="kanban-lane-title">${col}</span>
+          <span class="kanban-lane-count">${items.length}</span>
+        </div>
+        <div class="kanban-lane-body">
+          ${cards || ''}
+          <div class="kanban-add-card" onclick="addTask('${col}')">
+            <span>+ Add card</span>
+          </div>
+        </div>
+      </div>`;
   }).join('');
 
+  const overdueCount = STORE.tasks.filter(t => t.overdue).length;
+
   el.innerHTML = `
-    <div class="page-header"><h1>Task Board</h1><p>Auto-generated from projects + leads</p></div>
-    ${tasks.filter(t=>t.overdue).length > 0 ? `<div class="alert-banner"><span class="alert-icon">🔴</span><span class="alert-text"><strong>${tasks.filter(t=>t.overdue).length} overdue items need action TODAY</strong></span></div>` : ''}
-    ${sections}
+    <div class="page-header">
+      <h1>Task Board</h1>
+      <p>${STORE.tasks.length} tasks · ${overdueCount} overdue</p>
+    </div>
+    ${overdueCount > 0 ? `<div class="alert-banner"><span class="alert-icon">🔴</span><span class="alert-text"><strong>${overdueCount} overdue items need action TODAY</strong></span></div>` : ''}
+    <div class="kanban-board">${lanes}</div>
   `;
+}
+
+function addTask(defaultStatus) {
+  const projectNames = ['Lead', 'Operations', 'Governance', ...STORE.projects.map(p => val(p,'Name'))];
+  const html = `<div class="form-grid">
+    ${formField('Task Title', 'title', '', 'text')}
+    ${formField('Priority', 'priority', 'P1', 'select', ['P0', 'P1', 'P2'])}
+    ${formField('Project', 'project', '', 'select', projectNames)}
+    ${formField('Status', 'status', defaultStatus || 'To Do', 'select', ['To Do', 'In Progress', 'Waiting', 'Done'])}
+    ${formField('Detail', 'detail', '', 'textarea')}
+  </div>`;
+  showModal('Add Task', html, () => {
+    const data = getFormData();
+    STORE.tasks.push(data);
+    closeModal();
+    renderTasks();
+  });
+}
+
+function editTask(idx) {
+  const t = STORE.tasks[idx];
+  const projectNames = ['Lead', 'Operations', 'Governance', ...STORE.projects.map(p => val(p,'Name'))];
+  const html = `<div class="form-grid">
+    ${formField('Task Title', 'title', t.title || '', 'text')}
+    ${formField('Priority', 'priority', t.priority || 'P1', 'select', ['P0', 'P1', 'P2'])}
+    ${formField('Project', 'project', t.project || '', 'select', projectNames)}
+    ${formField('Status', 'status', t.status || 'To Do', 'select', ['To Do', 'In Progress', 'Waiting', 'Done'])}
+    ${formField('Detail', 'detail', t.detail || '', 'textarea')}
+  </div>`;
+  showModal('Edit Task', html, () => {
+    const data = getFormData();
+    Object.assign(STORE.tasks[idx], data);
+    closeModal();
+    renderTasks();
+  });
+  // Delete button
+  const footer = document.querySelector('.modal-footer');
+  const delBtn = document.createElement('button');
+  delBtn.className = 'btn btn-danger';
+  delBtn.textContent = 'Delete';
+  delBtn.style.marginRight = 'auto';
+  delBtn.onclick = () => { STORE.tasks.splice(idx, 1); closeModal(); renderTasks(); };
+  footer.insertBefore(delBtn, footer.firstChild);
 }
 
 
