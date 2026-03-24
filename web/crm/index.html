@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Majaz CRM — Engineering Consultancy</title>
+  <meta name="description" content="Majaz Engineering Consultancy CRM — Real-time project tracking, client management, and task oversight powered by Notion." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/design-system.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏗️</text></svg>" />
+</head>
+<body>
+  <!-- Mobile Hamburger -->
+  <button class="hamburger" id="hamburger" aria-label="Toggle navigation">☰</button>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <div class="app">
+    <!-- ═══ Sidebar ═══ -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">
+          <img src="../img/logo2.jpeg" alt="Majaz Logo" />
+          <div class="sidebar-logo-text">
+            <span class="sidebar-logo-name">MAJAZ</span>
+            <span class="sidebar-logo-sub">Engineering CRM</span>
+          </div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <div class="nav-section">
+          <span class="nav-label">Overview</span>
+          <a class="nav-item active" data-view="dashboard" id="nav-dashboard">
+            <span class="nav-icon">📊</span> Dashboard
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <span class="nav-label">Operations</span>
+          <a class="nav-item" data-view="clients" id="nav-clients">
+            <span class="nav-icon">👥</span> Clients
+            <span class="nav-badge badge-info" id="badge-clients">—</span>
+          </a>
+          <a class="nav-item" data-view="projects" id="nav-projects">
+            <span class="nav-icon">📐</span> Projects
+            <span class="nav-badge badge-warning" id="badge-projects">—</span>
+          </a>
+          <a class="nav-item" data-view="tasks" id="nav-tasks">
+            <span class="nav-icon">✅</span> Tasks
+            <span class="nav-badge badge-danger" id="badge-tasks">—</span>
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <span class="nav-label">Resources</span>
+          <a class="nav-item" data-view="team" id="nav-team">
+            <span class="nav-icon">👷</span> Team & Suppliers
+          </a>
+          <a class="nav-item" data-view="reports" id="nav-reports">
+            <span class="nav-icon">📈</span> Reports
+          </a>
+        </div>
+
+        <div class="nav-section">
+          <span class="nav-label">External</span>
+          <a class="nav-item" href="https://docs.google.com/spreadsheets/d/1PvURHGRwsQqdmC5pp0zlKHJE3QcfgpZJlP1zxD0iztY" target="_blank" id="nav-sheets">
+            <span class="nav-icon">📗</span> Google Sheets
+            <span style="margin-left:auto;opacity:0.4">↗</span>
+          </a>
+        </div>
+      </nav>
+
+      <div class="sidebar-footer">
+        <span>v2.0.0</span>
+        <span id="current-date"></span>
+      </div>
+    </aside>
+
+    <!-- ═══ Main Content ═══ -->
+    <main class="main" id="main-content">
+      <!-- Dashboard View -->
+      <section class="view active" id="view-dashboard">
+        <div class="hero">
+          <img src="../img/Generated_Image_February_23_2026_-_10_48AM.jpeg" alt="Majaz Engineering — Modern architectural design" />
+          <div class="hero-overlay">
+            <h1 class="hero-title">Welcome to Majaz CRM</h1>
+            <p class="hero-subtitle">Engineering Consultancy — Real-time project & client management</p>
+          </div>
+        </div>
+        <div class="kpi-grid" id="kpi-grid">
+          <div class="spinner"></div>
+        </div>
+        <div class="glass-card" id="dashboard-pipeline">
+          <div class="glass-card-header">
+            <span class="glass-card-title">Pipeline Overview</span>
+          </div>
+          <div id="pipeline-chart" class="chart-container"><div class="spinner"></div></div>
+        </div>
+      </section>
+
+      <!-- Clients View -->
+      <section class="view" id="view-clients">
+        <div class="view-header">
+          <h1 class="view-title">👥 Clients</h1>
+          <div class="view-actions">
+            <button class="btn btn-ghost btn-sm" id="clients-view-table">📋 Table</button>
+            <button class="btn btn-ghost btn-sm" id="clients-view-kanban">📊 Kanban</button>
+          </div>
+        </div>
+        <div class="filter-bar">
+          <input class="filter-input" type="text" id="clients-search" placeholder="🔍 Search clients..." />
+          <select class="filter-select" id="clients-filter-location">
+            <option value="">All Locations</option>
+          </select>
+        </div>
+        <div id="clients-content"><div class="spinner"></div></div>
+      </section>
+
+      <!-- Projects View -->
+      <section class="view" id="view-projects">
+        <div class="view-header">
+          <h1 class="view-title">📐 Projects</h1>
+          <div class="view-actions">
+            <button class="btn btn-ghost btn-sm" id="projects-view-kanban">📊 Kanban</button>
+            <button class="btn btn-ghost btn-sm" id="projects-view-table">📋 Table</button>
+          </div>
+        </div>
+        <div class="filter-bar">
+          <input class="filter-input" type="text" id="projects-search" placeholder="🔍 Search projects..." />
+          <select class="filter-select" id="projects-filter-stage">
+            <option value="">All Stages</option>
+            <option value="(SD) Schematic Design">SD</option>
+            <option value="(DD) Design Development">DD</option>
+            <option value="(CD) Construction Documents">CD</option>
+            <option value="(AS) Authorities Submission">AS</option>
+            <option value="Progress">Supervision</option>
+          </select>
+          <select class="filter-select" id="projects-filter-type">
+            <option value="">All Types</option>
+            <option value="DESIGN">Design</option>
+            <option value="SUPERVISION">Supervision</option>
+          </select>
+        </div>
+        <div id="projects-content"><div class="spinner"></div></div>
+      </section>
+
+      <!-- Tasks View -->
+      <section class="view" id="view-tasks">
+        <div class="view-header">
+          <h1 class="view-title">✅ Tasks</h1>
+          <div class="view-actions">
+            <button class="btn btn-ghost btn-sm" id="tasks-view-board">📊 Board</button>
+            <button class="btn btn-ghost btn-sm" id="tasks-view-list">📋 List</button>
+          </div>
+        </div>
+        <div class="filter-bar">
+          <input class="filter-input" type="text" id="tasks-search" placeholder="🔍 Search tasks..." />
+          <select class="filter-select" id="tasks-filter-status">
+            <option value="">All Statuses</option>
+            <option value="Not started">Not Started</option>
+            <option value="In progress">In Progress</option>
+            <option value="Done">Done</option>
+          </select>
+        </div>
+        <div id="tasks-content"><div class="spinner"></div></div>
+      </section>
+
+      <!-- Team & Suppliers View -->
+      <section class="view" id="view-team">
+        <div class="view-header">
+          <h1 class="view-title">👷 Team & Suppliers</h1>
+        </div>
+        <div class="tab-bar" id="team-tabs">
+          <button class="tab-btn active" data-tab="team-members">Team Members</button>
+          <button class="tab-btn" data-tab="suppliers">Suppliers & Contractors</button>
+        </div>
+        <div id="team-content"><div class="spinner"></div></div>
+      </section>
+
+      <!-- Reports View -->
+      <section class="view" id="view-reports">
+        <div class="view-header">
+          <h1 class="view-title">📈 Reports & Analytics</h1>
+        </div>
+        <div id="reports-content"><div class="spinner"></div></div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Detail Slide-over Panel -->
+  <div class="detail-panel" id="detail-panel">
+    <div class="detail-panel-header">
+      <h2 id="detail-title">—</h2>
+      <button class="detail-panel-close" id="detail-close">✕</button>
+    </div>
+    <div class="detail-panel-body" id="detail-body"></div>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/router.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/clients.js"></script>
+  <script src="js/projects.js"></script>
+  <script src="js/tasks.js"></script>
+  <script src="js/team.js"></script>
+  <script src="js/reports.js"></script>
+</body>
+</html>
