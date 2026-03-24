@@ -90,16 +90,35 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // ── Utility: Stage CSS class ──
+  // ── Utility: Stage CSS class (covers all databases) ──
   window.stageClass = function(stage) {
     if (!stage) return '';
     const s = stage.toLowerCase();
+    // Project stages
     if (s.includes('sd') || s.includes('schematic')) return 'status-sd';
     if (s.includes('dd') || s.includes('design dev')) return 'status-dd';
     if (s.includes('cd') || s.includes('construction')) return 'status-cd';
     if (s.includes('as') || s.includes('authorit')) return 'status-as';
     if (s.includes('done') || s.includes('complet')) return 'status-done';
     if (s.includes('progress') || s.includes('supervision')) return 'status-progress';
+    if (s.includes('handing')) return 'status-done';
+    if (s === 'on hold') return 'status-hold';
+    if (s === 'kickoff') return 'status-dd';
+    if (s === 'bidding') return 'status-cd';
+    if (s === 'not started') return '';
+    // Task statuses
+    if (s.includes('sent to structure')) return 'status-cd';
+    if (s.includes('needs review')) return 'status-cd';
+    if (s.includes('sent to client')) return 'status-as';
+    if (s.includes('submitted')) return 'status-as';
+    if (s === 'in progress') return 'status-dd';
+    // Client lead statuses
+    if (s === 'inquiry') return '';
+    if (s === 'qualified') return 'status-sd';
+    if (s === 'proposal') return 'status-dd';
+    if (s === 'negotiation') return 'status-cd';
+    if (s === 'won') return 'status-done';
+    if (s === 'lost') return 'status-lost';
     return '';
   };
 
@@ -111,7 +130,12 @@ document.addEventListener('DOMContentLoaded', () => {
     if (stage.includes('CD')) return 'CD';
     if (stage.includes('AS')) return 'AS';
     if (stage.includes('Progress')) return 'SUPV';
-    if (stage.includes('Done')) return 'DONE';
+    if (stage.includes('Done') || stage.includes('Completed')) return 'DONE';
+    if (stage.includes('Handing')) return 'H/O';
+    if (stage.includes('Kickoff')) return 'KICK';
+    if (stage.includes('Bidding')) return 'BID';
+    if (stage.includes('On Hold')) return 'HOLD';
+    if (stage.includes('Not started')) return 'NEW';
     return stage;
   };
 

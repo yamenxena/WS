@@ -1,5 +1,6 @@
 /**
- * Majaz CRM — Tasks Page (Board + List + Write-Back + Toasts)
+ * Majaz CRM — Tasks Page (Dynamic Board + List + Write-Back + Toasts)
+ * Columns auto-generated from Notion data — future-proof.
  */
 (() => {
   let tasksData = [];
@@ -47,26 +48,59 @@
     else renderList(el, filtered);
   }
 
-  function statusColor(s) {
-    if (s === 'Done') return 'status-done';
-    if (s === 'In progress') return 'status-dd';
-    if (s === 'Sent to Client') return 'status-as';
-    return '';
+  // ── Known status metadata (labels + colors). Order = Notion groups. ──
+  const KNOWN_STATUSES = [
+    // To-do group
+    { key: 'Not started',              label: 'Not Started',            color: 'var(--text-muted)' },
+    // In progress group
+    { key: 'SENT TO STRUCTURE',        label: 'Sent to Structure',      color: 'var(--warning)' },
+    { key: 'NEEDS REVIEW',             label: 'Needs Review',           color: 'var(--warning)' },
+    { key: 'In progress',              label: 'In Progress',            color: 'var(--info)' },
+    // Complete group
+    { key: 'SENT TO CLIENT',           label: 'Sent to Client',         color: 'var(--stage-as, #AB47BC)' },
+    { key: 'SUBMITTED TO AUTHORITIES', label: 'Submitted',              color: 'var(--stage-as, #AB47BC)' },
+    { key: 'Done',                     label: 'Done',                   color: 'var(--success)' },
+  ];
+
+  /**
+   * Build dynamic columns from data:
+   * 1. Show only KNOWN_STATUSES that exist in the current data
+   * 2. Append any unknown statuses as extra columns
+   */
+  function buildColumns(rows) {
+    const seenStatuses = new Set(rows.map(t => t.status).filter(Boolean));
+    const columns = KNOWN_STATUSES.filter(s => seenStatuses.has(s.key));
+    // Any unknown statuses → append
+    const knownKeys = new Set(KNOWN_STATUSES.map(s => s.key));
+    seenStatuses.forEach(status => {
+      if (!knownKeys.has(status)) {
+        columns.push({ key: status, label: status, color: 'var(--gold)' });
+      }
+    });
+    return columns.length ? columns : KNOWN_STATUSES;
+  }
+
+  /** All unique statuses for dropdowns */
+  function getAllStatuses(rows) {
+    const knownKeys = new Set(KNOWN_STATUSES.map(s => s.key));
+    const extras = [];
+    rows.forEach(t => {
+      if (t.status && !knownKeys.has(t.status)) {
+        extras.push({ key: t.status, label: t.status, color: 'var(--gold)' });
+      }
+    });
+    return [...KNOWN_STATUSES, ...extras];
   }
 
   function renderBoard(el, rows) {
-    const columns = [
-      { key: 'Not started', label: 'Not Started', color: 'var(--text-muted)' },
-      { key: 'In progress', label: 'In Progress', color: 'var(--info)' },
-      { key: 'Done', label: 'Done', color: 'var(--success)' },
-    ];
+    const cols = buildColumns(rows);
 
-    el.innerHTML = `<div class="kanban">${columns.map((col, i) => {
+    el.innerHTML = `<div class="kanban">${cols.map(col => {
       const cards = rows.filter(t => t.status === col.key);
       return `<div class="kanban-column stagger-in" style="flex:1;max-width:none" data-status="${col.key}"
         ondragover="event.preventDefault();this.classList.add('drag-over');this.querySelector('.kanban-cards').classList.add('drag-over')"
         ondragleave="this.classList.remove('drag-over');this.querySelector('.kanban-cards').classList.remove('drag-over')"
-        ondrop="handleTaskDrop(event,'${col.key}');this.classList.remove('drag-over');this.querySelector('.kanban-cards').classList.remove('drag-over')">
+        ondrop="handleTaskDrop(event,'${col.key.replace(/'/g,"\\'")}');this.classList.remove('drag-over');this.querySelector('.kanban-cards').classList.remove('drag-over')">
         <div class="kanban-col-header">
           <span class="kanban-col-title" style="color:${col.color}">${col.label}</span>
           <span class="kanban-col-count">${cards.length}</span>
@@ -79,6 +113,7 @@
             <div class="kanban-card-title">${t.name}</div>
             <div class="kanban-card-meta">
               ${t.due_date ? `<span>📅 ${t.due_date}</span>` : ''}
+              ${t.deadline ? `<span style="color:${new Date(t.deadline) < new Date() ? 'var(--danger)' : 'var(--text-muted)'}">⏰ ${t.deadline}</span>` : ''}
               ${(t.assigned_to||[]).length ? `<span>👤 ${t.assigned_to.join(', ')}</span>` : ''}
               ${t.duration ? `<span>⏱ ${t.duration}d</span>` : ''}
             </div>
@@ -115,16 +150,17 @@
   function renderList(el, rows) {
     el.innerHTML = `<div class="glass-card"><div class="data-table-wrap"><table class="data-table">
       <thead><tr>
-        <th>Task</th><th>Status</th><th>Due Date</th><th>Duration</th><th>Assigned To</th><th>Action</th>
+        <th>Task</th><th>Status</th><th>Due Date</th><th>Deadline</th><th>Duration</th><th>Assigned To</th><th>Action</th>
       </tr></thead>
       <tbody>${rows.map(t => `<tr>
         <td style="color:var(--text-primary);font-weight:500;cursor:pointer" onclick="showTaskDetail('${t.id}')">${t.name}</td>
-        <td><span class="status-badge ${statusColor(t.status)}">${t.status||'—'}</span></td>
+        <td><span class="status-badge ${stageClass(t.status)}">${t.status||'—'}</span></td>
         <td class="mono">${t.due_date||'—'}</td>
+        <td class="mono" style="color:${t.deadline && new Date(t.deadline) < new Date() ? 'var(--danger)' : 'inherit'}">${t.deadline||'—'}</td>
         <td>${t.duration ? t.duration+'d' : '—'}</td>
         <td>${(t.assigned_to||[]).join(', ')||'—'}</td>
         <td>
-          ${t.status !== 'Done' ? `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();markTaskDone('${t.id}','${t.name.replace(/'/g,"\\'")}')">✅ Done</button>` : '<span style="color:var(--success)">✓</span>'}
+          ${t.status !== 'Done' ? `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();markTaskDone('${t.id}','${t.name.replace(/'/g,"\\'")}')" style="font-size:0.7rem">✅ Done</button>` : '<span style="color:var(--success)">✓</span>'}
         </td>
       </tr>`).join('')}</tbody>
     </table></div></div>`;
@@ -133,22 +169,24 @@
   window.showTaskDetail = function(id) {
     const t = tasksData.find(ts => ts.id === id);
     if (!t) return;
-    const statuses = ['Not started', 'In progress', 'Done'];
+    const allStatuses = getAllStatuses(tasksData);
 
     openDetail(t.name, `
       <div class="detail-section"><div class="detail-label">Status</div>
         <div style="display:flex;align-items:center;gap:8px">
           <select class="filter-select" id="task-status-select" style="padding:4px 8px;font-size:0.8rem">
-            ${statuses.map(s => `<option value="${s}" ${t.status===s?'selected':''}>${s}</option>`).join('')}
+            ${allStatuses.map(s => `<option value="${s.key}" ${t.status===s.key?'selected':''}>${s.label}</option>`).join('')}
           </select>
           <button class="btn btn-primary btn-sm" id="task-save-status" style="font-size:0.7rem">Save ↗</button>
         </div>
       </div>
       <div class="detail-section"><div class="detail-label">Details</div>
         ${t.due_date ? `<div class="detail-value">📅 Due: ${t.due_date}</div>` : ''}
+        ${t.deadline ? `<div class="detail-value" style="color:${new Date(t.deadline) < new Date() ? 'var(--danger)' : 'inherit'}">⏰ Deadline: ${t.deadline}</div>` : ''}
         ${t.duration ? `<div class="detail-value">⏱ Duration: ${t.duration} days</div>` : ''}
         ${(t.assigned_to||[]).length ? `<div class="detail-value">👤 Assigned: ${t.assigned_to.join(', ')}</div>` : ''}
         <div class="detail-value">Created: ${t.created || '—'}</div>
+        ${t.last_edited ? `<div class="detail-value">Last Edited: ${t.last_edited}</div>` : ''}
       </div>
     `);
 

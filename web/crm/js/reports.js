@@ -22,15 +22,37 @@
     el.innerHTML = `
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px">
         ${buildBarChart('Project Stages', stages, {
+          'Not started': 'var(--text-muted)',
+          'On Hold': 'var(--text-muted)',
+          'Kickoff': 'var(--info)',
           '(SD) Schematic Design': 'var(--stage-sd)',
           '(DD) Design Development': 'var(--stage-dd)',
           '(CD) Construction Documents': 'var(--stage-cd)',
           '(AS) Authorities Submission': 'var(--stage-as)',
-          'Progress': 'var(--stage-progress)',
+          'Bidding': 'var(--warning)',
+          'Progress': 'var(--danger)',
+          'Completed': 'var(--success)',
+          'Handing Over': 'var(--success)',
+          'Done': 'var(--success)',
         })}
         ${buildBarChart('Service Types', types, { 'DESIGN': 'var(--info)', 'SUPERVISION': 'var(--warning)' })}
-        ${buildBarChart('Task Statuses', taskStatuses, { 'Done': 'var(--success)', 'In progress': 'var(--info)', 'Not started': 'var(--text-muted)' })}
-        ${buildBarChart('Lead Statuses', leads, {})}
+        ${buildBarChart('Task Statuses', taskStatuses, {
+          'Not started': 'var(--text-muted)',
+          'SENT TO STRUCTURE': 'var(--stage-cd)',
+          'NEEDS REVIEW': 'var(--stage-cd)',
+          'In progress': 'var(--info)',
+          'SENT TO CLIENT': 'var(--stage-as)',
+          'SUBMITTED TO AUTHORITIES': 'var(--stage-as)',
+          'Done': 'var(--success)',
+        })}
+        ${buildBarChart('Lead Statuses', leads, {
+          'Inquiry': 'var(--text-muted)',
+          'Qualified': 'var(--stage-sd)',
+          'Proposal': 'var(--stage-dd)',
+          'Negotiation': 'var(--stage-cd)',
+          'Won': 'var(--success)',
+          'Lost': 'var(--danger)',
+        })}
       </div>
 
       <div class="glass-card" style="margin-top:24px">

@@ -134,11 +134,18 @@
           <input class="filter-input" type="text" id="projects-search" placeholder="🔍 Search projects..." />
           <select class="filter-select" id="projects-filter-stage">
             <option value="">All Stages</option>
+            <option value="Not started">Not Started</option>
+            <option value="On Hold">On Hold</option>
+            <option value="Kickoff">Kickoff</option>
             <option value="(SD) Schematic Design">SD</option>
             <option value="(DD) Design Development">DD</option>
             <option value="(CD) Construction Documents">CD</option>
             <option value="(AS) Authorities Submission">AS</option>
+            <option value="Bidding">Bidding</option>
             <option value="Progress">Supervision</option>
+            <option value="Completed">Completed</option>
+            <option value="Handing Over">Handing Over</option>
+            <option value="Done">Done</option>
           </select>
           <select class="filter-select" id="projects-filter-type">
             <option value="">All Types</option>
@@ -163,7 +170,11 @@
           <select class="filter-select" id="tasks-filter-status">
             <option value="">All Statuses</option>
             <option value="Not started">Not Started</option>
+            <option value="SENT TO STRUCTURE">Sent to Structure</option>
+            <option value="NEEDS REVIEW">Needs Review</option>
             <option value="In progress">In Progress</option>
+            <option value="SENT TO CLIENT">Sent to Client</option>
+            <option value="SUBMITTED TO AUTHORITIES">Submitted</option>
             <option value="Done">Done</option>
           </select>
         </div>
