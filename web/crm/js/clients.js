@@ -1,6 +1,7 @@
 /**
- * Majaz CRM — Clients Page (Full-Property Rendering)
+ * Majaz CRM — Clients Page (Full-Property Rendering + Write-Back)
  * Shows all 27 Notion properties in table + detail panel.
+ * Supports: edit next_action/budget/phone/email/location, add client, add interaction.
  */
 (() => {
   let clientsData = [];
@@ -82,6 +83,51 @@
     </table></div></div>`;
   }
 
+  // ── Add Client Modal ──
+  window.showAddClientForm = function() {
+    openDetail('➕ New Client', `
+      <div class="detail-section">
+        <div class="detail-label">Client Information</div>
+        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">Name *</label>
+        <input id="new-client-name" class="filter-input" style="width:100%;margin-bottom:8px" placeholder="Client name" />
+        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">Phone</label>
+        <input id="new-client-phone" class="filter-input" style="width:100%;margin-bottom:8px" placeholder="+971..." />
+        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">Email</label>
+        <input id="new-client-email" class="filter-input" style="width:100%;margin-bottom:8px" placeholder="email@domain.com" />
+        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">Location</label>
+        <input id="new-client-location" class="filter-input" style="width:100%;margin-bottom:8px" placeholder="Abu Dhabi / Dubai / Al Ain..." />
+        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">Project Type</label>
+        <input id="new-client-type" class="filter-input" style="width:100%;margin-bottom:8px" placeholder="Villa / Commercial / Residential..." />
+        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">Service Interest</label>
+        <input id="new-client-service" class="filter-input" style="width:100%;margin-bottom:16px" placeholder="Design / Supervision / Both" />
+        <button class="btn btn-primary" onclick="submitNewClient()" style="width:100%">Create Client → Notion</button>
+      </div>
+    `);
+  };
+
+  window.submitNewClient = async function() {
+    const name = document.getElementById('new-client-name')?.value?.trim();
+    if (!name) { showToast('Name is required', 'error'); return; }
+    const data = {
+      name,
+      phone: document.getElementById('new-client-phone')?.value?.trim() || undefined,
+      email: document.getElementById('new-client-email')?.value?.trim() || undefined,
+      location: document.getElementById('new-client-location')?.value?.trim() || undefined,
+      project_type: document.getElementById('new-client-type')?.value?.trim() || undefined,
+      service_interest: document.getElementById('new-client-service')?.value?.trim() || undefined,
+    };
+    const res = await API.createClient(data);
+    if (res && res.id) {
+      showToast('Client created in Notion!', 'success');
+      loaded = false;
+      loadClients();
+      document.getElementById('detail-close')?.click();
+    } else {
+      showToast('Failed to create client', 'error');
+    }
+  };
+
+  // ── Show Client with Edit ──
   window.showClient = async function(id) {
     const c = await API.client(id);
     if (!c) return;
@@ -111,7 +157,6 @@
         <div class="detail-value">Budget: <span class="mono" style="color:var(--gold)">${c.budget != null ? fmtCurrency(c.budget) : '—'}</span></div>
         <div class="detail-value">CLV: <span class="mono" style="color:var(--gold)">${c.clv != null ? fmtCurrency(c.clv) : '—'}</span></div>
         <div class="detail-value">Active Projects: <strong>${c.active_projects ?? '—'}</strong></div>
-        ${Array.isArray(c.project_s_num) && c.project_s_num.length ? `<div class="detail-value">Project #s: ${c.project_s_num.join(', ')}</div>` : ''}
       </div>
 
       <!-- ── Lead Status ── -->
@@ -123,9 +168,17 @@
         ${c.last_contacted ? `<div class="detail-value">Last Contacted: <span class="mono">${c.last_contacted}</span></div>` : ''}
       </div>
 
+      <!-- ── Editable: Next Action ── -->
+      <div class="detail-section"><div class="detail-label">✏️ Quick Edit</div>
+        <label style="display:block;margin:6px 0 3px;color:var(--text-muted);font-size:0.7rem">Next Action</label>
+        <input id="edit-next-action" class="filter-input" style="width:100%;margin-bottom:8px" value="${c.next_action || ''}" placeholder="Enter next action..." />
+        <label style="display:block;margin:6px 0 3px;color:var(--text-muted);font-size:0.7rem">Budget (AED)</label>
+        <input id="edit-budget" type="number" class="filter-input" style="width:100%;margin-bottom:12px" value="${c.budget || ''}" placeholder="Enter budget..." />
+        <button class="btn btn-primary btn-sm" onclick="saveClientEdit('${c.id}')" style="width:100%">💾 Save to Notion</button>
+      </div>
+
       <!-- ── Actions ── -->
-      <div class="detail-section"><div class="detail-label">🎯 Actions</div>
-        ${c.next_action ? `<div class="detail-value" style="color:var(--gold)">Next: ${c.next_action}</div>` : '<div class="detail-value" style="color:var(--text-muted)">No next action set</div>'}
+      <div class="detail-section"><div class="detail-label">🎯 Info</div>
         ${c.representative ? `<div class="detail-value">Representative: ${c.representative}</div>` : ''}
         ${c.referred_by ? `<div class="detail-value">Referred By: ${c.referred_by}</div>` : ''}
         ${(c.assigned_to||[]).length ? `<div class="detail-value">Assigned To: ${c.assigned_to.join(', ')}</div>` : ''}
@@ -139,7 +192,23 @@
         ).join('') : '<div class="detail-value" style="color:var(--text-muted)">No linked projects</div>'}
       </div>
 
-      <!-- ── Interactions ── -->
+      <!-- ── Add Interaction ── -->
+      <div class="detail-section"><div class="detail-label">➕ Log Interaction</div>
+        <input id="new-int-name" class="filter-input" style="width:100%;margin-bottom:6px" placeholder="Interaction title..." />
+        <select id="new-int-type" class="filter-select" style="width:100%;margin-bottom:6px">
+          <option value="">Select type...</option>
+          <option value="Meeting">Meeting</option>
+          <option value="Call">Call</option>
+          <option value="Email">Email</option>
+          <option value="WhatsApp">WhatsApp</option>
+          <option value="Site Visit">Site Visit</option>
+        </select>
+        <textarea id="new-int-summary" class="filter-input" style="width:100%;min-height:60px;margin-bottom:6px;resize:vertical" placeholder="Summary..."></textarea>
+        <input id="new-int-next" class="filter-input" style="width:100%;margin-bottom:10px" placeholder="Next steps..." />
+        <button class="btn btn-primary btn-sm" onclick="submitInteraction('${c.id}')" style="width:100%">📝 Log → Notion</button>
+      </div>
+
+      <!-- ── Interactions List ── -->
       ${(c.interactions||[]).length ? `
       <div class="detail-section"><div class="detail-label">💬 Interactions (${c.interactions.length})</div>
         ${c.interactions.map(i => `<div style="padding:8px 0;border-bottom:1px solid var(--glass-border)">
@@ -158,5 +227,40 @@
         <div class="detail-value" style="font-size:0.7rem">Created: ${c.created || '—'}</div>
       </div>
     `);
+  };
+
+  // ── Save Client Edit ──
+  window.saveClientEdit = async function(id) {
+    const next_action = document.getElementById('edit-next-action')?.value?.trim() || '';
+    const budgetVal = document.getElementById('edit-budget')?.value;
+    const data = { next_action };
+    if (budgetVal !== '' && budgetVal != null) data.budget = parseFloat(budgetVal);
+    const res = await API.updateClient(id, data);
+    if (res?.ok) {
+      showToast('Client updated in Notion!', 'success');
+    } else {
+      showToast('Failed to update client', 'error');
+    }
+  };
+
+  // ── Submit Interaction ──
+  window.submitInteraction = async function(clientId) {
+    const name = document.getElementById('new-int-name')?.value?.trim();
+    if (!name) { showToast('Interaction title is required', 'error'); return; }
+    const data = {
+      name,
+      type: document.getElementById('new-int-type')?.value || undefined,
+      date: new Date().toISOString().split('T')[0],
+      summary: document.getElementById('new-int-summary')?.value?.trim() || undefined,
+      next_steps: document.getElementById('new-int-next')?.value?.trim() || undefined,
+      client_id: clientId,
+    };
+    const res = await API.createInteraction(data);
+    if (res && res.id) {
+      showToast('Interaction logged to Notion!', 'success');
+      showClient(clientId); // refresh detail
+    } else {
+      showToast('Failed to log interaction', 'error');
+    }
   };
 })();
