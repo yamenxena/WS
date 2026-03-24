@@ -1,21 +1,27 @@
 {
   "version": 2,
+  "buildCommand": "",
+  "outputDirectory": "",
   "builds": [
     {
       "src": "api/index.py",
       "use": "@vercel/python"
+    },
+    {
+      "src": "web/crm/**",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "web/img/**",
+      "use": "@vercel/static"
     }
   ],
   "routes": [
     { "src": "/api/(.*)", "dest": "api/index.py" },
     { "src": "/health", "dest": "api/index.py" },
-    { "src": "/crm/(.*)", "dest": "web/crm/$1" },
-    { "src": "/crm", "dest": "web/crm/index.html" },
-    { "src": "/img/(.*)", "dest": "web/img/$1" },
-    { "src": "/(.*\\.(css|js|jpeg|jpg|png|svg|ico|woff2?))", "dest": "web/crm/$1" },
-    { "src": "/", "dest": "web/crm/index.html" }
-  ],
-  "env": {
-    "MAJAZ_DEV": "1"
-  }
+    { "src": "/crm/(.*)", "dest": "/web/crm/$1" },
+    { "src": "/crm$", "dest": "/web/crm/index.html" },
+    { "src": "/img/(.*)", "dest": "/web/img/$1" },
+    { "src": "/$", "dest": "/web/crm/index.html" }
+  ]
 }
