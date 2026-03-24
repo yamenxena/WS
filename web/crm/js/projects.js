@@ -190,56 +190,82 @@
     if (!p) return;
     const pct = p.pct_completed != null && !Array.isArray(p.pct_completed) ? Math.round(p.pct_completed * 100) : null;
     const allStages = getAllStages(projectsData);
+    const fmtCurrency = v => new Intl.NumberFormat('en-AE',{style:'currency',currency:'AED',maximumFractionDigits:0}).format(v);
 
     openDetail(p.name, `
-      <div class="detail-section"><div class="detail-label">Project Info</div>
+      <!-- ── Project Info ── -->
+      <div class="detail-section"><div class="detail-label">📐 Project Info</div>
         <div class="detail-value">SN: <span class="mono" style="color:var(--gold)">#${p.sn||'—'}</span></div>
-        <div class="detail-value" style="display:flex;align-items:center;gap:8px">
-          Stage:
-          <select class="filter-select" id="detail-stage-select" style="padding:4px 8px;font-size:0.8rem">
-            ${allStages.map(s => `<option value="${s.key}" ${p.stage===s.key?'selected':''}>${s.key.replace(/[()]/g,'')}</option>`).join('')}
-          </select>
-          <button class="btn btn-primary btn-sm" id="detail-save-stage" style="font-size:0.7rem">Save ↗</button>
-        </div>
-        <div class="detail-value">Type: ${p.service_type||'—'}</div>
-        <div class="detail-value">Description: ${p.description||'—'}</div>
-        ${p.value != null ? `<div class="detail-value">Value: <span class="mono" style="color:var(--gold)">${new Intl.NumberFormat('en-AE',{style:'currency',currency:'AED',maximumFractionDigits:0}).format(p.value)}</span></div>` : ''}
+        <div class="detail-value">Type: <span class="status-badge ${p.service_type==='DESIGN'?'status-dd':'status-as'}">${p.service_type||'—'}</span></div>
         ${p.fab_id ? `<div class="detail-value">FAB ID: <span class="mono">${p.fab_id}</span></div>` : ''}
         ${p.adm_id ? `<div class="detail-value">ADM ID: <span class="mono">${p.adm_id}</span></div>` : ''}
-        ${p.plot_info ? `<div class="detail-value">Plot: ${p.plot_info}</div>` : ''}
+        ${p.plot_info ? `<div class="detail-value">📍 Plot: ${p.plot_info}</div>` : ''}
         ${pct !== null ? `<div class="detail-value">Completion: <strong style="color:var(--gold)">${pct}%</strong>
-          <div class="progress-bar" style="margin-top:4px;width:120px"><div class="progress-fill" style="width:${pct}%"></div></div>
+          <div class="progress-bar" style="margin-top:4px;width:160px"><div class="progress-fill" style="width:${pct}%"></div></div>
         </div>` : ''}
       </div>
 
+      <!-- ── Editable Fields ── -->
+      <div class="detail-section"><div class="detail-label">✏️ Edit Project</div>
+        <label style="display:block;margin:6px 0 3px;color:var(--text-muted);font-size:0.7rem">Stage</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <select class="filter-select" id="detail-stage-select" style="flex:1;padding:4px 8px;font-size:0.8rem">
+            ${allStages.map(s => `<option value="${s.key}" ${p.stage===s.key?'selected':''}>${s.key.replace(/[()]/g,'')}</option>`).join('')}
+          </select>
+        </div>
+        <label style="display:block;margin:8px 0 3px;color:var(--text-muted);font-size:0.7rem">Value (AED)</label>
+        <input id="detail-project-value" type="number" class="filter-input" style="width:100%;margin-bottom:6px" value="${p.value||''}" placeholder="Contract value..." />
+        <label style="display:block;margin:6px 0 3px;color:var(--text-muted);font-size:0.7rem">Description</label>
+        <textarea id="detail-project-desc" class="filter-input" style="width:100%;min-height:60px;resize:vertical;margin-bottom:10px" placeholder="Project description...">${p.description||''}</textarea>
+        <button class="btn btn-primary btn-sm" id="detail-save-project" style="width:100%">💾 Save to Notion</button>
+      </div>
+
+      <!-- ── Client ── -->
       ${(p.client_ids||[]).length ? `
-      <div class="detail-section"><div class="detail-label">Client</div>
+      <div class="detail-section"><div class="detail-label">👥 Client</div>
         <div class="detail-value" style="color:var(--gold);cursor:pointer" onclick="showClient('${p.client_ids[0]}')">
           🔗 View linked client →
         </div>
       </div>` : ''}
 
+      <!-- ── Linked Tasks ── -->
       ${(p.tasks||[]).length ? `
-      <div class="detail-section"><div class="detail-label">Tasks (${p.tasks.length})</div>
+      <div class="detail-section"><div class="detail-label">✅ Tasks (${p.tasks.length})</div>
         ${p.tasks.map(t => `<div style="padding:8px 0;border-bottom:1px solid var(--glass-border);display:flex;justify-content:space-between;align-items:center">
           <span style="font-size:0.85rem;color:var(--text-primary)">${t.name}</span>
           <span class="status-badge ${stageClass(t.status)}" style="font-size:0.65rem">${t.status||'—'}</span>
         </div>`).join('')}
-      </div>` : '<div class="detail-section"><div class="detail-label">Tasks</div><div class="detail-value" style="color:var(--text-muted)">No linked tasks</div></div>'}
+      </div>` : '<div class="detail-section"><div class="detail-label">✅ Tasks</div><div class="detail-value" style="color:var(--text-muted)">No linked tasks</div></div>'}
+
+      <!-- ── Meta ── -->
+      <div class="detail-section" style="opacity:0.5"><div class="detail-label">Meta</div>
+        <div class="detail-value" style="font-size:0.7rem">Created: ${p.created || '—'}</div>
+      </div>
     `);
 
-    // Attach write-back handler
-    document.getElementById('detail-save-stage')?.addEventListener('click', async () => {
+    // Unified save handler — stage + value + description
+    document.getElementById('detail-save-project')?.addEventListener('click', async () => {
       const newStage = document.getElementById('detail-stage-select').value;
-      showToast(`Updating stage to ${newStage.replace(/[()]/g,'')}...`, 'info');
-      const result = await API.updateProject(id, { stage: newStage });
+      const valInput = document.getElementById('detail-project-value')?.value;
+      const descInput = document.getElementById('detail-project-desc')?.value?.trim();
+
+      const payload = { stage: newStage };
+      if (valInput !== '' && valInput != null) payload.value = parseFloat(valInput);
+      if (descInput !== undefined) payload.description = descInput;
+
+      showToast('Saving project to Notion...', 'info');
+      const result = await API.updateProject(id, payload);
       if (result && !result.error) {
-        showToast(`Stage updated in Notion!`, 'success');
+        showToast('Project updated in Notion!', 'success');
         const proj = projectsData.find(pr => pr.id === id);
-        if (proj) proj.stage = newStage;
+        if (proj) {
+          proj.stage = newStage;
+          if (payload.value != null) proj.value = payload.value;
+          if (payload.description != null) proj.description = descInput;
+        }
         setTimeout(() => render(), 800);
       } else {
-        showToast('Failed to update stage', 'error');
+        showToast('Failed to update project', 'error');
       }
     });
   };
