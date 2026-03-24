@@ -115,6 +115,15 @@ document.addEventListener('DOMContentLoaded', () => {
     return stage;
   };
 
+  // ── Logout ──
+  document.getElementById('nav-logout')?.addEventListener('click', () => {
+    if (typeof API !== 'undefined' && API.logout) API.logout();
+    else {
+      sessionStorage.removeItem('majaz_token');
+      window.location.href = 'login.html';
+    }
+  });
+
   // ── Boot ──
   switchView('dashboard');
 });

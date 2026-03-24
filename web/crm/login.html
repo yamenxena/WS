@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Majaz CRM — Login</title>
+  <meta name="description" content="Login to Majaz Engineering Consultancy CRM" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏗️</text></svg>" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+    body {
+      font-family: 'Inter', sans-serif;
+      color: #f0f0f0;
+      background: #0D0D1A;
+    }
+
+    .login-page {
+      position: relative;
+      width: 100vw;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-bg {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+    }
+
+    .login-bg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: brightness(0.35) saturate(0.8);
+    }
+
+    .login-bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(13, 13, 26, 0.95) 0%,
+        rgba(15, 52, 96, 0.6) 50%,
+        rgba(212, 168, 83, 0.1) 100%
+      );
+    }
+
+    .login-card {
+      position: relative;
+      z-index: 10;
+      width: 400px;
+      max-width: 90vw;
+      background: rgba(26, 26, 46, 0.75);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 40px 36px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      animation: cardIn 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes cardIn {
+      from { opacity: 0; transform: translateY(30px) scale(0.96); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .login-logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 8px;
+    }
+
+    .login-logo img {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      object-fit: cover;
+    }
+
+    .login-logo-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .login-logo-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #D4A853;
+      letter-spacing: 0.08em;
+    }
+
+    .login-logo-sub {
+      font-size: 0.7rem;
+      color: #5A5A6A;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+    }
+
+    .login-welcome {
+      font-size: 0.85rem;
+      color: #8A8A9A;
+      margin: 16px 0 28px;
+    }
+
+    .field {
+      margin-bottom: 18px;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #8A8A9A;
+      margin-bottom: 6px;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 12px 16px;
+      background: rgba(13, 13, 26, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 10px;
+      color: #f0f0f0;
+      font-size: 0.95rem;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    }
+
+    .field input:focus {
+      border-color: rgba(212, 168, 83, 0.4);
+      box-shadow: 0 0 0 3px rgba(212, 168, 83, 0.1);
+    }
+
+    .field input::placeholder {
+      color: #5A5A6A;
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 13px;
+      margin-top: 8px;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      background: linear-gradient(135deg, #D4A853, #B8892E);
+      color: #0D0D1A;
+      transition: all 0.25s ease;
+      letter-spacing: 0.03em;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(212, 168, 83, 0.3);
+    }
+
+    .login-btn:active {
+      transform: translateY(0);
+    }
+
+    .login-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .login-error {
+      margin-top: 14px;
+      padding: 10px 14px;
+      background: rgba(229, 57, 53, 0.12);
+      border: 1px solid rgba(229, 57, 53, 0.25);
+      border-radius: 8px;
+      color: #E53935;
+      font-size: 0.8rem;
+      display: none;
+    }
+
+    .login-error.visible { display: block; animation: shake 0.3s ease; }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-6px); }
+      75% { transform: translateX(6px); }
+    }
+
+    .login-footer {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 0.7rem;
+      color: #5A5A6A;
+    }
+
+    .login-skip {
+      display: block;
+      margin-top: 12px;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #5A5A6A;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .login-skip:hover { color: #D4A853; }
+  </style>
+</head>
+<body>
+  <div class="login-page">
+    <div class="login-bg">
+      <img src="../img/Generated_Image_February_23_2026_-_10_48AM.jpeg" alt="Modern villa" />
+    </div>
+
+    <div class="login-card">
+      <div class="login-logo">
+        <img src="../img/logo2.jpeg" alt="Majaz" />
+        <div class="login-logo-text">
+          <span class="login-logo-name">MAJAZ</span>
+          <span class="login-logo-sub">Engineering CRM</span>
+        </div>
+      </div>
+      <p class="login-welcome">Sign in to manage projects, clients, and tasks.</p>
+
+      <form id="login-form" autocomplete="on">
+        <div class="field">
+          <label for="username">Username</label>
+          <input type="text" id="username" name="username" placeholder="Enter username" required autofocus />
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" placeholder="Enter password" required />
+        </div>
+        <button type="submit" class="login-btn" id="login-btn">Sign In</button>
+        <div class="login-error" id="login-error">Invalid username or password</div>
+      </form>
+
+      <a class="login-skip" id="login-skip">Skip → Open CRM (dev mode)</a>
+
+      <div class="login-footer">
+        &copy; 2026 Majaz Engineering Consultancy
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API_BASE = window.location.hostname === 'localhost'
+      ? 'http://localhost:5051'
+      : window.location.origin;
+
+    // Check if already authenticated
+    const token = sessionStorage.getItem('majaz_token');
+    if (token) {
+      window.location.href = 'index.html';
+    }
+
+    // Login form
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('login-btn');
+      const errEl = document.getElementById('login-error');
+      btn.disabled = true;
+      btn.textContent = 'Signing in...';
+      errEl.classList.remove('visible');
+
+      try {
+        const res = await fetch(`${API_BASE}/api/auth/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: document.getElementById('username').value,
+            password: document.getElementById('password').value
+          })
+        });
+
+        if (!res.ok) throw new Error('auth_failed');
+        const data = await res.json();
+        sessionStorage.setItem('majaz_token', data.token);
+        window.location.href = 'index.html';
+      } catch (err) {
+        errEl.classList.add('visible');
+        btn.disabled = false;
+        btn.textContent = 'Sign In';
+      }
+    });
+
+    // Dev skip
+    document.getElementById('login-skip').addEventListener('click', () => {
+      sessionStorage.setItem('majaz_token', 'dev-bypass');
+      window.location.href = 'index.html';
+    });
+  </script>
+</body>
+</html>
