@@ -20,6 +20,16 @@ __pycache__/
 *.pyc
 .venv/
 
+# Node
+node_modules/
+
+# Notion exports (large data, stays local)
+Notion/
+
 # OS files
 Thumbs.db
 .DS_Store
+
+# Temp
+/tmp/
+*.log

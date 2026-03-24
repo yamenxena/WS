@@ -3,15 +3,14 @@
 // Falls back to static data if API is not configured
 
 const CONFIG = {
-  // PASTE YOUR APPS SCRIPT WEB APP URL HERE after deploying:
-  API_URL: '',
-  // Google Sheets direct link
-  SHEETS_URL: 'https://docs.google.com/spreadsheets/d/1tUOi9TsCRKXcELz1JK0WohKfeiDiQL3PQp0zvYLYmTk/edit?gid=1098074229#gid=1098074229',
-  SHEETS_EMBED: 'https://docs.google.com/spreadsheets/d/1tUOi9TsCRKXcELz1JK0WohKfeiDiQL3PQp0zvYLYmTk/htmlembed?gid=0',
-  // Sheet tab names (must match exactly)
-  SHEET_CRM: 'CRM Pipeline',
-  SHEET_PROJECTS: 'Projects',
-  SHEET_SUPERVISION: 'Supervision',
+  // Local Notion Proxy URL
+  API_URL: 'http://localhost:5051/api',
+  // Direct links (disabled sheets embed)
+  SHEETS_URL: 'https://www.notion.so/yamenxena',
+  SHEETS_EMBED: '',
+  // Endpoints
+  ENDPOINT_CRM: '/crm',
+  ENDPOINT_PROJECTS: '/projects',
 };
 
 // --- API Client ---
@@ -20,10 +19,10 @@ const API = {
     return CONFIG.API_URL && CONFIG.API_URL.length > 10;
   },
 
-  async read(sheetName) {
+  async read(endpoint) {
     if (!this.isConfigured()) return null;
     try {
-      const url = `${CONFIG.API_URL}?action=read&sheet=${encodeURIComponent(sheetName)}`;
+      const url = `${CONFIG.API_URL}${endpoint}`;
       const res = await fetch(url);
       const data = await res.json();
       if (data.error) { console.warn('API error:', data.error); return null; }
@@ -34,46 +33,10 @@ const API = {
     }
   },
 
-  async create(sheetName, rowData) {
-    if (!this.isConfigured()) return { error: 'API not configured' };
-    try {
-      const url = `${CONFIG.API_URL}?action=create&sheet=${encodeURIComponent(sheetName)}`;
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(rowData),
-      });
-      return await res.json();
-    } catch (err) {
-      return { error: err.message };
-    }
-  },
-
-  async update(sheetName, rowNum, rowData) {
-    if (!this.isConfigured()) return { error: 'API not configured' };
-    try {
-      const url = `${CONFIG.API_URL}?action=update&sheet=${encodeURIComponent(sheetName)}&row=${rowNum}`;
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(rowData),
-      });
-      return await res.json();
-    } catch (err) {
-      return { error: err.message };
-    }
-  },
-
-  async remove(sheetName, rowNum) {
-    if (!this.isConfigured()) return { error: 'API not configured' };
-    try {
-      const url = `${CONFIG.API_URL}?action=delete&sheet=${encodeURIComponent(sheetName)}&row=${rowNum}`;
-      const res = await fetch(url, { method: 'POST' });
-      return await res.json();
-    } catch (err) {
-      return { error: err.message };
-    }
-  }
+  // CRUD ops disabled for Proxy (read-only for now)
+  async create(endpoint, rowData) { return { error: 'Read-only proxy' }; },
+  async update(endpoint, rowNum, rowData) { return { error: 'Read-only proxy' }; },
+  async remove(endpoint, rowNum) { return { error: 'Read-only proxy' }; }
 };
 
 
@@ -133,10 +96,9 @@ let STORE = {
 async function loadData() {
   // Try live API first
   if (API.isConfigured()) {
-    const [crm, proj, sup] = await Promise.all([
-      API.read(CONFIG.SHEET_CRM),
-      API.read(CONFIG.SHEET_PROJECTS),
-      API.read(CONFIG.SHEET_SUPERVISION),
+    const [crm, proj] = await Promise.all([
+      API.read(CONFIG.ENDPOINT_CRM),
+      API.read(CONFIG.ENDPOINT_PROJECTS),
     ]);
 
     if (crm && crm.rows) {
