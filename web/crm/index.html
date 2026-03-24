@@ -51,6 +51,18 @@
             <span class="nav-icon">✅</span> Tasks
             <span class="nav-badge badge-danger" id="badge-tasks">—</span>
           </a>
+          <a class="nav-item" data-view="meetings" id="nav-meetings">
+            <span class="nav-icon">📅</span> Meetings
+            <span class="nav-badge badge-info" id="badge-meetings">—</span>
+          </a>
+          <a class="nav-item" data-view="pipeline" id="nav-pipeline">
+            <span class="nav-icon">🔄</span> Pipeline
+            <span class="nav-badge badge-warning" id="badge-pipeline">—</span>
+          </a>
+          <a class="nav-item" data-view="interactions" id="nav-interactions">
+            <span class="nav-icon">💬</span> Interactions
+            <span class="nav-badge badge-info" id="badge-interactions">—</span>
+          </a>
         </div>
 
         <div class="nav-section">
@@ -181,6 +193,42 @@
         <div id="tasks-content"><div class="spinner"></div></div>
       </section>
 
+      <!-- Meetings View -->
+      <section class="view" id="view-meetings">
+        <div class="view-header">
+          <h1 class="view-title">📅 Meetings</h1>
+        </div>
+        <div class="filter-bar">
+          <input class="filter-input" type="text" id="meetings-search" placeholder="🔍 Search meetings..." />
+        </div>
+        <div id="meetings-content"><div class="spinner"></div></div>
+      </section>
+
+      <!-- Pipeline View -->
+      <section class="view" id="view-pipeline">
+        <div class="view-header">
+          <h1 class="view-title">🔄 Work Pipeline</h1>
+        </div>
+        <div class="filter-bar">
+          <input class="filter-input" type="text" id="pipeline-search" placeholder="🔍 Search pipeline..." />
+          <select class="filter-select" id="pipeline-filter-stage">
+            <option value="">All Stages</option>
+          </select>
+        </div>
+        <div id="pipeline-content"><div class="spinner"></div></div>
+      </section>
+
+      <!-- Interactions View -->
+      <section class="view" id="view-interactions">
+        <div class="view-header">
+          <h1 class="view-title">💬 Interactions</h1>
+        </div>
+        <div class="filter-bar">
+          <input class="filter-input" type="text" id="interactions-search" placeholder="🔍 Search interactions..." />
+        </div>
+        <div id="interactions-content"><div class="spinner"></div></div>
+      </section>
+
       <!-- Team & Suppliers View -->
       <section class="view" id="view-team">
         <div class="view-header">
@@ -220,5 +268,8 @@
   <script src="js/tasks.js"></script>
   <script src="js/team.js"></script>
   <script src="js/reports.js"></script>
+  <script src="js/meetings.js"></script>
+  <script src="js/pipeline.js"></script>
+  <script src="js/interactions.js"></script>
 </body>
 </html>
