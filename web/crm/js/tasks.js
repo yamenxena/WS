@@ -1,5 +1,5 @@
 /**
- * Majaz CRM — Tasks Page (Board + List + Write-Back)
+ * Majaz CRM — Tasks Page (Board + List + Write-Back + Toasts)
  */
 (() => {
   let tasksData = [];
@@ -15,6 +15,7 @@
 
   async function loadTasks() {
     loaded = true;
+    showSkeleton();
     const res = await API.tasks();
     if (!res) return;
     tasksData = res.rows || [];
@@ -23,6 +24,11 @@
     document.getElementById('tasks-filter-status')?.addEventListener('change', render);
 
     render();
+  }
+
+  function showSkeleton() {
+    const el = document.getElementById('tasks-content');
+    el.innerHTML = `<div class="kanban">${'<div class="kanban-column stagger-in" style="flex:1;max-width:none"><div class="kanban-col-header"><div class="skeleton skeleton-text" style="width:60%"></div></div><div class="kanban-cards"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div></div></div>'.repeat(3)}</div>`;
   }
 
   function getFiltered() {
@@ -44,6 +50,7 @@
   function statusColor(s) {
     if (s === 'Done') return 'status-done';
     if (s === 'In progress') return 'status-dd';
+    if (s === 'Sent to Client') return 'status-as';
     return '';
   }
 
@@ -54,15 +61,21 @@
       { key: 'Done', label: 'Done', color: 'var(--success)' },
     ];
 
-    el.innerHTML = `<div class="kanban">${columns.map(col => {
+    el.innerHTML = `<div class="kanban">${columns.map((col, i) => {
       const cards = rows.filter(t => t.status === col.key);
-      return `<div class="kanban-column" style="flex:1;max-width:none">
+      return `<div class="kanban-column stagger-in" style="flex:1;max-width:none" data-status="${col.key}"
+        ondragover="event.preventDefault();this.classList.add('drag-over');this.querySelector('.kanban-cards').classList.add('drag-over')"
+        ondragleave="this.classList.remove('drag-over');this.querySelector('.kanban-cards').classList.remove('drag-over')"
+        ondrop="handleTaskDrop(event,'${col.key}');this.classList.remove('drag-over');this.querySelector('.kanban-cards').classList.remove('drag-over')">
         <div class="kanban-col-header">
           <span class="kanban-col-title" style="color:${col.color}">${col.label}</span>
           <span class="kanban-col-count">${cards.length}</span>
         </div>
         <div class="kanban-cards">${cards.map(t => `
-          <div class="kanban-card" onclick="showTaskDetail('${t.id}')">
+          <div class="kanban-card" id="tcard-${t.id}" draggable="true"
+            ondragstart="event.dataTransfer.setData('text/plain','${t.id}');this.classList.add('dragging')"
+            ondragend="this.classList.remove('dragging')"
+            onclick="showTaskDetail('${t.id}')">
             <div class="kanban-card-title">${t.name}</div>
             <div class="kanban-card-meta">
               ${t.due_date ? `<span>📅 ${t.due_date}</span>` : ''}
@@ -74,6 +87,30 @@
       </div>`;
     }).join('')}</div>`;
   }
+
+  // Drag-and-drop for task board
+  window.handleTaskDrop = async function(event, newStatus) {
+    event.preventDefault();
+    const taskId = event.dataTransfer.getData('text/plain');
+    const task = tasksData.find(t => t.id === taskId);
+    if (!task || task.status === newStatus) return;
+
+    const oldStatus = task.status;
+    task.status = newStatus;
+    render();
+
+    showToast(`Moving "${task.name}" to ${newStatus}...`, 'info');
+    const result = await API.updateTask(taskId, { status: newStatus });
+    if (result && !result.error) {
+      showToast(`Task status updated in Notion!`, 'success');
+      const card = document.getElementById(`tcard-${taskId}`);
+      card?.classList.add('pulse');
+    } else {
+      task.status = oldStatus;
+      render();
+      showToast('Failed to update task', 'error');
+    }
+  };
 
   function renderList(el, rows) {
     el.innerHTML = `<div class="glass-card"><div class="data-table-wrap"><table class="data-table">
@@ -96,7 +133,6 @@
   window.showTaskDetail = function(id) {
     const t = tasksData.find(ts => ts.id === id);
     if (!t) return;
-
     const statuses = ['Not started', 'In progress', 'Done'];
 
     openDetail(t.name, `
@@ -108,43 +144,38 @@
           <button class="btn btn-primary btn-sm" id="task-save-status" style="font-size:0.7rem">Save ↗</button>
         </div>
       </div>
-
       <div class="detail-section"><div class="detail-label">Details</div>
         ${t.due_date ? `<div class="detail-value">📅 Due: ${t.due_date}</div>` : ''}
         ${t.duration ? `<div class="detail-value">⏱ Duration: ${t.duration} days</div>` : ''}
         ${(t.assigned_to||[]).length ? `<div class="detail-value">👤 Assigned: ${t.assigned_to.join(', ')}</div>` : ''}
         <div class="detail-value">Created: ${t.created || '—'}</div>
       </div>
-
-      <div id="task-save-feedback" style="margin-top:12px;font-size:0.8rem;display:none"></div>
     `);
 
     document.getElementById('task-save-status')?.addEventListener('click', async () => {
       const newStatus = document.getElementById('task-status-select').value;
-      const feedback = document.getElementById('task-save-feedback');
-      feedback.style.display = 'block';
-      feedback.style.color = 'var(--text-muted)';
-      feedback.textContent = '⏳ Saving to Notion...';
-
+      showToast(`Updating task status...`, 'info');
       const result = await API.updateTask(id, { status: newStatus });
       if (result && !result.error) {
-        feedback.style.color = 'var(--success)';
-        feedback.textContent = '✅ Status updated in Notion!';
+        showToast('Task status updated in Notion!', 'success');
         t.status = newStatus;
-        setTimeout(() => render(), 1000);
+        setTimeout(() => render(), 800);
       } else {
-        feedback.style.color = 'var(--danger)';
-        feedback.textContent = '❌ Failed to save';
+        showToast('Failed to update task', 'error');
       }
     });
   };
 
   window.markTaskDone = async function(id, name) {
+    showToast(`Marking "${name}" as Done...`, 'info');
     const result = await API.updateTask(id, { status: 'Done' });
     if (result && !result.error) {
       const t = tasksData.find(ts => ts.id === id);
       if (t) t.status = 'Done';
       render();
+      showToast('Task completed!', 'success');
+    } else {
+      showToast('Failed to update task', 'error');
     }
   };
 })();

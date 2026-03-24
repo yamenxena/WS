@@ -1,5 +1,5 @@
 /**
- * Majaz CRM — Projects Page (Kanban + Table + Write-Back)
+ * Majaz CRM — Projects Page (Kanban DnD + Table + Write-Back + Toasts)
  */
 (() => {
   let projectsData = [];
@@ -15,6 +15,7 @@
 
   async function loadProjects() {
     loaded = true;
+    showSkeleton();
     const res = await API.projects();
     if (!res) return;
     projectsData = res.rows || [];
@@ -24,6 +25,11 @@
     document.getElementById('projects-filter-type')?.addEventListener('change', render);
 
     render();
+  }
+
+  function showSkeleton() {
+    const el = document.getElementById('projects-content');
+    el.innerHTML = `<div class="kanban">${'<div class="kanban-column stagger-in"><div class="kanban-col-header"><div class="skeleton skeleton-text" style="width:60%"></div></div><div class="kanban-cards"><div class="skeleton skeleton-card"></div><div class="skeleton skeleton-card"></div></div></div>'.repeat(5)}</div>`;
   }
 
   function getFiltered() {
@@ -50,18 +56,21 @@
     return Math.round(v * 100);
   }
 
-  function renderKanban(el, rows) {
-    const columns = [
-      { key: '(SD) Schematic Design', label: 'SD — Schematic', color: 'var(--stage-sd)' },
-      { key: '(DD) Design Development', label: 'DD — Design Dev', color: 'var(--stage-dd)' },
-      { key: '(CD) Construction Documents', label: 'CD — Construction', color: 'var(--stage-cd)' },
-      { key: '(AS) Authorities Submission', label: 'AS — Authorities', color: 'var(--stage-as)' },
-      { key: 'Progress', label: 'Supervision', color: 'var(--stage-progress)' },
-    ];
+  const STAGES = [
+    { key: '(SD) Schematic Design', label: 'SD — Schematic', color: 'var(--stage-sd)' },
+    { key: '(DD) Design Development', label: 'DD — Design Dev', color: 'var(--stage-dd)' },
+    { key: '(CD) Construction Documents', label: 'CD — Construction', color: 'var(--stage-cd)' },
+    { key: '(AS) Authorities Submission', label: 'AS — Authorities', color: 'var(--stage-as)' },
+    { key: 'Progress', label: 'Supervision', color: 'var(--stage-progress)' },
+  ];
 
-    el.innerHTML = `<div class="kanban">${columns.map(col => {
+  function renderKanban(el, rows) {
+    el.innerHTML = `<div class="kanban">${STAGES.map(col => {
       const cards = rows.filter(p => p.stage === col.key);
-      return `<div class="kanban-column">
+      return `<div class="kanban-column stagger-in" data-stage="${col.key}"
+        ondragover="event.preventDefault();this.classList.add('drag-over');this.querySelector('.kanban-cards').classList.add('drag-over')"
+        ondragleave="this.classList.remove('drag-over');this.querySelector('.kanban-cards').classList.remove('drag-over')"
+        ondrop="handleDrop(event,'${col.key}');this.classList.remove('drag-over');this.querySelector('.kanban-cards').classList.remove('drag-over')">
         <div class="kanban-col-header">
           <span class="kanban-col-title" style="color:${col.color}">${col.label}</span>
           <span class="kanban-col-count">${cards.length}</span>
@@ -69,7 +78,10 @@
         <div class="kanban-cards">${cards.map(p => {
           const pct = pctValue(p);
           return `
-          <div class="kanban-card" onclick="showProject('${p.id}')">
+          <div class="kanban-card" id="card-${p.id}" draggable="true"
+            ondragstart="event.dataTransfer.setData('text/plain','${p.id}');this.classList.add('dragging')"
+            ondragend="this.classList.remove('dragging')"
+            onclick="showProject('${p.id}')">
             <div class="kanban-card-title">${p.name}</div>
             <div class="kanban-card-meta">
               <span>${p.service_type || '—'}</span>
@@ -82,6 +94,31 @@
       </div>`;
     }).join('')}</div>`;
   }
+
+  // Drag-and-drop handler → write-back to Notion
+  window.handleDrop = async function(event, newStage) {
+    event.preventDefault();
+    const projectId = event.dataTransfer.getData('text/plain');
+    const proj = projectsData.find(p => p.id === projectId);
+    if (!proj || proj.stage === newStage) return;
+
+    const oldStage = proj.stage;
+    proj.stage = newStage; // optimistic update
+    render();
+
+    showToast(`Moving "${proj.name}" to ${newStage.replace(/[()]/g,'')}...`, 'info');
+
+    const result = await API.updateProject(projectId, { stage: newStage });
+    if (result && !result.error) {
+      showToast(`✅ "${proj.name}" stage updated in Notion!`, 'success');
+      const card = document.getElementById(`card-${projectId}`);
+      card?.classList.add('pulse');
+    } else {
+      proj.stage = oldStage; // revert
+      render();
+      showToast(`Failed to update "${proj.name}"`, 'error');
+    }
+  };
 
   function renderTable(el, rows) {
     el.innerHTML = `<div class="glass-card"><div class="data-table-wrap"><table class="data-table">
@@ -110,21 +147,13 @@
     if (!p) return;
     const pct = p.pct_completed != null && !Array.isArray(p.pct_completed) ? Math.round(p.pct_completed * 100) : null;
 
-    const stageOptions = [
-      '(SD) Schematic Design',
-      '(DD) Design Development',
-      '(CD) Construction Documents',
-      '(AS) Authorities Submission',
-      'Progress',
-    ];
-
     openDetail(p.name, `
       <div class="detail-section"><div class="detail-label">Project Info</div>
         <div class="detail-value">SN: <span class="mono" style="color:var(--gold)">#${p.sn||'—'}</span></div>
         <div class="detail-value" style="display:flex;align-items:center;gap:8px">
           Stage:
           <select class="filter-select" id="detail-stage-select" style="padding:4px 8px;font-size:0.8rem">
-            ${stageOptions.map(s => `<option value="${s}" ${p.stage===s?'selected':''}>${s.replace(/\(|\)/g,'')}</option>`).join('')}
+            ${STAGES.map(s => `<option value="${s.key}" ${p.stage===s.key?'selected':''}>${s.key.replace(/[()]/g,'')}</option>`).join('')}
           </select>
           <button class="btn btn-primary btn-sm" id="detail-save-stage" style="font-size:0.7rem">Save ↗</button>
         </div>
@@ -151,29 +180,20 @@
           <span class="status-badge ${t.status==='Done'?'status-done':t.status==='In progress'?'status-dd':''}" style="font-size:0.65rem">${t.status||'—'}</span>
         </div>`).join('')}
       </div>` : '<div class="detail-section"><div class="detail-label">Tasks</div><div class="detail-value" style="color:var(--text-muted)">No linked tasks</div></div>'}
-
-      <div id="detail-save-feedback" style="margin-top:12px;font-size:0.8rem;display:none"></div>
     `);
 
     // Attach write-back handler
     document.getElementById('detail-save-stage')?.addEventListener('click', async () => {
       const newStage = document.getElementById('detail-stage-select').value;
-      const feedback = document.getElementById('detail-save-feedback');
-      feedback.style.display = 'block';
-      feedback.style.color = 'var(--text-muted)';
-      feedback.textContent = '⏳ Saving to Notion...';
-
+      showToast(`Updating stage to ${newStage.replace(/[()]/g,'')}...`, 'info');
       const result = await API.updateProject(id, { stage: newStage });
       if (result && !result.error) {
-        feedback.style.color = 'var(--success)';
-        feedback.textContent = '✅ Stage updated in Notion!';
-        // Update local data
+        showToast(`Stage updated in Notion!`, 'success');
         const proj = projectsData.find(pr => pr.id === id);
         if (proj) proj.stage = newStage;
-        setTimeout(() => render(), 1000);
+        setTimeout(() => render(), 800);
       } else {
-        feedback.style.color = 'var(--danger)';
-        feedback.textContent = '❌ Failed to save — check API';
+        showToast('Failed to update stage', 'error');
       }
     });
   };
