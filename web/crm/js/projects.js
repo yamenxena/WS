@@ -269,4 +269,54 @@
       }
     });
   };
+
+  // ── Add Project Form ──
+  window.showAddProjectForm = function() {
+    openDetail('➕ New Project', `
+      <div class="detail-section">
+        <div class="detail-label">Project Information</div>
+        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">Project Name *</label>
+        <input id="new-proj-name" class="filter-input" style="width:100%;margin-bottom:8px" placeholder="Project name..." />
+        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">SN (Serial Number)</label>
+        <input id="new-proj-sn" type="number" class="filter-input" style="width:100%;margin-bottom:8px" placeholder="e.g. 210" />
+        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">Service Type</label>
+        <select id="new-proj-type" class="filter-select" style="width:100%;margin-bottom:8px">
+          <option value="">Select...</option>
+          <option value="DESIGN">Design</option>
+          <option value="SUPERVISION">Supervision</option>
+        </select>
+        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">Stage</label>
+        <select id="new-proj-stage" class="filter-select" style="width:100%;margin-bottom:8px">
+          ${KNOWN_STAGES.map(s => `<option value="${s.key}">${s.key.replace(/[()]/g,'')}</option>`).join('')}
+        </select>
+        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">Value (AED)</label>
+        <input id="new-proj-value" type="number" class="filter-input" style="width:100%;margin-bottom:8px" placeholder="Contract value..." />
+        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">Description</label>
+        <textarea id="new-proj-desc" class="filter-input" style="width:100%;min-height:60px;resize:vertical;margin-bottom:16px" placeholder="Project description..."></textarea>
+        <button class="btn btn-primary" onclick="submitNewProject()" style="width:100%">Create Project → Notion</button>
+      </div>
+    `);
+  };
+
+  window.submitNewProject = async function() {
+    const name = document.getElementById('new-proj-name')?.value?.trim();
+    if (!name) { showToast('Project name is required', 'error'); return; }
+    const data = {
+      name,
+      sn: document.getElementById('new-proj-sn')?.value ? parseInt(document.getElementById('new-proj-sn').value) : undefined,
+      service_type: document.getElementById('new-proj-type')?.value || undefined,
+      stage: document.getElementById('new-proj-stage')?.value || undefined,
+      value: document.getElementById('new-proj-value')?.value ? parseFloat(document.getElementById('new-proj-value').value) : undefined,
+      description: document.getElementById('new-proj-desc')?.value?.trim() || undefined,
+    };
+    const res = await API.createProject(data);
+    if (res && res.id) {
+      showToast('Project created in Notion!', 'success');
+      loaded = false;
+      loadProjects();
+      document.getElementById('detail-close')?.click();
+    } else {
+      showToast('Failed to create project', 'error');
+    }
+  };
 })();

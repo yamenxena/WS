@@ -106,6 +106,7 @@ const API = (() => {
 
     createClient:      (data) => _post('/api/clients', data),
     createInteraction: (data) => _post('/api/interactions', data),
+    createTask:        (data) => _post('/api/tasks', data),
 
     logout: () => {
       sessionStorage.removeItem('majaz_token');

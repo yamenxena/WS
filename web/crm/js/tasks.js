@@ -216,4 +216,54 @@
       showToast('Failed to update task', 'error');
     }
   };
+
+  // ── Add Task Form ──
+  window.showAddTaskForm = async function() {
+    // Fetch projects for the dropdown
+    const projRes = await API.projects();
+    const projects = projRes?.rows || [];
+
+    openDetail('➕ New Task', `
+      <div class="detail-section">
+        <div class="detail-label">Task Information</div>
+        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">Task Name *</label>
+        <input id="new-task-name" class="filter-input" style="width:100%;margin-bottom:8px" placeholder="Task name..." />
+        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">Status</label>
+        <select id="new-task-status" class="filter-select" style="width:100%;margin-bottom:8px">
+          ${KNOWN_STATUSES.map(s => `<option value="${s.key}">${s.label}</option>`).join('')}
+        </select>
+        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">Due Date</label>
+        <input id="new-task-due" type="date" class="filter-input" style="width:100%;margin-bottom:8px" />
+        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">Duration (days)</label>
+        <input id="new-task-duration" type="number" class="filter-input" style="width:100%;margin-bottom:8px" placeholder="e.g. 14" />
+        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">Linked Project</label>
+        <select id="new-task-project" class="filter-select" style="width:100%;margin-bottom:16px">
+          <option value="">None</option>
+          ${projects.map(p => `<option value="${p.id}">${p.sn ? '#'+p.sn+' ' : ''}${p.name}</option>`).join('')}
+        </select>
+        <button class="btn btn-primary" onclick="submitNewTask()" style="width:100%">Create Task → Notion</button>
+      </div>
+    `);
+  };
+
+  window.submitNewTask = async function() {
+    const name = document.getElementById('new-task-name')?.value?.trim();
+    if (!name) { showToast('Task name is required', 'error'); return; }
+    const data = {
+      name,
+      status: document.getElementById('new-task-status')?.value || undefined,
+      due_date: document.getElementById('new-task-due')?.value || undefined,
+      duration: document.getElementById('new-task-duration')?.value ? parseInt(document.getElementById('new-task-duration').value) : undefined,
+      project_id: document.getElementById('new-task-project')?.value || undefined,
+    };
+    const res = await API.createTask(data);
+    if (res && res.id) {
+      showToast('Task created in Notion!', 'success');
+      loaded = false;
+      loadTasks();
+      document.getElementById('detail-close')?.click();
+    } else {
+      showToast('Failed to create task', 'error');
+    }
+  };
 })();

@@ -655,6 +655,25 @@ def update_task(page_id):
     return jsonify({"error": result.get("message", "Failed")}), 400
 
 
+@app.route("/api/tasks", methods=["POST"])
+@require_auth
+def create_task():
+    data = request.get_json() or {}
+    props = {"Task": {"title": [{"text": {"content": data.get("name", "")}}]}}
+    if data.get("status"):
+        props["Status"] = {"status": {"name": data["status"]}}
+    if data.get("due_date"):
+        props["Due Date"] = {"date": {"start": data["due_date"]}}
+    if data.get("duration"):
+        props["Duration"] = {"number": data["duration"]}
+    if data.get("project_id"):
+        props["Project"] = {"relation": [{"id": data["project_id"]}]}
+    ok, result = notion_create_page(DB["tasks"], props)
+    if ok:
+        return jsonify(transform_task(result)), 201
+    return jsonify({"error": result.get("message", "Failed")}), 400
+
+
 # ── Interactions ──
 @app.route("/api/interactions")
 @require_auth
