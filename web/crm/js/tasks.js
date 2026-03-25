@@ -91,8 +91,8 @@
           <span class="kanban-col-title" style="color:${col.color}">${col.label}</span>
           <span class="kanban-col-count">${cards.length}</span>
         </div>
-        <div class="kanban-cards">${cards.map(t => `
-          <div class="kanban-card" id="tcard-${t.id}" draggable="true"
+        <div class="kanban-cards">${cards.map((t, idx) => `
+          <div class="kanban-card stagger-entrance" style="--i: ${idx}" id="tcard-${t.id}" draggable="true"
             ondragstart="event.dataTransfer.setData('text/plain','${t.id}');this.classList.add('dragging')"
             ondragend="this.classList.remove('dragging')"
             onclick="showTaskDetail('${t.id}')">

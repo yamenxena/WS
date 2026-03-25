@@ -105,10 +105,10 @@
           <span class="kanban-col-title" style="color:${col.color}">${col.label}</span>
           <span class="kanban-col-count">${cards.length}</span>
         </div>
-        <div class="kanban-cards">${cards.map(p => {
+        <div class="kanban-cards">${cards.map((p, idx) => {
           const pct = pctValue(p);
           return `
-          <div class="kanban-card" id="card-${p.id}" draggable="true"
+          <div class="kanban-card stagger-entrance" style="--i: ${idx}" id="card-${p.id}" draggable="true"
             ondragstart="event.dataTransfer.setData('text/plain','${p.id}');this.classList.add('dragging')"
             ondragend="this.classList.remove('dragging')"
             onclick="showProject('${p.id}')">
