@@ -31,7 +31,7 @@
   function renderTable(rows) {
     const el = document.getElementById('interactions-content');
     if (!rows.length) {
-      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">💬</div><div class="empty-state-text">No interactions found</div></div>';
+      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">—</div><div class="empty-state-text">No interactions found</div></div>';
       return;
     }
 
@@ -54,7 +54,7 @@
     if (!i) return;
     openSidePeek(`<span style="color:var(--gold)">${i.name || 'Interaction'}</span>`, `
       <details class="peek-section" open>
-        <summary>💬 Interaction Details</summary>
+        <summary>Interaction Details</summary>
         <div class="peek-section-body">
           <div class="peek-row"><span class="peek-label">Name</span><span style="font-weight:500">${i.name || '—'}</span></div>
           <div class="peek-row"><span class="peek-label">Type</span><span class="status-badge status-as">${i.type || '—'}</span></div>
@@ -64,26 +64,26 @@
       </details>
       ${i.summary ? `
       <details class="peek-section" open>
-        <summary>📝 Summary</summary>
+        <summary>Summary</summary>
         <div class="peek-section-body">
           <div style="line-height:1.6;color:var(--text-secondary)">${i.summary}</div>
         </div>
       </details>` : ''}
       ${i.next_steps ? `
       <details class="peek-section" open>
-        <summary>🎯 Next Steps</summary>
+        <summary>Next Steps</summary>
         <div class="peek-section-body">
           <div style="color:var(--gold);line-height:1.6">${i.next_steps}</div>
         </div>
       </details>` : ''}
       <details class="peek-section" ${(i.client_ids||[]).length || (i.project_ids||[]).length ? 'open' : ''}>
-        <summary>🔗 Links</summary>
+        <summary>Links</summary>
         <div class="peek-section-body">
           ${(i.client_ids||[]).length
-            ? i.client_ids.map(cid => `<div class="peek-row" style="color:var(--gold);cursor:pointer" onclick="showClient('${cid}')">👥 View client →</div>`).join('')
+            ? i.client_ids.map(cid => `<div class="peek-row" style="color:var(--gold);cursor:pointer" onclick="showClient('${cid}')">View client →</div>`).join('')
             : ''}
           ${(i.project_ids||[]).length
-            ? i.project_ids.map(pid => `<div class="peek-row" style="color:var(--gold);cursor:pointer" onclick="showProject('${pid}')">📐 View project →</div>`).join('')
+            ? i.project_ids.map(pid => `<div class="peek-row" style="color:var(--gold);cursor:pointer" onclick="showProject('${pid}')">View project →</div>`).join('')
             : ''}
           ${!(i.client_ids||[]).length && !(i.project_ids||[]).length ? '<div style="color:var(--text-muted)">No linked records</div>' : ''}
         </div>

@@ -140,7 +140,7 @@
 
     const result = await API.updateProject(projectId, { stage: newStage });
     if (result && !result.error) {
-      showToast(`✅ "${proj.name}" stage updated in Notion!`, 'success');
+      showToast(`"${proj.name}" stage updated in Notion!`, 'success');
       const card = document.getElementById(`card-${projectId}`);
       card?.classList.add('pulse');
     } else {
@@ -184,13 +184,13 @@
     openSidePeek(`<span style="color:var(--gold)">${p.name}</span>`, `
       <!-- ── Project Info ── -->
       <details class="peek-section" open>
-        <summary>📐 Project Info</summary>
+        <summary>Project Info</summary>
         <div class="peek-section-body">
           <div class="peek-row"><span class="peek-label">SN</span><span class="mono" style="color:var(--gold)">#${p.sn||'—'}</span></div>
           <div class="peek-row"><span class="peek-label">Type</span><span class="status-badge ${p.service_type==='DESIGN'?'status-dd':'status-as'}">${p.service_type||'—'}</span></div>
           ${p.fab_id ? `<div class="peek-row"><span class="peek-label">FAB ID</span><span class="mono">${p.fab_id}</span></div>` : ''}
           ${p.adm_id ? `<div class="peek-row"><span class="peek-label">ADM ID</span><span class="mono">${p.adm_id}</span></div>` : ''}
-          ${p.plot_info ? `<div class="peek-row"><span class="peek-label">Plot</span><span>📍 ${p.plot_info}</span></div>` : ''}
+          ${p.plot_info ? `<div class="peek-row"><span class="peek-label">Plot</span><span>${p.plot_info}</span></div>` : ''}
           ${pct !== null ? `<div class="peek-row"><span class="peek-label">Completion</span><span style="color:var(--gold);font-weight:600">${pct}%</span></div>
           <div class="progress-bar" style="margin-top:4px"><div class="progress-fill" style="width:${pct}%"></div></div>` : ''}
         </div>
@@ -198,7 +198,7 @@
 
       <!-- ── Edit Project ── -->
       <details class="peek-section" open>
-        <summary>✏️ Edit Project</summary>
+        <summary>Edit Project</summary>
         <div class="peek-section-body">
           <label class="peek-label">Stage</label>
           <select class="peek-input" id="detail-stage-select">
@@ -208,24 +208,24 @@
           <input id="detail-project-value" type="number" class="peek-input" value="${p.value||''}" placeholder="Contract value..." />
           <label class="peek-label">Description</label>
           <textarea id="detail-project-desc" class="peek-input" style="min-height:60px;resize:vertical" placeholder="Project description...">${p.description||''}</textarea>
-          <button class="btn btn-primary btn-sm" id="detail-save-project" style="width:100%;margin-top:8px">💾 Save to Notion</button>
+          <button class="btn btn-primary btn-sm" id="detail-save-project" style="width:100%;margin-top:8px">Save to Notion</button>
         </div>
       </details>
 
       <!-- ── Client ── -->
       ${(p.client_ids||[]).length ? `
       <details class="peek-section" open>
-        <summary>👥 Client</summary>
+        <summary>Client</summary>
         <div class="peek-section-body">
           <div class="peek-row" style="color:var(--gold);cursor:pointer" onclick="showClient('${p.client_ids[0]}')">
-            🔗 View linked client →
+            View linked client →
           </div>
         </div>
       </details>` : ''}
 
       <!-- ── Linked Tasks ── -->
       <details class="peek-section" ${(p.tasks||[]).length ? 'open' : ''}>
-        <summary>✅ Tasks (${(p.tasks||[]).length})</summary>
+        <summary>Tasks (${(p.tasks||[]).length})</summary>
         <div class="peek-section-body">
           ${(p.tasks||[]).length ? p.tasks.map(t => `<div style="padding:6px 0;border-bottom:1px solid var(--glass-border);display:flex;justify-content:space-between;align-items:center">
             <span style="font-size:0.85rem;color:var(--text-primary)">${t.name}</span>
@@ -244,7 +244,7 @@
 
       <!-- ── Archive (Admin) ── -->
       <div class="peek-section-body" data-role="admin" style="display:none">
-        <button class="btn btn-danger btn-sm" style="width:100%" onclick="archiveRecord('project','${p.id}','${p.name.replace(/'/g,"&#39;")}')">🗑 Archive Project</button>
+        <button class="btn btn-danger btn-sm" style="width:100%" onclick="archiveRecord('project','${p.id}','${p.name.replace(/'/g,"&#39;")}')">Archive Project</button>
       </div>
     `);
 
@@ -277,7 +277,7 @@
 
   // ── Add Project Form ──
   window.showAddProjectForm = function() {
-    openSidePeek('➕ New Project', `
+    openSidePeek('New Project', `
       <details class="peek-section" open>
         <summary>Project Information</summary>
         <div class="peek-section-body">

@@ -48,18 +48,18 @@
     el.innerHTML = `
       <!-- ── KPI Summary Cards ── -->
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;margin-bottom:24px">
-        ${kpiCard('📐', data.total_projects, 'Projects', 'var(--gold)')}
-        ${kpiCard('👥', data.total_clients, 'Clients', 'var(--info)')}
-        ${kpiCard('✅', totalTasks, 'Tasks', 'var(--success)')}
-        ${kpiCard('🔄', pipelineRows.length, 'Pipeline Items', 'var(--warning)')}
-        ${kpiCard('📅', meetingCount, 'Meetings', 'var(--stage-dd)')}
-        ${kpiCard('💬', interactionCount, 'Interactions', 'var(--stage-as)')}
-        ${kpiCard('📊', completionRate + '%', 'Completion Rate', completionRate > 70 ? 'var(--success)' : completionRate > 40 ? 'var(--warning)' : 'var(--danger)')}
+        ${kpiCard('●', data.total_projects, 'Projects', 'var(--gold)')}
+        ${kpiCard('●', data.total_clients, 'Clients', 'var(--info)')}
+        ${kpiCard('●', totalTasks, 'Tasks', 'var(--success)')}
+        ${kpiCard('●', pipelineRows.length, 'Pipeline Items', 'var(--warning)')}
+        ${kpiCard('●', meetingCount, 'Meetings', 'var(--stage-dd)')}
+        ${kpiCard('●', interactionCount, 'Interactions', 'var(--stage-as)')}
+        ${kpiCard('●', completionRate + '%', 'Completion Rate', completionRate > 70 ? 'var(--success)' : completionRate > 40 ? 'var(--warning)' : 'var(--danger)')}
       </div>
 
       <!-- ── Distribution Charts ── -->
       <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px">
-        ${buildBarChart('📐 Project Stages', stages, {
+        ${buildBarChart('Project Stages', stages, {
           'Not started': 'var(--text-muted)',
           'On Hold': 'var(--text-muted)',
           'Kickoff': 'var(--info)',
@@ -73,8 +73,8 @@
           'Handing Over': 'var(--success)',
           'Done': 'var(--success)',
         })}
-        ${buildBarChart('🔧 Service Types', types, { 'DESIGN': 'var(--info)', 'SUPERVISION': 'var(--warning)' })}
-        ${buildBarChart('✅ Task Statuses', taskStatuses, {
+        ${buildBarChart('Service Types', types, { 'DESIGN': 'var(--info)', 'SUPERVISION': 'var(--warning)' })}
+        ${buildBarChart('Task Statuses', taskStatuses, {
           'Not started': 'var(--text-muted)',
           'SENT TO STRUCTURE': 'var(--stage-cd)',
           'NEEDS REVIEW': 'var(--stage-cd)',
@@ -83,7 +83,7 @@
           'SUBMITTED TO AUTHORITIES': 'var(--stage-as)',
           'Done': 'var(--success)',
         })}
-        ${buildBarChart('👥 Lead Statuses', leads, {
+        ${buildBarChart('Lead Statuses', leads, {
           'Inquiry': 'var(--text-muted)',
           'Qualified': 'var(--stage-sd)',
           'Proposal': 'var(--stage-dd)',
@@ -91,13 +91,13 @@
           'Won': 'var(--success)',
           'Lost': 'var(--danger)',
         })}
-        ${buildBarChart('🔄 Pipeline by Stage', pipelineStages, {
+        ${buildBarChart('Pipeline by Stage', pipelineStages, {
           '(SD) Schematic Design': 'var(--stage-sd)',
           '(DD) Design Development': 'var(--stage-dd)',
           '(CD) Construction Documents': 'var(--stage-cd)',
           '(AS) Authorities Submission': 'var(--stage-as)',
         })}
-        ${buildBarChart('🔄 Pipeline by Type', pipelineTypes, {})}
+        ${buildBarChart('Pipeline by Type', pipelineTypes, {})}
       </div>
     `;
   }

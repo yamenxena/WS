@@ -15,10 +15,10 @@
 
     container.innerHTML = `
       <div class="view-header">
-        <span class="view-title">📋 Concept Plans</span>
+        <span class="view-title">Concept Plans</span>
       </div>
       <div class="filter-bar" style="margin:16px 0">
-        <input class="filter-input" id="cp-search" placeholder="🔍 Search plans..." oninput="filterConceptPlans()" />
+        <input class="filter-input" id="cp-search" placeholder="Search plans..." oninput="filterConceptPlans()" />
         <select class="filter-select" id="cp-filter" onchange="filterConceptPlans()">
           <option value="all">All</option>
           <option value="done">✅ Done</option>

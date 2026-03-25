@@ -233,10 +233,10 @@ document.addEventListener('DOMContentLoaded', () => {
     || (() => { const c = document.createElement('div'); c.className = 'toast-container'; document.body.appendChild(c); return c; })();
 
   window.showToast = function(message, type = 'info', durationMs = 3500) {
-    const icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
+    const icons = { success: '✓', error: '✗', info: 'i', warning: '!' };
     const toast = document.createElement('div');
     toast.className = `toast toast-${type}`;
-    toast.innerHTML = `<span class="toast-icon">${icons[type] || 'ℹ️'}</span><span>${message}</span>`;
+    toast.innerHTML = `<span class="toast-icon">${icons[type] || 'i'}</span><span>${message}</span>`;
     toastContainer.appendChild(toast);
     setTimeout(() => {
       toast.classList.add('toast-out');

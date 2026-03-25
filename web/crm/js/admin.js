@@ -162,7 +162,7 @@
 
         <!-- Column Visibility -->
         <details class="peek-section" open>
-          <summary>📊 Table Column Visibility</summary>
+          <summary>Table Column Visibility</summary>
           <div class="peek-section-body">
             <p style="color:var(--text-muted);font-size:0.8rem;margin-bottom:16px">
               Toggle which columns appear in tables. Changes are saved instantly to your browser.
@@ -176,7 +176,7 @@
 
         <!-- Activity Log -->
         <details class="peek-section" open>
-          <summary>📋 Recent Activity (Last 50 records)</summary>
+          <summary>Recent Activity (Last 50 records)</summary>
           <div class="peek-section-body">
             <div id="activity-log-list"><div class="spinner"></div></div>
           </div>

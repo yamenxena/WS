@@ -45,7 +45,7 @@
   function renderTable(rows) {
     const el = document.getElementById('pipeline-content');
     if (!rows.length) {
-      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🔄</div><div class="empty-state-text">No pipeline items found</div></div>';
+      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">—</div><div class="empty-state-text">No pipeline items found</div></div>';
       return;
     }
 
@@ -68,7 +68,7 @@
     if (!p) return;
     openSidePeek(`<span style="color:var(--gold)">${p.name || 'Pipeline Item'}</span>`, `
       <details class="peek-section" open>
-        <summary>🔄 Pipeline Details</summary>
+        <summary>Pipeline Details</summary>
         <div class="peek-section-body">
           <div class="peek-row"><span class="peek-label">Task</span><span style="font-weight:500">${p.name || '—'}</span></div>
           <div class="peek-row"><span class="peek-label">Stage</span><span class="status-badge ${stageClass(p.stage)}">${p.stage || '—'}</span></div>
@@ -77,10 +77,10 @@
         </div>
       </details>
       <details class="peek-section" ${(p.project_ids||[]).length ? 'open' : ''}>
-        <summary>📐 Linked Projects (${(p.project_ids||[]).length})</summary>
+        <summary>Linked Projects (${(p.project_ids||[]).length})</summary>
         <div class="peek-section-body">
           ${(p.project_ids||[]).length
-            ? p.project_ids.map(pid => `<div class="peek-row" style="color:var(--gold);cursor:pointer" onclick="showProject('${pid}')">🔗 View project →</div>`).join('')
+            ? p.project_ids.map(pid => `<div class="peek-row" style="color:var(--gold);cursor:pointer" onclick="showProject('${pid}')">View project →</div>`).join('')
             : '<div style="color:var(--text-muted)">No linked projects</div>'}
         </div>
       </details>

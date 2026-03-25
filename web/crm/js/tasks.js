@@ -98,10 +98,10 @@
             onclick="showTaskDetail('${t.id}')">
             <div class="kanban-card-title">${t.name}</div>
             <div class="kanban-card-meta">
-              ${t.due_date ? `<span>📅 ${t.due_date}</span>` : ''}
-              ${t.deadline ? `<span style="color:${new Date(t.deadline) < new Date() ? 'var(--danger)' : 'var(--text-muted)'}">⏰ ${t.deadline}</span>` : ''}
-              ${(t.assigned_to||[]).length ? `<span>👤 ${t.assigned_to.join(', ')}</span>` : ''}
-              ${t.duration ? `<span>⏱ ${t.duration}d</span>` : ''}
+              ${t.due_date ? `<span>${t.due_date}</span>` : ''}
+              ${t.deadline ? `<span style="color:${new Date(t.deadline) < new Date() ? 'var(--danger)' : 'var(--text-muted)'}">${t.deadline}</span>` : ''}
+              ${(t.assigned_to||[]).length ? `<span>${t.assigned_to.join(', ')}</span>` : ''}
+              ${t.duration ? `<span>${t.duration}d</span>` : ''}
             </div>
           </div>
         `).join('')}</div>
@@ -146,7 +146,7 @@
         <td>${t.duration ? t.duration+'d' : '—'}</td>
         <td>${(t.assigned_to||[]).join(', ')||'—'}</td>
         <td>
-          ${t.status !== 'Done' ? `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();markTaskDone('${t.id}','${t.name.replace(/'/g,"\\'")}')">✅ Done</button>` : '<span style="color:var(--success)">✓</span>'}
+          ${t.status !== 'Done' ? `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();markTaskDone('${t.id}','${t.name.replace(/'/g,"\\'")}')">✓ Done</button>` : '<span style="color:var(--success)">✓</span>'}
         </td>
       </tr>`).join('')}</tbody>
     </table></div></div>`;
@@ -174,12 +174,12 @@
 
       <!-- ── Details ── -->
       <details class="peek-section" open>
-        <summary>📋 Details</summary>
+        <summary>Details</summary>
         <div class="peek-section-body">
-          ${t.due_date ? `<div class="peek-row"><span class="peek-label">Due Date</span><span class="mono">📅 ${t.due_date}</span></div>` : ''}
-          ${t.deadline ? `<div class="peek-row"><span class="peek-label">Deadline</span><span class="mono" style="color:${new Date(t.deadline) < new Date() ? 'var(--danger)' : 'inherit'}">⏰ ${t.deadline}</span></div>` : ''}
-          ${t.duration ? `<div class="peek-row"><span class="peek-label">Duration</span><span>⏱ ${t.duration} days</span></div>` : ''}
-          ${(t.assigned_to||[]).length ? `<div class="peek-row"><span class="peek-label">Assigned To</span><span>👤 ${t.assigned_to.join(', ')}</span></div>` : ''}
+          ${t.due_date ? `<div class="peek-row"><span class="peek-label">Due Date</span><span class="mono">${t.due_date}</span></div>` : ''}
+          ${t.deadline ? `<div class="peek-row"><span class="peek-label">Deadline</span><span class="mono" style="color:${new Date(t.deadline) < new Date() ? 'var(--danger)' : 'inherit'}">${t.deadline}</span></div>` : ''}
+          ${t.duration ? `<div class="peek-row"><span class="peek-label">Duration</span><span>${t.duration} days</span></div>` : ''}
+          ${(t.assigned_to||[]).length ? `<div class="peek-row"><span class="peek-label">Assigned To</span><span>${t.assigned_to.join(', ')}</span></div>` : ''}
         </div>
       </details>
 
@@ -224,7 +224,7 @@
   let taskProjectCombo = null;
 
   window.showAddTaskForm = function() {
-    openSidePeek('➕ New Task', `
+    openSidePeek('New Task', `
       <details class="peek-section" open>
         <summary>Task Information</summary>
         <div class="peek-section-body">
@@ -248,7 +248,7 @@
     // Initialize ComboBox for project relation
     taskProjectCombo = createComboBox({
       containerId: 'new-task-project-combo',
-      placeholder: '🔍 Search projects...',
+      placeholder: 'Search projects...',
       fetchOptions: async () => {
         const res = await API.projects();
         return (res?.rows || []).map(p => ({

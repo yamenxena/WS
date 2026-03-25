@@ -35,7 +35,7 @@
 
   function renderTeamMembers(el) {
     if (!teamData.length) {
-      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👷</div><div class="empty-state-text">No team members found</div></div>';
+      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">—</div><div class="empty-state-text">No team members found</div></div>';
       return;
     }
     el.innerHTML = `<div class="glass-card"><div class="data-table-wrap"><table class="data-table">
@@ -60,15 +60,15 @@
     if (!m) return;
     openSidePeek(`<span style="color:var(--gold)">${m.name}</span>`, `
       <details class="peek-section" open>
-        <summary>👤 Team Member</summary>
+        <summary>Team Member</summary>
         <div class="peek-section-body">
           <div class="peek-row"><span class="peek-label">ID</span><span class="mono" style="color:var(--gold)">${m.uid||'—'}</span></div>
-          <div class="peek-row"><span class="peek-label">Email</span><span>📧 ${m.email||'—'}</span></div>
-          <div class="peek-row"><span class="peek-label">Work Phone</span><span class="mono">📞 ${m.work_phone||'—'}</span></div>
-          <div class="peek-row"><span class="peek-label">Personal</span><span class="mono">📱 ${m.personal_phone||'—'}</span></div>
-          <div class="peek-row"><span class="peek-label">DOB</span><span>🎂 ${m.dob||'—'}</span></div>
-          <div class="peek-row"><span class="peek-label">Joining Date</span><span>📅 ${m.joining_date||'—'}</span></div>
-          ${m.e_pass ? `<div class="peek-row"><span class="peek-label">E-Pass</span><span class="mono">🪪 ${m.e_pass}</span></div>` : ''}
+          <div class="peek-row"><span class="peek-label">Email</span><span>${m.email||'—'}</span></div>
+          <div class="peek-row"><span class="peek-label">Work Phone</span><span class="mono">${m.work_phone||'—'}</span></div>
+          <div class="peek-row"><span class="peek-label">Personal</span><span class="mono">${m.personal_phone||'—'}</span></div>
+          <div class="peek-row"><span class="peek-label">DOB</span><span>${m.dob||'—'}</span></div>
+          <div class="peek-row"><span class="peek-label">Joining Date</span><span>${m.joining_date||'—'}</span></div>
+          ${m.e_pass ? `<div class="peek-row"><span class="peek-label">E-Pass</span><span class="mono">${m.e_pass}</span></div>` : ''}
         </div>
       </details>
     `);
@@ -76,7 +76,7 @@
 
   function renderSuppliers(el) {
     if (!supplierData.length) {
-      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">🏭</div><div class="empty-state-text">No suppliers found</div></div>';
+      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">—</div><div class="empty-state-text">No suppliers found</div></div>';
       return;
     }
     el.innerHTML = `<div class="glass-card"><div class="data-table-wrap"><table class="data-table">
@@ -101,7 +101,7 @@
     if (!s) return;
     openSidePeek(`<span style="color:var(--gold)">${s.name}</span>`, `
       <details class="peek-section" open>
-        <summary>🏭 Supplier/Contractor</summary>
+        <summary>Supplier/Contractor</summary>
         <div class="peek-section-body">
           <div class="peek-row"><span class="peek-label">ID</span><span class="mono" style="color:var(--gold)">${s.uid||'—'}</span></div>
           <div class="peek-row"><span class="peek-label">Type</span><span class="status-badge ${s.type==='Supplier'?'status-dd':'status-as'}">${s.type||'—'}</span></div>
@@ -109,7 +109,7 @@
         </div>
       </details>
       <details class="peek-section" open>
-        <summary>📞 Contact</summary>
+        <summary>Contact</summary>
         <div class="peek-section-body">
           <div class="peek-row"><span class="peek-label">Phone</span><span class="mono">${s.phone||'—'}</span></div>
           <div class="peek-row"><span class="peek-label">Email</span><span>${s.email||'—'}</span></div>

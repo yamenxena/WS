@@ -61,7 +61,7 @@
         <div class="kpi-label">Tasks</div>
       </div>
       <div class="kpi-card stagger-in">
-        <div class="kpi-icon">📊</div>
+        <div class="kpi-icon">●</div>
         <div class="kpi-value">${completionPct}%</div>
         <div class="kpi-label">Task Completion</div>
         <div class="progress-bar" style="margin-top:8px;width:100%">

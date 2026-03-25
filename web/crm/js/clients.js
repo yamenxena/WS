@@ -100,7 +100,7 @@
 
   // ── Add Client Modal (via Side-Peek) ──
   window.showAddClientForm = function() {
-    openSidePeek('➕ New Client', `
+    openSidePeek('New Client', `
       <details class="peek-section" open>
         <summary>Client Information</summary>
         <div class="peek-section-body">
@@ -191,7 +191,7 @@
 
       <!-- ── Lead Status ── -->
       <details class="peek-section" open>
-        <summary>📊 Status</summary>
+        <summary>Status</summary>
         <div class="peek-section-body">
           <div class="peek-row"><span class="peek-label">Lead Status</span><span class="status-badge ${stageClass(c.lead_status)}">${c.lead_status || '—'}</span></div>
           <div class="peek-row"><span class="peek-label">Urgency</span><span>${urgencyIcon(c.urgency) || '—'} ${c.overdue_alert ? `<span style="color:var(--danger);margin-left:4px">${c.overdue_alert}</span>` : ''}</span></div>
@@ -241,7 +241,7 @@
 
       <!-- ── Add Interaction ── -->
       <details class="peek-section">
-        <summary>➕ Log Interaction</summary>
+        <summary>Log Interaction</summary>
         <div class="peek-section-body">
           <input id="new-int-name" class="peek-input" placeholder="Interaction title..." />
           <select id="new-int-type" class="peek-input">

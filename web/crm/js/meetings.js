@@ -31,7 +31,7 @@
   function renderTable(rows) {
     const el = document.getElementById('meetings-content');
     if (!rows.length) {
-      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">📅</div><div class="empty-state-text">No meetings found</div></div>';
+      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">—</div><div class="empty-state-text">No meetings found</div></div>';
       return;
     }
 
@@ -53,14 +53,14 @@
     if (!m) return;
     openSidePeek(`<span style="color:var(--gold)">${m.name || 'Meeting'}</span>`, `
       <details class="peek-section" open>
-        <summary>📅 Meeting Details</summary>
+        <summary>Meeting Details</summary>
         <div class="peek-section-body">
           <div class="peek-row"><span class="peek-label">Name</span><span style="font-weight:500">${m.name || '—'}</span></div>
           <div class="peek-row"><span class="peek-label">Created</span><span class="mono">${m.created || '—'}</span></div>
         </div>
       </details>
       <details class="peek-section" ${(m.attendee||[]).length ? 'open' : ''}>
-        <summary>👥 Attendees (${(m.attendee||[]).length})</summary>
+        <summary>Attendees (${(m.attendee||[]).length})</summary>
         <div class="peek-section-body">
           ${(m.attendee||[]).length
             ? m.attendee.map(a => `<div class="peek-row"><span class="status-badge status-dd">${a}</span></div>`).join('')
@@ -68,10 +68,10 @@
         </div>
       </details>
       <details class="peek-section" ${(m.project_ids||[]).length ? 'open' : ''}>
-        <summary>📐 Linked Projects (${(m.project_ids||[]).length})</summary>
+        <summary>Linked Projects (${(m.project_ids||[]).length})</summary>
         <div class="peek-section-body">
           ${(m.project_ids||[]).length
-            ? m.project_ids.map(pid => `<div class="peek-row" style="color:var(--gold);cursor:pointer" onclick="showProject('${pid}')">🔗 View project →</div>`).join('')
+            ? m.project_ids.map(pid => `<div class="peek-row" style="color:var(--gold);cursor:pointer" onclick="showProject('${pid}')">View project →</div>`).join('')
             : '<div style="color:var(--text-muted)">No linked projects</div>'}
         </div>
       </details>
