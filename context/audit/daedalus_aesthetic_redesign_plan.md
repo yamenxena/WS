@@ -230,7 +230,7 @@ The following tokens need to be added to `design-system.css` for v6.0.0:
 | Phase | Status | Commit | Notes |
 |---|:---:|---|---|
 | **P1: Collapsible Sidebar** | ✅ Done | `77dccef` | 240→60px toggle, localStorage, auto-collapse <1024px, tooltips |
-| **P2: Bento Grid** | ⏳ Pending | — | Dashboard needs asymmetric grid layout |
+| **P2: Bento Grid** | ✅ Done | — | Hero KPI card, sparklines, recent activity tile, 768px responsive |
 | **P3: Glassmorphism v2** | ✅ Done | `2b56468` | blur(16px), layered glass, ambient glow |
 | **P4: Border Radius** | ✅ Done | `2b56468` | 16px outer, 10px inner, all tokenized |
 | **P5: Card Hover & Glow** | ✅ Done | `2b56468` | Gold glow, spring press, spring easing |

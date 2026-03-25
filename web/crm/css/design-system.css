@@ -602,10 +602,16 @@ body.peek-open .main {
 .bento-grid {
   display: grid;
   grid-template-columns: minmax(300px, 1fr) 2fr;
+  grid-template-areas:
+    "kpi pipeline"
+    "activity activity";
   gap: 20px;
   align-items: stretch;
   margin-bottom: 28px;
 }
+.bento-grid > .bento-kpi-container { grid-area: kpi; }
+.bento-grid > .bento-span-2       { grid-area: pipeline; }
+.bento-grid > .recent-activity-tile { grid-area: activity; }
 
 .bento-grid > .glass-card { margin-bottom: 0; }
 
@@ -616,8 +622,110 @@ body.peek-open .main {
   align-content: start;
 }
 
+/* P2.2 — Hero KPI card spans full width of kpi container */
+.kpi-card.kpi-hero {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  padding: 28px 24px;
+}
+.kpi-hero .kpi-icon  { font-size: 2rem; }
+.kpi-hero .kpi-value { font-size: 2.6rem; }
+.kpi-hero .kpi-meta  {
+  margin-left: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+.kpi-hero .kpi-meta .kpi-sub {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* P2.3 — CSS Sparkline mini-charts */
+.kpi-sparkline {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 28px;
+  margin-top: 10px;
+}
+.kpi-sparkline .spark-bar {
+  flex: 1;
+  min-width: 4px;
+  max-width: 8px;
+  background: var(--gold);
+  border-radius: 2px 2px 0 0;
+  opacity: 0.5;
+  transition: opacity var(--duration) var(--ease), height 0.4s var(--transition-spring);
+}
+.kpi-card:hover .spark-bar { opacity: 0.85; }
+
+/* P2.5 — Recent Activity Tile */
+.recent-activity-tile {
+  grid-column: 1 / -1;
+}
+.activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.activity-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--glass-border);
+  font-size: 0.85rem;
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gold);
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+.activity-dot.type-call      { background: var(--stage-sd); }
+.activity-dot.type-email     { background: var(--stage-dd); }
+.activity-dot.type-meeting   { background: var(--stage-cd); }
+.activity-dot.type-note      { background: var(--text-muted); }
+.activity-body {
+  flex: 1;
+  min-width: 0;
+}
+.activity-title {
+  color: var(--text-primary);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.activity-sub {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  margin-top: 2px;
+}
+.activity-time {
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 @media (max-width: 1024px) {
-  .bento-grid { grid-template-columns: 1fr; }
+  .bento-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "kpi"
+      "pipeline"
+      "activity";
+  }
   .bento-kpi-container { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
 }
 
@@ -1992,6 +2100,13 @@ select.peek-input.field-error {
 /* ══════════════════════════════════════════════════════════════
    RESPONSIVE — Small phones (≤480px)
    ══════════════════════════════════════════════════════════════ */
+/* P2.6 — Mobile ≤768px: stack bento to single column */
+@media (max-width: 768px) {
+  .bento-kpi-container { grid-template-columns: 1fr; }
+  .kpi-hero { flex-direction: column; align-items: flex-start; }
+  .kpi-hero .kpi-meta { margin-left: 0; align-items: flex-start; }
+}
+
 @media (max-width: 480px) {
   .kpi-grid { grid-template-columns: 1fr; }
   .filter-bar { flex-direction: column; }

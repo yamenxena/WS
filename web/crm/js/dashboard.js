@@ -44,16 +44,40 @@
     if (bp) bp.textContent = data.total_projects;
     if (bt) bt.textContent = data.total_tasks;
 
-    // KPI Cards with stagger
+    // ── P2 Bento Grid: KPI Cards ──
     const completedTasks = data.task_statuses?.Done || 0;
     const totalTasks = data.total_tasks || 1;
     const completionPct = Math.round((completedTasks / totalTasks) * 100);
 
+    // Stage sparkline data for hero card
+    const stages = data.stages || {};
+    const stageVals = Object.values(stages);
+    const stageMax = Math.max(...stageVals, 1);
+
+    // Task status sparkline data
+    const taskStatuses = data.task_statuses || {};
+    const taskVals = Object.values(taskStatuses);
+    const taskMax = Math.max(...taskVals, 1);
+
+    // Build sparkline HTML helper
+    function sparkline(values, max, color) {
+      if (!values.length) return '';
+      return `<div class="kpi-sparkline">${values.map(v =>
+        `<div class="spark-bar" style="height:${Math.max(12, (v / max) * 100)}%;background:${color}"></div>`
+      ).join('')}</div>`;
+    }
+
     grid.innerHTML = `
-      <div class="kpi-card stagger-in">
-        <div class="kpi-icon"><i data-lucide="ruler" class="nav-icon"></i></div>
-        <div class="kpi-value">${data.total_projects}</div>
-        <div class="kpi-label">Projects</div>
+      <div class="kpi-card kpi-hero stagger-in">
+        <div>
+          <div class="kpi-icon"><i data-lucide="ruler" class="nav-icon"></i></div>
+          <div class="kpi-value">${data.total_projects}</div>
+          <div class="kpi-label">Active Projects</div>
+        </div>
+        <div class="kpi-meta">
+          <div class="kpi-sub">${Object.keys(stages).length} stages</div>
+          ${sparkline(stageVals, stageMax, 'var(--gold)')}
+        </div>
       </div>
       <div class="kpi-card stagger-in">
         <div class="kpi-icon"><i data-lucide="users" class="nav-icon"></i></div>
@@ -64,11 +88,12 @@
         <div class="kpi-icon"><i data-lucide="check-circle" class="nav-icon"></i></div>
         <div class="kpi-value">${data.total_tasks}</div>
         <div class="kpi-label">Tasks</div>
+        ${sparkline(taskVals, taskMax, 'var(--stage-sd)')}
       </div>
       <div class="kpi-card stagger-in">
-        <div class="kpi-icon">●</div>
+        <div class="kpi-icon"><i data-lucide="activity" class="nav-icon"></i></div>
         <div class="kpi-value">${completionPct}%</div>
-        <div class="kpi-label">Task Completion</div>
+        <div class="kpi-label">Completion</div>
         <div class="progress-bar" style="margin-top:8px;width:100%">
           <div class="progress-fill" style="width:${completionPct}%"></div>
         </div>
@@ -78,8 +103,7 @@
     // Re-initialize Lucide icons in KPI cards
     if (window.lucide) lucide.createIcons();
 
-    // Pipeline chart (animated bars)
-    const stages = data.stages || {};
+    // ── Pipeline chart (animated bars) ──
     const stageColors = {
       '(SD) Schematic Design': 'var(--stage-sd)',
       '(DD) Design Development': 'var(--stage-dd)',
@@ -134,5 +158,52 @@
         bar.style.width = bar.dataset.targetWidth;
       });
     });
+
+    // ── P2.5: Recent Activity Tile ──
+    loadRecentActivity();
+  }
+
+  async function loadRecentActivity() {
+    const container = document.getElementById('recent-activity');
+    if (!container) return;
+    container.innerHTML = '<div class="spinner" style="padding:20px"></div>';
+
+    try {
+      const interactions = await API.interactions();
+      if (!interactions || !interactions.length) {
+        container.innerHTML = `
+          <div class="activity-list">
+            <div class="activity-item">
+              <div class="activity-dot"></div>
+              <div class="activity-body">
+                <div class="activity-title" style="color:var(--text-muted)">No recent activity</div>
+                <div class="activity-sub">Interactions will appear here</div>
+              </div>
+            </div>
+          </div>`;
+        return;
+      }
+
+      // Sort by date descending, take last 5
+      const sorted = interactions
+        .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+        .slice(0, 5);
+
+      container.innerHTML = `<div class="activity-list">${sorted.map(ix => {
+        const typeClass = (ix.type || '').toLowerCase().replace(/\s+/g, '-');
+        const date = ix.date ? new Date(ix.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) : '';
+        return `
+          <div class="activity-item stagger-in">
+            <div class="activity-dot type-${typeClass}"></div>
+            <div class="activity-body">
+              <div class="activity-title">${ix.title || 'Untitled'}</div>
+              <div class="activity-sub">${ix.client_name || ''} ${ix.type ? '· ' + ix.type : ''}</div>
+            </div>
+            <div class="activity-time">${date}</div>
+          </div>`;
+      }).join('')}</div>`;
+    } catch (e) {
+      container.innerHTML = '<div style="padding:12px;font-size:0.8rem;color:var(--text-muted)">Could not load activity</div>';
+    }
   }
 })();
