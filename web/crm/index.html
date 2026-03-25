@@ -10,6 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/design-system.css" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏗️</text></svg>" />
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
 <body>
   <!-- Mobile Hamburger -->
@@ -34,7 +35,7 @@
         <div class="nav-section">
           <span class="nav-label">Overview</span>
           <a class="nav-item active" data-view="dashboard" id="nav-dashboard">
-            <span class="nav-icon">📊</span> Dashboard
+            <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span> Dashboard
           </a>
         </div>
 
@@ -42,19 +43,19 @@
         <div class="nav-section">
           <span class="nav-label">Operations</span>
           <a class="nav-item" data-view="clients" id="nav-clients">
-            <span class="nav-icon">👥</span> Clients
+            <span class="nav-icon"><i data-lucide="users"></i></span> Clients
             <span class="nav-badge badge-info" id="badge-clients">—</span>
           </a>
           <a class="nav-item" data-view="projects" id="nav-projects">
-            <span class="nav-icon">📐</span> Projects
+            <span class="nav-icon"><i data-lucide="folder-kanban"></i></span> Projects
             <span class="nav-badge badge-warning" id="badge-projects">—</span>
           </a>
           <a class="nav-item" data-view="tasks" id="nav-tasks">
-            <span class="nav-icon">✅</span> Tasks
+            <span class="nav-icon"><i data-lucide="check-circle-2"></i></span> Tasks
             <span class="nav-badge badge-danger" id="badge-tasks">—</span>
           </a>
           <a class="nav-item" data-view="team" id="nav-team">
-            <span class="nav-icon">👷</span> Team & Suppliers
+            <span class="nav-icon"><i data-lucide="hard-hat"></i></span> Team & Suppliers
           </a>
         </div>
 
@@ -62,25 +63,25 @@
         <div class="nav-section">
           <span class="nav-label">Management</span>
           <a class="nav-item" data-view="meetings" data-role="admin" id="nav-meetings">
-            <span class="nav-icon">📅</span> Meetings
+            <span class="nav-icon"><i data-lucide="calendar"></i></span> Meetings
             <span class="nav-badge badge-info" id="badge-meetings">—</span>
           </a>
           <a class="nav-item" data-view="pipeline" data-role="admin" id="nav-pipeline">
-            <span class="nav-icon">🔄</span> Pipeline
+            <span class="nav-icon"><i data-lucide="git-branch"></i></span> Pipeline
             <span class="nav-badge badge-warning" id="badge-pipeline">—</span>
           </a>
           <a class="nav-item" data-view="interactions" data-role="admin" id="nav-interactions">
-            <span class="nav-icon">💬</span> Interactions
+            <span class="nav-icon"><i data-lucide="message-square"></i></span> Interactions
             <span class="nav-badge badge-info" id="badge-interactions">—</span>
           </a>
           <a class="nav-item" data-view="concept-plans" data-role="admin" id="nav-concept-plans">
-            <span class="nav-icon">📋</span> Concept Plans
+            <span class="nav-icon"><i data-lucide="clipboard-list"></i></span> Concept Plans
           </a>
           <a class="nav-item" data-view="reports" data-role="admin" id="nav-reports">
-            <span class="nav-icon">📈</span> Reports
+            <span class="nav-icon"><i data-lucide="bar-chart-3"></i></span> Reports
           </a>
           <a class="nav-item" data-view="admin-settings" data-role="admin" id="nav-admin-settings">
-            <span class="nav-icon">⚙️</span> Settings
+            <span class="nav-icon"><i data-lucide="settings"></i></span> Settings
           </a>
         </div>
 
@@ -88,17 +89,21 @@
         <div class="nav-section">
           <span class="nav-label">External</span>
           <a class="nav-item" href="https://docs.google.com/spreadsheets/d/1PvURHGRwsQqdmC5pp0zlKHJE3QcfgpZJlP1zxD0iztY" target="_blank" id="nav-sheets">
-            <span class="nav-icon">📗</span> Google Sheets
-            <span style="margin-left:auto;opacity:0.4">↗</span>
+            <span class="nav-icon"><i data-lucide="sheet"></i></span> Google Sheets
+            <span style="margin-left:auto;opacity:0.4"><i data-lucide="external-link" style="width:14px;height:14px"></i></span>
           </a>
           <a class="nav-item" id="nav-logout" style="cursor:pointer">
-            <span class="nav-icon">🚪</span> Logout
+            <span class="nav-icon"><i data-lucide="log-out"></i></span> Logout
           </a>
         </div>
       </nav>
 
       <div class="sidebar-footer">
-        <span>v4.0.0</span>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+          <i data-lucide="sun" class="theme-icon-light"></i>
+          <i data-lucide="moon" class="theme-icon-dark"></i>
+        </button>
+        <span>v5.0.0</span>
         <span id="current-date"></span>
       </div>
     </aside>
@@ -131,7 +136,7 @@
       <!-- Clients View -->
       <section class="view" id="view-clients">
         <div class="view-header">
-          <h1 class="view-title">👥 Clients</h1>
+          <h1 class="view-title">Clients</h1>
           <div class="view-actions">
             <button class="btn btn-primary btn-sm" onclick="showAddClientForm()">➕ Add Client</button>
             <button class="btn btn-ghost btn-sm" id="clients-view-table">📋 Table</button>
@@ -159,7 +164,7 @@
       <!-- Projects View -->
       <section class="view" id="view-projects">
         <div class="view-header">
-          <h1 class="view-title">📐 Projects</h1>
+          <h1 class="view-title">Projects</h1>
           <div class="view-actions">
             <button class="btn btn-primary btn-sm" onclick="showAddProjectForm()">➕ Add Project</button>
             <button class="btn btn-ghost btn-sm" id="projects-view-kanban">📊 Kanban</button>
@@ -195,7 +200,7 @@
       <!-- Tasks View -->
       <section class="view" id="view-tasks">
         <div class="view-header">
-          <h1 class="view-title">✅ Tasks</h1>
+          <h1 class="view-title">Tasks</h1>
           <div class="view-actions">
             <button class="btn btn-primary btn-sm" onclick="showAddTaskForm()">➕ Add Task</button>
             <button class="btn btn-ghost btn-sm" id="tasks-view-board">📊 Board</button>
@@ -221,7 +226,7 @@
       <!-- Meetings View -->
       <section class="view" id="view-meetings">
         <div class="view-header">
-          <h1 class="view-title">📅 Meetings</h1>
+          <h1 class="view-title">Meetings</h1>
         </div>
         <div class="filter-bar">
           <input class="filter-input" type="text" id="meetings-search" placeholder="🔍 Search meetings..." />
@@ -232,7 +237,7 @@
       <!-- Pipeline View -->
       <section class="view" id="view-pipeline">
         <div class="view-header">
-          <h1 class="view-title">🔄 Work Pipeline</h1>
+          <h1 class="view-title">Work Pipeline</h1>
         </div>
         <div class="filter-bar">
           <input class="filter-input" type="text" id="pipeline-search" placeholder="🔍 Search pipeline..." />
@@ -246,7 +251,7 @@
       <!-- Interactions View -->
       <section class="view" id="view-interactions">
         <div class="view-header">
-          <h1 class="view-title">💬 Interactions</h1>
+          <h1 class="view-title">Interactions</h1>
         </div>
         <div class="filter-bar">
           <input class="filter-input" type="text" id="interactions-search" placeholder="🔍 Search interactions..." />
@@ -257,7 +262,7 @@
       <!-- Team & Suppliers View -->
       <section class="view" id="view-team">
         <div class="view-header">
-          <h1 class="view-title">👷 Team & Suppliers</h1>
+          <h1 class="view-title">Team & Suppliers</h1>
         </div>
         <div class="tab-bar" id="team-tabs">
           <button class="tab-btn active" data-tab="team-members">Team Members</button>
@@ -269,7 +274,7 @@
       <!-- Reports View -->
       <section class="view" id="view-reports">
         <div class="view-header">
-          <h1 class="view-title">📈 Reports & Analytics</h1>
+          <h1 class="view-title">Reports & Analytics</h1>
         </div>
         <div id="reports-content"><div class="spinner"></div></div>
       </section>
@@ -282,7 +287,7 @@
       <!-- Admin Settings View -->
       <section class="view" id="view-admin-settings">
         <div class="view-header">
-          <h1 class="view-title">⚙️ Admin Settings</h1>
+          <h1 class="view-title">Admin Settings</h1>
         </div>
         <div id="admin-settings-content"><div class="spinner"></div></div>
       </section>
@@ -327,5 +332,29 @@
   <script src="js/interactions.js"></script>
   <script src="js/concept_plans.js"></script>
   <script src="js/admin.js"></script>
+  <script>
+    // Lucide icons init
+    lucide.createIcons();
+
+    // Theme toggle
+    (() => {
+      const toggle = document.getElementById('theme-toggle');
+      const saved = localStorage.getItem('majaz-theme');
+      if (saved === 'light') document.documentElement.setAttribute('data-theme', 'light');
+
+      toggle?.addEventListener('click', () => {
+        const isLight = document.documentElement.getAttribute('data-theme') === 'light';
+        if (isLight) {
+          document.documentElement.removeAttribute('data-theme');
+          localStorage.setItem('majaz-theme', 'dark');
+        } else {
+          document.documentElement.setAttribute('data-theme', 'light');
+          localStorage.setItem('majaz-theme', 'light');
+        }
+        // Re-create icons to pick up new currentColor
+        lucide.createIcons();
+      });
+    })();
+  </script>
 </body>
 </html>
