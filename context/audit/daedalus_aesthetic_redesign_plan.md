@@ -110,7 +110,7 @@ The light theme gets proper glassmorphism treatment with translucent white glass
 
 ## §4 Remediation Plan — 8 Phases
 
-### Phase 1 — Collapsible Sidebar (Est: 2 sessions)
+### Phase 1 — Collapsible Sidebar ✅ COMPLETED (Commit `77dccef`)
 **[INSPIRED BY: Supabase sidebar pattern](https://navbar.gallery) | [UX Planet best practices](https://uxplanet.org)**
 
 | Task | Detail |
@@ -139,7 +139,7 @@ The light theme gets proper glassmorphism treatment with translucent white glass
 
 **Token impact:** Add grid template tokens `--dashboard-cols: 4` and `--dashboard-gap: var(--space-md)`
 
-### Phase 3 — Glassmorphism v2 (Est: 1 session)
+### Phase 3 — Glassmorphism v2 ✅ COMPLETED (Commit `2b56468`)
 **[INSPIRED BY: Dark Glassmorphism on Medium](https://medium.com) | SSoT §2**
 
 | Task | Detail |
@@ -152,7 +152,7 @@ The light theme gets proper glassmorphism treatment with translucent white glass
 
 **Token impact:** Add `--glass-bg-light: rgba(255,255,255,0.72)` (already exists in SSoT)
 
-### Phase 4 — Border Radius Alignment (Est: 30 min)
+### Phase 4 — Border Radius Alignment ✅ COMPLETED (Commit `2b56468`)
 **SSoT §5 compliance**
 
 | Task | Detail |
@@ -162,7 +162,7 @@ The light theme gets proper glassmorphism treatment with translucent white glass
 | 4.3 | Update sidebar from `0` → `var(--radius-lg)` on right edge only |
 | 4.4 | Audit all hardcoded `border-radius` and replace with tokens |
 
-### Phase 5 — Card Hover & Ambient Glow (Est: 1 session)
+### Phase 5 — Card Hover & Ambient Glow ✅ COMPLETED (Commit `2b56468`)
 **SSoT §2 + §4 compliance**
 
 | Task | Detail |
@@ -173,7 +173,7 @@ The light theme gets proper glassmorphism treatment with translucent white glass
 | 5.4 | Add `.glass-card:active` press: `transform: scale(0.98); transition-duration: 0.1s` |
 | 5.5 | Wrap all hover/motion in `@media (prefers-reduced-motion: no-preference)` |
 
-### Phase 6 — Accessibility Pass (Est: 1 session)
+### Phase 6 — Accessibility Pass ✅ COMPLETED (Commit `2b56468`)
 
 | Task | Detail |
 |---|---|
@@ -184,7 +184,7 @@ The light theme gets proper glassmorphism treatment with translucent white glass
 | 6.5 | Run contrast ratio check on all text-on-surface combinations |
 | 6.6 | Add `role` and `aria-` attributes to Kanban board (drag sources/targets) |
 
-### Phase 7 — Light Theme Polish (Est: 1 session)
+### Phase 7 — Light Theme Polish ✅ COMPLETED (Commit `2b56468`)
 
 | Task | Detail |
 |---|---|
@@ -225,20 +225,22 @@ The following tokens need to be added to `design-system.css` for v6.0.0:
 
 ---
 
-## §6 Execution Priority Matrix
+## §6 Execution Status
 
-| Phase | Priority | Effort | Impact | Dependency |
-|---|:---:|:---:|:---:|---|
-| **P6: Accessibility** | 🔴 Critical | Medium | High | None |
-| **P5: Card Hover & Glow** | 🟡 High | Low | High | P4 |
-| **P4: Border Radius** | 🟡 High | Low | Medium | None |
-| **P3: Glassmorphism v2** | 🟡 High | Low | High | P4 |
-| **P7: Light Theme Polish** | 🟡 High | Medium | High | P3 |
-| **P1: Collapsible Sidebar** | 🟢 Medium | High | High | None |
-| **P2: Bento Grid** | 🟢 Medium | High | Very High | P1 |
-| **P8: Motion** | 🟢 Medium | Medium | Medium | P5, P6 |
+| Phase | Status | Commit | Notes |
+|---|:---:|---|---|
+| **P1: Collapsible Sidebar** | ✅ Done | `77dccef` | 240→60px toggle, localStorage, auto-collapse <1024px, tooltips |
+| **P2: Bento Grid** | ⏳ Pending | — | Dashboard needs asymmetric grid layout |
+| **P3: Glassmorphism v2** | ✅ Done | `2b56468` | blur(16px), layered glass, ambient glow |
+| **P4: Border Radius** | ✅ Done | `2b56468` | 16px outer, 10px inner, all tokenized |
+| **P5: Card Hover & Glow** | ✅ Done | `2b56468` | Gold glow, spring press, spring easing |
+| **P6: Accessibility** | ✅ Done | `2b56468` | Focus rings, skip-link, reduced-motion |
+| **P7: Light Theme Polish** | ✅ Done | `2b56468` | Glass panels, drop shadows, warm gold |
+| **P8: Motion** | ⏳ Pending | — | Stagger anims, View Transitions API |
 
-**Recommended execution order:** P4 → P3 → P5 → P6 → P7 → P1 → P2 → P8
+**Completion: 6/8 phases done (75%)**
+
+**Remaining work:** P2 (Bento Grid) → P8 (Motion & View Transitions)
 
 ---
 
