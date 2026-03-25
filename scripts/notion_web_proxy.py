@@ -182,7 +182,14 @@ def notion_query(db_id, filter_obj=None, sorts=None, page_size=100):
     while has_more:
         if cursor:
             body["start_cursor"] = cursor
-        resp = requests.post(url, headers=HEADERS, json=body)
+        # Retry with exponential backoff on 429
+        for attempt in range(4):
+            resp = requests.post(url, headers=HEADERS, json=body)
+            if resp.status_code == 429:
+                wait = (2 ** attempt) * 0.5
+                time.sleep(wait)
+                continue
+            break
         if resp.status_code != 200:
             return all_results
         data = resp.json()
@@ -330,6 +337,7 @@ def transform_client(page):
         "project_s_num": _rollup(p.get("PROJECT/S NUM")),
         "project_ids": _relation_ids(p.get("PROJECTS")),
         "created": _created(page),
+        "_last_edited": page.get("last_edited_time", ""),
     }
 
 def transform_project(page):
@@ -352,6 +360,7 @@ def transform_project(page):
         "meeting_ids": _relation_ids(p.get("Meetings")),
         "pipeline_ids": _relation_ids(p.get("Work Pipe line")),
         "created": _created(page),
+        "_last_edited": page.get("last_edited_time", ""),
     }
 
 def transform_task(page):
@@ -366,7 +375,7 @@ def transform_task(page):
         "deadline": _formula(p.get("Deadline")),
         "project_ids": _relation_ids(p.get("Project")),
         "created": _created(page),
-        "last_edited": _edited(page),
+        "_last_edited": page.get("last_edited_time", ""),
     }
 
 def transform_interaction(page):
@@ -469,7 +478,7 @@ def transform_team(page):
 # ── Health ──
 @app.route("/health")
 def health():
-    return jsonify({"status": "ok", "version": "2.0.0", "databases": len(DB)})
+    return jsonify({"status": "ok", "version": "7.0.0", "databases": len(DB)})
 
 
 # ── Dashboard (aggregated KPIs) ──
@@ -661,6 +670,14 @@ def update_project(page_id):
             headers=HEADERS, json={"in_trash": True}
         )
         return jsonify({"ok": resp.status_code == 200})
+    # ── Conflict detection (S3) ──
+    client_last = data.pop("_last_edited", None)
+    if client_last:
+        current = notion_get_page(page_id)
+        if current:
+            server_last = current.get("last_edited_time", "")
+            if server_last and client_last != server_last:
+                return jsonify({"error": "conflict", "message": "This record was modified in Notion since you last loaded it. Please refresh and try again.", "server_last_edited": server_last}), 409
     props = {}
     if "stage" in data:
         props["Stage"] = {"status": {"name": data["stage"]}}
@@ -700,6 +717,14 @@ def update_task(page_id):
             headers=HEADERS, json={"in_trash": True}
         )
         return jsonify({"ok": resp.status_code == 200})
+    # ── Conflict detection (S3) ──
+    client_last = data.pop("_last_edited", None)
+    if client_last:
+        current = notion_get_page(page_id)
+        if current:
+            server_last = current.get("last_edited_time", "")
+            if server_last and client_last != server_last:
+                return jsonify({"error": "conflict", "message": "This record was modified since you last loaded it. Please refresh and try again.", "server_last_edited": server_last}), 409
     props = {}
     if "status" in data:
         props["Status"] = {"status": {"name": data["status"]}}
@@ -838,7 +863,7 @@ def get_activity():
 # ══════════════════════════════════════════════════════════════
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5051))
-    print(f"🏗️  Majaz CRM API v2.0.0")
+    print(f"🏗️  Majaz CRM API v6.1.0")
     print(f"📡 Serving {len(DB)} Notion databases on port {port}")
     print(f"🔗 API: http://localhost:{port}/api")
     print(f"💚 Health: http://localhost:{port}/health")

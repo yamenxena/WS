@@ -5,13 +5,19 @@
 (() => {
   let meetingsData = [];
   let loaded = false;
+  let lastFetchTime = 0;
 
   window.addEventListener('viewChange', (e) => {
-    if (e.detail.view === 'meetings' && !loaded) loadMeetings();
+    if (e.detail.view === 'meetings') {
+      if (!loaded || (Date.now() - lastFetchTime > 60000)) loadMeetings();
+    }
   });
+
+  window.refreshMeetings = function() { loaded = false; loadMeetings(); };
 
   async function loadMeetings() {
     loaded = true;
+    lastFetchTime = Date.now();
     const res = await API.meetings();
     if (!res) return;
     meetingsData = res.rows || [];

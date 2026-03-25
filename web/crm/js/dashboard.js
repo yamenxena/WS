@@ -3,16 +3,22 @@
  */
 (() => {
   let loaded = false;
+  let lastFetchTime = 0;
 
   window.addEventListener('viewChange', (e) => {
-    if (e.detail.view === 'dashboard' && !loaded) loadDashboard();
+    if (e.detail.view === 'dashboard') {
+      if (!loaded || (Date.now() - lastFetchTime > 60000)) loadDashboard();
+    }
   });
+
+  window.refreshDashboard = function() { loaded = false; loadDashboard(); };
 
   // Auto-load on boot
   setTimeout(() => { if (!loaded) loadDashboard(); }, 100);
 
   async function loadDashboard() {
     loaded = true;
+    lastFetchTime = Date.now();
 
     // Show skeleton while loading
     const grid = document.getElementById('kpi-grid');
@@ -169,8 +175,9 @@
     container.innerHTML = '<div class="spinner" style="padding:20px"></div>';
 
     try {
-      const interactions = await API.interactions();
-      if (!interactions || !interactions.length) {
+      const interactionsRes = await API.interactions();
+      const ixList = interactionsRes?.rows || interactionsRes || [];
+      if (!ixList || !ixList.length) {
         container.innerHTML = `
           <div class="activity-list">
             <div class="activity-item">
@@ -185,7 +192,7 @@
       }
 
       // Sort by date descending, take last 5
-      const sorted = interactions
+      const sorted = ixList
         .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
         .slice(0, 5);
 
@@ -196,8 +203,8 @@
           <div class="activity-item stagger-in">
             <div class="activity-dot type-${typeClass}"></div>
             <div class="activity-body">
-              <div class="activity-title">${ix.title || 'Untitled'}</div>
-              <div class="activity-sub">${ix.client_name || ''} ${ix.type ? '· ' + ix.type : ''}</div>
+              <div class="activity-title">${ix.name || 'Untitled'}</div>
+              <div class="activity-sub">${ix.type ? ix.type : ''}</div>
             </div>
             <div class="activity-time">${date}</div>
           </div>`;

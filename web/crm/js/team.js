@@ -4,11 +4,16 @@
  */
 (() => {
   let loaded = false;
+  let lastFetchTime = 0;
   let currentTab = 'team-members';
 
   window.addEventListener('viewChange', (e) => {
-    if (e.detail.view === 'team' && !loaded) loadTeam();
+    if (e.detail.view === 'team') {
+      if (!loaded || (Date.now() - lastFetchTime > 60000)) loadTeam();
+    }
   });
+
+  window.refreshTeam = function() { loaded = false; loadTeam(); };
 
   window.addEventListener('tabChange', (e) => {
     if (e.detail.tab === 'team-members' || e.detail.tab === 'suppliers') {
@@ -21,6 +26,7 @@
 
   async function loadTeam() {
     loaded = true;
+    lastFetchTime = Date.now();
     const [teamRes, supplierRes] = await Promise.all([API.team(), API.suppliers()]);
     teamData = teamRes?.rows || [];
     supplierData = supplierRes?.rows || [];

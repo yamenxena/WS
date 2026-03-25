@@ -109,7 +109,7 @@
           <i data-lucide="sun" class="theme-icon-light"></i>
           <i data-lucide="moon" class="theme-icon-dark"></i>
         </button>
-        <span>v6.0.0</span>
+        <span>v7.0.0</span>
         <span id="current-date"></span>
       </div>
     </aside>
@@ -127,6 +127,7 @@
           </div>
         </div>
         <div class="bento-grid">
+          <button class="btn btn-ghost btn-sm" onclick="refreshDashboard()" title="Refresh" style="position:absolute;right:24px;top:12px;z-index:2;font-size:1.1rem;padding:4px 8px">🔄</button>
           <div class="bento-kpi-container" id="kpi-grid">
             <div class="spinner"></div>
           </div>
@@ -150,7 +151,8 @@
         <div class="view-header">
           <h1 class="view-title">Clients</h1>
           <div class="view-actions">
-            <button class="btn btn-primary btn-sm" onclick="showAddClientForm()">+ Add Client</button>
+            <button class="btn btn-primary btn-sm" data-role="admin" onclick="showAddClientForm()">+ Add Client</button>
+            <button class="btn btn-ghost btn-sm" onclick="refreshClients()" title="Refresh from Notion">🔄</button>
             <button class="btn btn-ghost btn-sm" id="clients-view-table">Table</button>
             <button class="btn btn-ghost btn-sm" id="clients-view-kanban">Kanban</button>
           </div>
@@ -178,7 +180,8 @@
         <div class="view-header">
           <h1 class="view-title">Projects</h1>
           <div class="view-actions">
-            <button class="btn btn-primary btn-sm" onclick="showAddProjectForm()">+ Add Project</button>
+            <button class="btn btn-primary btn-sm" data-role="admin" onclick="showAddProjectForm()">+ Add Project</button>
+            <button class="btn btn-ghost btn-sm" onclick="refreshProjects()" title="Refresh from Notion">🔄</button>
             <button class="btn btn-ghost btn-sm" id="projects-view-kanban">Kanban</button>
             <button class="btn btn-ghost btn-sm" id="projects-view-table">Table</button>
           </div>
@@ -214,7 +217,8 @@
         <div class="view-header">
           <h1 class="view-title">Tasks</h1>
           <div class="view-actions">
-            <button class="btn btn-primary btn-sm" onclick="showAddTaskForm()">+ Add Task</button>
+            <button class="btn btn-primary btn-sm" data-role="admin" onclick="showAddTaskForm()">+ Add Task</button>
+            <button class="btn btn-ghost btn-sm" onclick="refreshTasks()" title="Refresh from Notion">🔄</button>
             <button class="btn btn-ghost btn-sm" id="tasks-view-board">Board</button>
             <button class="btn btn-ghost btn-sm" id="tasks-view-list">List</button>
           </div>
@@ -316,20 +320,14 @@
     <div class="side-peek-body" id="side-peek-body"></div>
   </aside>
 
-  <!-- ═══ Legacy Detail Panel (backward compat, removed in R3) ═══ -->
-  <div class="detail-panel" id="detail-panel">
-    <div class="detail-panel-header">
-      <h2 id="detail-title">—</h2>
-      <button class="detail-panel-close" id="detail-close">✕</button>
-    </div>
-    <div class="detail-panel-body" id="detail-body"></div>
-  </div>
+  <!-- Legacy detail-panel removed in v6.1 — replaced by side-peek -->
 
   <!-- Toast container -->
   <div class="toast-container" id="toast-container"></div>
 
   <!-- ═══ Scripts ═══ -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="js/sanitize.js"></script>
   <script src="js/api.js"></script>
   <script src="js/combobox.js"></script>
   <script src="js/router.js"></script>

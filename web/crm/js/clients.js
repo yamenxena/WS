@@ -6,13 +6,19 @@
 (() => {
   let clientsData = [];
   let loaded = false;
+  let lastFetchTime = 0;
 
   window.addEventListener('viewChange', (e) => {
-    if (e.detail.view === 'clients' && !loaded) loadClients();
+    if (e.detail.view === 'clients') {
+      if (!loaded || (Date.now() - lastFetchTime > 60000)) loadClients();
+    }
   });
+
+  window.refreshClients = function() { loaded = false; loadClients(); };
 
   async function loadClients() {
     loaded = true;
+    lastFetchTime = Date.now();
     const res = await API.clients();
     if (!res) return;
     clientsData = res.rows || [];
@@ -30,7 +36,7 @@
     }
 
     // Populate lead status filter
-    const leadSelect = document.getElementById('clients-filter-lead');
+    const leadSelect = document.getElementById('clients-filter-lead-status');
     if (leadSelect && leadSelect.options.length <= 1) {
       ['Inquiry','Qualified','Proposal','Negotiation','Won','Lost'].forEach(s => {
         const opt = document.createElement('option');
@@ -42,13 +48,13 @@
     // Search + filter
     document.getElementById('clients-search')?.addEventListener('input', applyFilters);
     document.getElementById('clients-filter-location')?.addEventListener('change', applyFilters);
-    document.getElementById('clients-filter-lead')?.addEventListener('change', applyFilters);
+    document.getElementById('clients-filter-lead-status')?.addEventListener('change', applyFilters);
   }
 
   function applyFilters() {
     const q = (document.getElementById('clients-search')?.value || '').toLowerCase();
     const loc = document.getElementById('clients-filter-location')?.value || '';
-    const lead = document.getElementById('clients-filter-lead')?.value || '';
+    const lead = document.getElementById('clients-filter-lead-status')?.value || '';
     let filtered = clientsData;
     if (q) filtered = filtered.filter(c => c.name.toLowerCase().includes(q) || (c.email||'').toLowerCase().includes(q) || (c.phone||'').includes(q));
     if (loc) filtered = filtered.filter(c => c.location === loc);
@@ -202,7 +208,8 @@
         </div>
       </details>
 
-      <!-- ── Quick Edit ── -->
+      <!-- ── Quick Edit (Admin) / Read-Only (Team) ── -->
+      ${API.isAdmin() ? `
       <details class="peek-section" open>
         <summary>Quick Edit</summary>
         <div class="peek-section-body">
@@ -217,7 +224,13 @@
           <input id="edit-budget" type="number" class="peek-input" value="${c.budget || ''}" placeholder="Enter budget..." />
           <button class="btn btn-primary btn-sm" onclick="saveClientEdit('${c.id}')" style="width:100%;margin-top:8px">Save to Notion</button>
         </div>
-      </details>
+      </details>` : `
+      <details class="peek-section" open>
+        <summary>Details</summary>
+        <div class="peek-section-body">
+          <div class="peek-row"><span class="peek-label">Next Action</span><span>${c.next_action || '—'}</span></div>
+        </div>
+      </details>`}
 
       <!-- ── Info ── -->
       <details class="peek-section">

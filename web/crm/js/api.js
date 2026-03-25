@@ -1,5 +1,5 @@
 /**
- * Majaz CRM — API Client v4.0.0
+ * Majaz CRM — API Client v7.0.0
  * Connects to the Flask proxy at Vercel (or localhost for dev).
  * Handles JWT token + role from sessionStorage.
  */
@@ -18,15 +18,8 @@ const API = (() => {
     return h;
   }
 
-  function _authParam() {
-    const token = sessionStorage.getItem('majaz_token');
-    return (!token || token === 'dev-bypass') ? 'no_auth=1' : '';
-  }
-
   function _url(endpoint) {
-    const ap = _authParam();
-    const sep = endpoint.includes('?') ? '&' : '?';
-    return `${BASE}${endpoint}${ap ? sep + ap : ''}`;
+    return `${BASE}${endpoint}`;
   }
 
   // ── HTTP methods ──
@@ -80,6 +73,11 @@ const API = (() => {
         window.location.href = 'login.html';
         return null;
       }
+      if (res.status === 409) {
+        const body = await res.json();
+        if (typeof showToast === 'function') showToast('⚠️ Conflict: ' + (body.message || 'Record was modified elsewhere. Please refresh.'), 'error');
+        return { error: 'conflict', conflict: true, message: body.message };
+      }
       return await res.json();
     } catch (err) {
       console.error(`[API PATCH] ${endpoint}:`, err);
@@ -105,7 +103,6 @@ const API = (() => {
     meetings:     () => _get('/api/meetings'),
     pipeline:     () => _get('/api/pipeline'),
     interactions: () => _get('/api/interactions'),
-    stageCards:   () => _get('/api/stage-cards'),
     conceptPlans: () => _get('/api/concept-plans'),
     activity:     () => _get('/api/activity'),
 

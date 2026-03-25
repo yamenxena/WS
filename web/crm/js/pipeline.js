@@ -5,13 +5,19 @@
 (() => {
   let pipelineData = [];
   let loaded = false;
+  let lastFetchTime = 0;
 
   window.addEventListener('viewChange', (e) => {
-    if (e.detail.view === 'pipeline' && !loaded) loadPipeline();
+    if (e.detail.view === 'pipeline') {
+      if (!loaded || (Date.now() - lastFetchTime > 60000)) loadPipeline();
+    }
   });
+
+  window.refreshPipeline = function() { loaded = false; loadPipeline(); };
 
   async function loadPipeline() {
     loaded = true;
+    lastFetchTime = Date.now();
     const res = await API.pipeline();
     if (!res) return;
     pipelineData = res.rows || [];

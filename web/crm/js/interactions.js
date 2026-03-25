@@ -5,13 +5,19 @@
 (() => {
   let interactionsData = [];
   let loaded = false;
+  let lastFetchTime = 0;
 
   window.addEventListener('viewChange', (e) => {
-    if (e.detail.view === 'interactions' && !loaded) loadInteractions();
+    if (e.detail.view === 'interactions') {
+      if (!loaded || (Date.now() - lastFetchTime > 60000)) loadInteractions();
+    }
   });
+
+  window.refreshInteractions = function() { loaded = false; loadInteractions(); };
 
   async function loadInteractions() {
     loaded = true;
+    lastFetchTime = Date.now();
     const res = await API.interactions();
     if (!res) return;
     interactionsData = res.rows || [];

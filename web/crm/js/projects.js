@@ -6,17 +6,23 @@
 (() => {
   let projectsData = [];
   let loaded = false;
+  let lastFetchTime = 0;
   let viewMode = 'kanban';
 
   window.addEventListener('viewChange', (e) => {
-    if (e.detail.view === 'projects' && !loaded) loadProjects();
+    if (e.detail.view === 'projects') {
+      if (!loaded || (Date.now() - lastFetchTime > 60000)) loadProjects();
+    }
   });
+
+  window.refreshProjects = function() { loaded = false; loadProjects(); };
 
   document.getElementById('projects-view-kanban')?.addEventListener('click', () => { viewMode = 'kanban'; render(); });
   document.getElementById('projects-view-table')?.addEventListener('click', () => { viewMode = 'table'; render(); });
 
   async function loadProjects() {
     loaded = true;
+    lastFetchTime = Date.now();
     showSkeleton();
     const res = await API.projects();
     if (!res) return;
@@ -126,11 +132,15 @@
   }
 
   // Drag-and-drop handler → write-back to Notion
+  const _pendingDnD = new Set();
   window.handleDrop = async function(event, newStage) {
     event.preventDefault();
     const projectId = event.dataTransfer.getData('text/plain');
     const proj = projectsData.find(p => p.id === projectId);
     if (!proj || proj.stage === newStage) return;
+    // Prevent rapid-fire race condition (UU-A3)
+    if (_pendingDnD.has(projectId)) { showToast('Please wait, previous update is still saving...', 'info'); return; }
+    _pendingDnD.add(projectId);
 
     const oldStage = proj.stage;
     proj.stage = newStage;
@@ -138,8 +148,14 @@
 
     showToast(`Moving "${proj.name}" to ${newStage.replace(/[()]/g,'')}...`, 'info');
 
-    const result = await API.updateProject(projectId, { stage: newStage });
-    if (result && !result.error) {
+    const result = await API.updateProject(projectId, { stage: newStage, _last_edited: proj._last_edited || '' });
+    _pendingDnD.delete(projectId);
+    if (result && result.conflict) {
+      // Conflict: revert and force refresh
+      proj.stage = oldStage;
+      loaded = false;
+      loadProjects();
+    } else if (result && !result.error) {
       showToast(`"${proj.name}" stage updated in Notion!`, 'success');
       const card = document.getElementById(`card-${projectId}`);
       card?.classList.add('pulse');
@@ -204,10 +220,15 @@
           <select class="peek-input" id="detail-stage-select">
             ${allStages.map(s => `<option value="${s.key}" ${p.stage===s.key?'selected':''}>${s.key.replace(/[()]/g,'')}</option>`).join('')}
           </select>
+          ${API.isAdmin() ? `
           <label class="peek-label">Value (AED)</label>
           <input id="detail-project-value" type="number" class="peek-input" value="${p.value||''}" placeholder="Contract value..." />
           <label class="peek-label">Description</label>
           <textarea id="detail-project-desc" class="peek-input" style="min-height:60px;resize:vertical" placeholder="Project description...">${p.description||''}</textarea>
+          ` : `
+          ${p.value != null ? `<div class="peek-row"><span class="peek-label">Value</span><span class="mono" style="color:var(--gold)">${fmtCurrency(p.value)}</span></div>` : ''}
+          ${p.description ? `<div class="peek-row"><span class="peek-label">Description</span><span style="font-size:0.8rem;color:var(--text-muted)">${p.description}</span></div>` : ''}
+          `}
           <button class="btn btn-primary btn-sm" id="detail-save-project" style="width:100%;margin-top:8px">Save to Notion</button>
         </div>
       </details>
@@ -254,13 +275,17 @@
       const valInput = document.getElementById('detail-project-value')?.value;
       const descInput = document.getElementById('detail-project-desc')?.value?.trim();
 
-      const payload = { stage: newStage };
+      const payload = { stage: newStage, _last_edited: p._last_edited || '' };
       if (valInput !== '' && valInput != null) payload.value = parseFloat(valInput);
       if (descInput !== undefined) payload.description = descInput;
 
       showToast('Saving project to Notion...', 'info');
       const result = await API.updateProject(id, payload);
-      if (result && !result.error) {
+      if (result && result.conflict) {
+        loaded = false;
+        loadProjects();
+        closeSidePeek();
+      } else if (result && !result.error) {
         showToast('Project updated in Notion!', 'success');
         const proj = projectsData.find(pr => pr.id === id);
         if (proj) {

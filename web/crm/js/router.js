@@ -13,10 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const navItems    = document.querySelectorAll('.nav-item[data-view]');
   const views       = document.querySelectorAll('.view');
   const dateEl      = document.getElementById('current-date');
-  // Legacy detail panel
-  const detailPanel = document.getElementById('detail-panel');
-  const detailClose = document.getElementById('detail-close');
-  // New side-peek panel
+  // Side-peek panel
   const sidePeek      = document.getElementById('side-peek');
   const sidePeekClose = document.getElementById('side-peek-close');
 
@@ -30,6 +27,10 @@ document.addEventListener('DOMContentLoaded', () => {
     document.body.classList.add('role-admin');
   } else {
     document.body.classList.remove('role-admin');
+    // Hide all admin-only elements (buttons, nav items) for team users
+    document.querySelectorAll('[data-role="admin"]').forEach(el => {
+      el.style.display = 'none';
+    });
   }
 
   // Team users cannot navigate to admin-only views
@@ -115,7 +116,6 @@ document.addEventListener('DOMContentLoaded', () => {
       overlay.classList.remove('open');
 
       // Close panels
-      closeDetail();
       closeSidePeek();
 
       // Scroll main to top
@@ -168,20 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.closeSidePeek = closeSidePeek;
   sidePeekClose?.addEventListener('click', closeSidePeek);
 
-  // ══════════════════════════════════════════════════════════════
-  // LEGACY DETAIL PANEL (backward compat — used until R3 migrates)
-  // ══════════════════════════════════════════════════════════════
-  window.openDetail = function(title, html) {
-    document.getElementById('detail-title').textContent = title;
-    document.getElementById('detail-body').innerHTML = html;
-    detailPanel.classList.add('open');
-  };
 
-  function closeDetail() {
-    detailPanel?.classList.remove('open');
-  }
-
-  detailClose?.addEventListener('click', closeDetail);
 
   // ══════════════════════════════════════════════════════════════
   // TAB BARS

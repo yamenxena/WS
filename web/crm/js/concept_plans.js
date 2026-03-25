@@ -3,10 +3,15 @@
    ══════════════════════════════════════════════════════════════ */
 (function () {
   let loaded = false;
+  let lastFetchTime = 0;
 
   window.addEventListener('viewChange', (e) => {
-    if (e.detail.view === 'concept-plans' && !loaded) window.loadConceptPlans();
+    if (e.detail.view === 'concept-plans') {
+      if (!loaded || (Date.now() - lastFetchTime > 60000)) window.loadConceptPlans();
+    }
   });
+
+  window.refreshConceptPlans = function() { loaded = false; window.loadConceptPlans(); };
 
   window.loadConceptPlans = async function () {
     if (loaded) return;
@@ -35,6 +40,7 @@
       const res = await API.conceptPlans();
       const plans = res?.rows || [];
       loaded = true;
+      lastFetchTime = Date.now();
       window._conceptPlans = plans;
       renderConceptPlans(plans);
     } catch (e) {

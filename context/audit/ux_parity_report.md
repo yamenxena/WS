@@ -1,7 +1,10 @@
 # Majaz CRM vs Notion: Deep UX & Parity Audit
 
+we must be able to have admin control on the app. only with admin access
+
 ## 1. Executive Summary
-The Majaz CRM app has successfully decentralized daily operations from Notion's dense, generic interface into a focused, high-performance web application. 
+
+The Majaz CRM app has successfully decentralized daily operations from Notion's dense, generic interface into a focused, high-performance web application.
 
 By evaluating the system through two primary lenses — **The Admin (Waseem)** and **The Employees (Team)** — this audit assesses whether data entry, modification, and readability have been preserved, simplified, or gated.
 
@@ -12,19 +15,21 @@ Overall Verdict: **The CRM app provides a superior, simplified daily experience 
 ## 2. Persona UX & Parity Breakdown
 
 ### A. The Employee Experience
+
 **Goal:** Reduce cognitive load, speed up data entry, and focus on daily tasks without being overwhelmed by Notion's backend properties.
 
-- **Entering Data (Adding):** 
+- **Entering Data (Adding):**
   - **Parity Achieved:** Employees can easily add new Clients, Projects, Tasks, and Interactions via focused modal forms.
-  - **UX Improvement:** In Notion, creating a client exposes ~30 structural properties. In the App, the user is presented with exactly **6 essential fields**, ensuring clean data is captured instantly.
+  - **UX Improvement:** In Notion, creating a client exposes ~30 structural properties. In the App, the user is presented with exactly **6 essential fields**, ensuring clean data is captured instantly. (here we must be able to view this from admin control)
 - **Changing Data (Editing):**
-  - **Parity Achieved:** Employees can drag-and-drop tasks across Kanban columns (Status changes) and projects across Pipeline stages.
+  - **Parity Achieved:** Employees can drag-and-drop tasks across Kanban columns (Status changes) and projects across Pipeline stages. (we must be able to scale column width )
   - **UX Improvement:** Mobile horizontal-scroll Kanban makes updating statuses on-the-go vastly easier than navigating Notion boards on a phone.
 - **Selecting & Linking Data:**
-  - **Parity Achieved:** When logging an interaction or task, the App provides clear dropdowns fetching live Clients/Projects. 
+  - **Parity Achieved:** When logging an interaction or task, the App provides clear dropdowns fetching live Clients/Projects.
 - **Simplicity & Clarity:** High. Employees only see what they need. Read-only views for Team & Suppliers ensure they don't accidentally corrupt master data.
 
 ### B. The Admin Experience (Waseem)
+
 **Goal:** Global oversight, trend analysis, pipeline steering, and master data management.
 
 - **KPIs & Reports (Oversight):**
@@ -43,10 +48,12 @@ Overall Verdict: **The CRM app provides a superior, simplified daily experience 
 The CRM utilizes a premium dark-mode theme (`var(--bg-app)` deep navy) paired with `var(--gold)` accents. This matches Majaz's architectural/premium branding far better than Notion's default generic UI. The use of glassmorphic panels (`backdrop-filter`) creates a spatial hierarchy that Notion lacks.
 
 **2. Information Density (Cognitive Load):**
+
 - **Notion problem:** A database with 27 columns requires horizontal scrolling for miles. Click a record, and a full-page side-peek opens with endless properties.
 - **App solution:** We built "Detail Panels" that logically group data into chunks (Contact, Profile, Business, Quick Edit, Linked Projects). This removes the overwhelming density.
 
 **3. Mobile Responsiveness:**
+
 - **Notion mobile:** Notoriously clunky for complex database maneuvering.
 - **App mobile:** Custom media queries (`max-width: 768px`) automatically turn the 3-column Kanban into a swipeable touch interface. The sidebar tucks behind a hamburger menu, preserving maximum screen real-estate for the actual data.
 

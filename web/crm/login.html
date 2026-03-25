@@ -244,7 +244,7 @@
         <div class="login-error" id="login-error">Invalid username or password</div>
       </form>
 
-      <a class="login-skip" id="login-skip">Skip → Open CRM (dev mode)</a>
+      <a class="login-skip" id="login-skip" style="display:none">Skip → Open CRM (dev mode)</a>
 
       <div class="login-footer">
         &copy; 2026 Majaz Engineering Consultancy
@@ -294,12 +294,18 @@
       }
     });
 
-    // Dev skip
-    document.getElementById('login-skip').addEventListener('click', () => {
-      sessionStorage.setItem('majaz_token', 'dev-bypass');
-      sessionStorage.setItem('majaz_role', 'admin');
-      window.location.href = 'index.html';
-    });
+    // Dev skip (localhost only)
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      const skipEl = document.getElementById('login-skip');
+      if (skipEl) {
+        skipEl.style.display = '';
+        skipEl.addEventListener('click', () => {
+          sessionStorage.setItem('majaz_token', 'dev-bypass');
+          sessionStorage.setItem('majaz_role', 'admin');
+          window.location.href = 'index.html';
+        });
+      }
+    }
   </script>
 </body>
 </html>

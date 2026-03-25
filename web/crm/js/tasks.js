@@ -6,17 +6,23 @@
 (() => {
   let tasksData = [];
   let loaded = false;
+  let lastFetchTime = 0;
   let viewMode = 'board';
 
   window.addEventListener('viewChange', (e) => {
-    if (e.detail.view === 'tasks' && !loaded) loadTasks();
+    if (e.detail.view === 'tasks') {
+      if (!loaded || (Date.now() - lastFetchTime > 60000)) loadTasks();
+    }
   });
+
+  window.refreshTasks = function() { loaded = false; loadTasks(); };
 
   document.getElementById('tasks-view-board')?.addEventListener('click', () => { viewMode = 'board'; render(); });
   document.getElementById('tasks-view-list')?.addEventListener('click', () => { viewMode = 'list'; render(); });
 
   async function loadTasks() {
     loaded = true;
+    lastFetchTime = Date.now();
     showSkeleton();
     const res = await API.tasks();
     if (!res) return;
@@ -110,19 +116,28 @@
   }
 
   // Drag-and-drop for task board
+  const _pendingTaskDnD = new Set();
   window.handleTaskDrop = async function(event, newStatus) {
     event.preventDefault();
     const taskId = event.dataTransfer.getData('text/plain');
     const task = tasksData.find(t => t.id === taskId);
     if (!task || task.status === newStatus) return;
+    // Prevent rapid-fire race condition (UU-A3)
+    if (_pendingTaskDnD.has(taskId)) { showToast('Please wait, previous update is still saving...', 'info'); return; }
+    _pendingTaskDnD.add(taskId);
 
     const oldStatus = task.status;
     task.status = newStatus;
     render();
 
     showToast(`Moving "${task.name}" to ${newStatus}...`, 'info');
-    const result = await API.updateTask(taskId, { status: newStatus });
-    if (result && !result.error) {
+    const result = await API.updateTask(taskId, { status: newStatus, _last_edited: task._last_edited || '' });
+    _pendingTaskDnD.delete(taskId);
+    if (result && result.conflict) {
+      task.status = oldStatus;
+      loaded = false;
+      loadTasks();
+    } else if (result && !result.error) {
       showToast(`Task status updated in Notion!`, 'success');
       const card = document.getElementById(`tcard-${taskId}`);
       card?.classList.add('pulse');
@@ -183,12 +198,20 @@
         </div>
       </details>
 
+      <!-- ── Linked Project ── -->
+      ${(t.project_ids||[]).length ? `
+      <details class="peek-section" open>
+        <summary>Project</summary>
+        <div class="peek-section-body">
+          ${t.project_ids.map(pid => `<div class="peek-row" style="color:var(--gold);cursor:pointer" onclick="showProject('${pid}')">View linked project →</div>`).join('')}
+        </div>
+      </details>` : ''}
+
       <!-- ── Meta ── -->
       <details class="peek-section">
         <summary>Meta</summary>
         <div class="peek-section-body">
           <div class="peek-row"><span class="peek-label">Created</span><span class="mono" style="font-size:0.75rem">${t.created || '—'}</span></div>
-          ${t.last_edited ? `<div class="peek-row"><span class="peek-label">Last Edited</span><span class="mono" style="font-size:0.75rem">${t.last_edited}</span></div>` : ''}
         </div>
       </details>
     `);
@@ -196,8 +219,12 @@
     document.getElementById('task-save-status')?.addEventListener('click', async () => {
       const newStatus = document.getElementById('task-status-select').value;
       showToast(`Updating task status...`, 'info');
-      const result = await API.updateTask(id, { status: newStatus });
-      if (result && !result.error) {
+      const result = await API.updateTask(id, { status: newStatus, _last_edited: t._last_edited || '' });
+      if (result && result.conflict) {
+        loaded = false;
+        loadTasks();
+        closeSidePeek();
+      } else if (result && !result.error) {
         showToast('Task status updated in Notion!', 'success');
         t.status = newStatus;
         setTimeout(() => render(), 800);
