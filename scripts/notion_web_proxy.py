@@ -247,19 +247,41 @@ def require_auth(f):
 
 @app.route("/api/auth/login", methods=["POST"])
 def login():
-    """Login and get a JWT token."""
+    """Login and get a JWT token. Returns role='admin' or 'team'."""
     data = request.get_json() or {}
     username = data.get("username", "")
     password = data.get("password", "")
-    # Simple credential check — configurable via env
-    valid_user = os.environ.get("MAJAZ_USER", "admin")
-    valid_pass = os.environ.get("MAJAZ_PASS", "majaz2026")
-    if username == valid_user and password == valid_pass:
+
+    # Admin credentials — full access
+    admin_user = os.environ.get("MAJAZ_USER", "admin")
+    admin_pass = os.environ.get("MAJAZ_PASS", "majaz2026")
+
+    # Team credentials — comma-separated "user:pass" pairs
+    # Example: MAJAZ_TEAM_USERS="ahmed:pass1,sara:pass2"
+    team_users_raw = os.environ.get("MAJAZ_TEAM_USERS", "team:majaz2026")
+
+    role = None
+
+    if username == admin_user and password == admin_pass:
+        role = "admin"
+    else:
+        # Check team credentials
+        for pair in team_users_raw.split(","):
+            pair = pair.strip()
+            if ":" in pair:
+                tu, tp = pair.split(":", 1)
+                if username == tu and password == tp:
+                    role = "team"
+                    break
+
+    if role:
         token = jwt.encode(
-            {"user": username, "exp": datetime.utcnow().timestamp() + 86400},
+            {"user": username, "role": role,
+             "exp": datetime.utcnow().timestamp() + 86400},
             JWT_SECRET, algorithm="HS256"
         )
-        return jsonify({"token": token, "user": username})
+        return jsonify({"token": token, "user": username, "role": role})
+
     return jsonify({"error": "Invalid credentials"}), 401
 
 

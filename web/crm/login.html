@@ -285,6 +285,7 @@
         if (!res.ok) throw new Error('auth_failed');
         const data = await res.json();
         sessionStorage.setItem('majaz_token', data.token);
+        sessionStorage.setItem('majaz_role', data.role || 'team');
         window.location.href = 'index.html';
       } catch (err) {
         errEl.classList.add('visible');
@@ -296,6 +297,7 @@
     // Dev skip
     document.getElementById('login-skip').addEventListener('click', () => {
       sessionStorage.setItem('majaz_token', 'dev-bypass');
+      sessionStorage.setItem('majaz_role', 'admin');
       window.location.href = 'index.html';
     });
   </script>
