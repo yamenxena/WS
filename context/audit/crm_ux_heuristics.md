@@ -1,109 +1,150 @@
-# Deep Research: Open-Source CRM UX/UI Heuristics & Principles
+# Majaz CRM — UX/UI Design Constitution (v2)
 
-This audit establishes a set of foundational UX/UI design heuristics specifically tailored for Enterprise CRM development, aggregated from modern open-source CRM projects (Twenty, EspoCRM, SuiteCRM) and adapted from Nielsen’s 10 Usability Heuristics.
-
-By observing these heuristics, Majaz CRM can ensure maximum user adoption, minimal cognitive load, and high data integrity.
-
----
-
-## 1. CRM-Specific UX/UI Paradigms
-
-1. **Progressive Disclosure vs. Data Walls**
-   * *The Problem:* Legacy CRMs present all 50 properties of a client record at once.
-   * *The Heuristic:* Show only essential identifying information (Name, Status, Primary Contact) on index/list views. Use *Detail Panels* (slide-overs) or *Modals* to reveal secondary information only when clicked.
-   * *Open Source Inspiration:* **Twenty CRM** utilizes clean, modern side-peek layouts to keep users in context without losing their place on a main table.
-
-2. **Role-Based Information Architecture**
-   * *The Problem:* Employees and Admins see the exact same overwhelming interface.
-   * *The Heuristic:* Tailor modules and dashboards. A junior engineer needs to see their active "Tasks" and "Projects." Waseem (Admin) needs the "Pipeline," "Reports," and "Audit Logs."
-   * *Open Source Inspiration:* **ERPNext** strictly permissions modules so users never suffer from feature fatigue.
-
-3. **Workflow Prioritization (Efficiency of Use)**
-   * *The Problem:* It takes 6 clicks and 3 page loads to add a new lead.
-   * *The Heuristic:* Core actions (Add Lead, Log Call, Update Status) must be globally accessible via floating action buttons or 1-click quick-edit forms. Drag-and-drop (Kanban) is the gold standard for state changes.
-   * *Open Source Inspiration:* **EspoCRM** focuses on speed and minimal page reloads, using fast contextual menus.
-
-4. **Match Real-World language**
-   * *The Problem:* System terms like `rel_client_id_fk` or generic names like `Item 42`.
-   * *The Heuristic:* Speak the user's language. Use stages like *(SD) Schematic Design* instead of *Phase 1*. 
+> **Scale:** SME (≤20 users) · **SSoT:** Notion · **Posture:** Full rewrite authorized  
+> **Design Philosophy:** Simplicity without compression loss — every Notion property surfaced, but only when needed.
 
 ---
 
-## 2. Adapting Nielsen’s 10 Heuristics for the Majaz CRM
+## 1. The Two Personas
 
-Applying the classic 10 heuristics directly to our CRM context:
+The entire CRM is built around two distinct user archetypes. Every screen, every button, every data field answers the question: *"Who needs this, and when?"*
 
-1. **Visibility of System Status**
-   Whenever a user updates a Pipeline stage or edits a Client, immediate visual feedback (e.g., green Toast notification "Client details updated") is mandatory.
-2. **User Control and Freedom**
-   Provide "emergency exits". If a user clicks a heavily loaded modal (like an Interaction log), a clear '✕' or ability to click outside the modal to close is essential.
-3. **Consistency and Standards**
-   If `var(--gold)` means an actionable button, never use it for a static label. If tasks are edited via a Detail Panel on the right, do not switch to a center modal for Projects.
-4. **Error Prevention**
-   Use relational dropdowns (fetching active projects from the API) instead of manual text inputs for linking records. This structurally prevents bad data.
-5. **Recognition Rather Than Recall**
-   Users should not have to remember a client's ID. When logging a task, the dropdown should show "Client Name (Location)".
-6. **Aesthetic and Minimalist Design**
-   Remove visual noise. In CRMs, white space (or dark space in our dark theme) is a feature. Too many borders and bold colors distract from the active data.
-7. **Help Diagnose and Recover from Errors**
-   If an API call to Notion fails, do not show `500 Internal Server Error`. Show: `⚠️ Could not save task. Please check your connection and try again.`
+### 👷 The Team (Employees)
+**Goal:** Get in, do the task, get out.  
+**Mindset:** "Show me my work. Let me update it. Don't make me think."
 
----
+| They NEED | They DON'T need |
+|-----------|-----------------|
+| Their assigned Tasks (filtered by owner) | Bulk database operations |
+| Active Projects they're working on | Financial summaries or pipeline stage counts |
+| Client contact info for calls/site visits | Lead source analytics or conversion funnels |
+| Quick status updates (drag-and-drop) | Schema management or property editing |
+| Mobile-first, thumb-friendly interface | Admin audit logs |
 
-## 3. Heuristic Implementation Checklist for Majaz CRM
-
-To enforce these best practices moving forward, all new features must pass this heuristic audit:
-
-- [ ] **Data Readability:** Can the user grasp the state of the entity in 3 seconds?
-- [ ] **Action Proximity:** Can the user perform the most likely next action in 1-2 clicks?
-- [ ] **Error Boundaries:** Are dangerous actions (deleting/overwriting) gated or hidden from accidental clicks?
-- [ ] **Context Retention:** Do modals and slide-overs preserve the background list view instead of navigating away?
-- [ ] **Mobile Touch Targets:** Are all interactive buttons and rows at least `44px` tall on mobile?
+**UX Rule:** The Team should never see more than **5-7 data columns** on any table view. All secondary data lives behind a click (side-peek).
 
 ---
 
-## 4. Top UI Dependencies & GitHub Repositories for Modern CRM Design
+### 🛡️ The Admin (Waseem)
+**Goal:** Full operational visibility. Steer the business, audit data quality, manage the pipeline.  
+**Mindset:** "Show me everything — but let me choose what to focus on."
 
-To attain the best CRM app design in 2026, leveraging established open-source structural dependencies is highly recommended. These ecosystems provide enterprise-ready accessibility, theming, and data-dense components.
+| They NEED | How to deliver it |
+|-----------|-------------------|
+| All 27 Client properties | Collapsible section groups (Contact / Profile / Business / Status) with **show/hide toggles** |
+| Full Pipeline with stage analytics | Kanban board + expandable stage summary cards |
+| Financial data (project values, budgets) | Dedicated Admin-only "Finance" tab or KPI row |
+| Ability to add/edit/archive any record | Full CRUD access with confirmation dialogs on destructive actions |
+| Audit trail (who changed what, when) | Activity log panel (sourced from Notion's `last_edited_by` + `last_edited_time`) |
+| Database-level configuration | Admin Settings page (property visibility toggles, default filters) |
 
-### Best Component Ecosystems (The "Modern Stack")
-1. **[shadcn/ui](https://github.com/shadcn-ui/ui)**: The current gold standard for React/Next.js dashboards. It provides beautifully styled, copy-paste components built on top of Radix UI (accessible primitives) and TailwindCSS. Perfect for building sophisticated CRM data tables, dropdowns, and side-peeks.
-2. **[Tremor](https://github.com/tremorlabs/tremor)**: The undeniable leader for building dashboard KPIs and CRM charts. Tremor offers React components specifically designed to make financial and operational data look incredible (Area Charts, Bar Charts, KPI trackers) using Tailwind CSS.
-3. **[Ant Design](https://github.com/ant-design/ant-design)**: With 90K+ stars, this is the most robust enterprise-class UI design language. It is heavily utilized for hyper-complex data tables with built-in filtering, sorting, and pagination, making it perfect for dense CRMs.
-
-### Top Open-Source CRM/Dashboard Templates (Reference Architectures)
-1. **[Twenty CRM](https://github.com/twentyhq/twenty)**: The fastest-growing open-source CRM. A masterclass in Notion/Airtable-style UX (editable tables, dynamic side-peeks, relational mapping) built with modern React. Study their repository for structural UI inspiration.
-2. **[TailAdmin](https://github.com/TailAdmin/TailAdmin)**: A highly-rated Tailwind CSS dashboard template supporting Vanilla HTML, React, and Vue. Excellent if the goal is to stick to a lightweight Vanilla JS/HTML setup but achieve a modern, component-based UI look.
-3. **[Atomic CRM]**: An open-source implementation using Next.js, Supabase, and shadcn/ui. It perfectly demonstrates the minimalist, developer-first dashboard aesthetic with high performance.
+**UX Rule:** The Admin sees every data field that exists in Notion — but grouped, collapsible, and filterable. **Never a wall of raw data.** Clarity through progressive disclosure with expand/collapse controls.
 
 ---
 
-## 5. Architectural Recommendations for Majaz CRM (SME — ≤20 Users)
+## 2. Core Design Heuristics (Adapted from Nielsen + Open-Source Leaders)
+
+These 8 rules govern every screen in the CRM. Sourced from Twenty CRM, EspoCRM, ERPNext, and Nielsen's 10 Usability Heuristics.
+
+| # | Heuristic | CRM Implementation |
+|---|-----------|-------------------|
+| 1 | **Progressive Disclosure** | Show 5-7 columns on list views. All secondary data accessed via a side-peek panel that slides from the right — never navigate away from the list. |
+| 2 | **Role-Based Views** | Team sees a filtered, simplified dashboard. Admin sees the full operational view. Same underlying data, different presentation layers. |
+| 3 | **1-Click Core Actions** | Add Client, Log Task, Update Status — always accessible via a floating action button (FAB) or inline quick-edit. Never more than 2 clicks for key workflows. |
+| 4 | **Visibility of System Status** | After every write-back, show an inline toast: `✅ Client updated` / `⚠️ Save failed — retry`. Never leave the user wondering if their action worked. |
+| 5 | **Error Prevention over Error Recovery** | Use relational dropdowns (fetching live Projects from API) instead of free text. Structurally prevent orphaned data. |
+| 6 | **Real-World Language** | Use `(SD) Schematic Design` not `Phase 1`. Use `Client` not `Contact Record`. Match terminology to what the team says on-site. |
+| 7 | **Admin: Show/Hide Toggles** | Admin can toggle visibility of data sections and columns. Collapsed state is remembered per-session so the Admin's custom view persists. |
+| 8 | **Mobile-First, Touch-Ready** | All interactive elements ≥44px. Horizontal-scroll Kanban. Hamburger sidebar. Stacked cards on narrow screens. |
+
+---
+
+## 3. Data Visibility Matrix (No Compression Loss)
+
+Every Notion property is surfaced in the CRM — nothing is hidden permanently. The question is *where* it appears for each persona.
+
+### Clients (27 Notion Properties)
+
+| Property | Team View (Table) | Team View (Side-Peek) | Admin View |
+|----------|:-:|:-:|:-:|
+| Name | ✅ Column | ✅ Header | ✅ Always |
+| Phone / Email | ✅ Column | ✅ Contact section | ✅ Always |
+| Location | ✅ Column | ✅ Contact section | ✅ Always |
+| Lead Status | ✅ Badge | ✅ Status section | ✅ Editable |
+| Service Type | — | ✅ Profile section | ✅ Editable |
+| ICP / Urgency / Budget | — | ✅ Business section | ✅ Editable |
+| Next Action / Next Action Date | — | ✅ Quick Edit | ✅ Editable |
+| Lead Source / Referral | — | — | ✅ Collapsible |
+| Projects (relation) | — | ✅ Linked list | ✅ Linked list |
+| Interactions (relation) | — | ✅ Linked list | ✅ Linked list |
+| Created/Edited timestamps | — | — | ✅ Audit section |
+
+### Projects / Tasks / Pipeline
+Same principle applies: **Team sees Name + Status + Owner on the table.** Everything else (Value, Duration, Description, Linked Client) is revealed in the side-peek or available on Admin views.
+
+---
+
+## 4. Reference Architecture & Best GitHub Sources
+
+### Component Ecosystems (Ordered by Relevance to Majaz)
+
+| Library | GitHub Stars | Why It's Relevant | Use Case |
+|---------|:-----------:|-------------------|----------|
+| [**TailAdmin**](https://github.com/TailAdmin/TailAdmin) | 10K+ | **Supports Vanilla HTML** — no React required. Gives us modern component aesthetics (sidebar, cards, tables, charts) without a framework. Closest fit to our current stack. | Dashboard layout, sidebar, data tables, form elements |
+| [**Twenty CRM**](https://github.com/twentyhq/twenty) | 25K+ | The gold-standard for CRM side-peek UX and relational data navigation. Study for UX patterns, not codebase adoption. | UX reference for side-peeks, inline editing, Kanban |
+| [**shadcn/ui**](https://github.com/shadcn-ui/ui) | 80K+ | Best-in-class accessible components. If we ever migrate to React/Next.js, this is the non-negotiable starting point. | Future migration reference |
+| [**Tremor**](https://github.com/tremorlabs/tremor) | 16K+ | Best dashboard chart/KPI components. Even without React, we can study their chart patterns and replicate with Chart.js. | KPI card design patterns, chart layouts |
+| [**EspoCRM**](https://github.com/espocrm/espocrm) | 2K+ | Clean, minimalist CRM with fast contextual menus and role-based layouts. The closest open-source CRM to our SME scale. | Workflow speed patterns, Admin layout reference |
+
+### CSS-Only Patterns We Can Adopt Immediately
+These require zero framework migration:
+- **CSS `details`/`summary`** for collapsible Admin sections (show/hide property groups)
+- **CSS Grid + `@container` queries** for responsive card layouts
+- **CSS `:has()` selectors** for state-driven styling (highlight rows with overdue tasks)
+- **`backdrop-filter: blur()`** for glassmorphic modal overlays (already in our design system)
+
+---
+
+## 5. Architectural Decision: Full Rewrite Strategy
 
 > [!IMPORTANT]
-> Majaz Engineering is a **Small-to-Medium Enterprise (SME)** with a user base that will not exceed **20 users** in the foreseeable future. All recommendations below are calibrated for this scale — not for a SaaS product or a 10,000-user enterprise.
+> The user has authorized a **full app rewrite** if it produces the best possible UX matching top GitHub standards. The question is not "should we rewrite?" but "what is the smartest rewrite path?"
 
-| Approach | Tech Stack | Verdict | Reasoning for an SME |
-|----------|------------|:-------:|----------------------|
-| **1. Full React Migration** | Next.js + shadcn/ui + Tailwind | ❌ **Overkill** | Introduces a Node.js build pipeline, `node_modules` dependency hell, and 2-4 weeks of zero-feature refactoring — all to serve 20 users who already have a working app. The complexity-to-benefit ratio is terrible at this scale. |
-| **2. Vue.js Hybrid** | Vue 3 + Tailwind (CDN) | ⚠️ **Unnecessary** | Adds a framework dependency and rewrites all existing JS modules into Vue components. For ≤20 users, reactive state management is a luxury, not a necessity. Our pages reload in <1s anyway. |
-| **3. Bespoke Iterate (Current)** | Vanilla JS + Vanilla CSS + Python Proxy | ✅ **Best Fit** | Zero dependencies. Zero build step. Loads in <1 second. We already have full bidirectional Notion parity. For an SME team of ≤20, this is the ideal architecture: lightweight, fully custom, and instantly deployable. |
+### Recommended Rewrite Path
 
-### 🏆 Final Decision: Stay on Approach #3 (Bespoke Iterate)
+| Phase | Scope | Approach |
+|:-----:|-------|----------|
+| **R1** | **Design System Overhaul** | Rebuild `design-system.css` from scratch using TailAdmin's layout patterns. Implement CSS custom properties for theme switching (dark/light). Add the show/hide toggle system for Admin sections. |
+| **R2** | **Dual-Persona Router** | Implement a role-based login (`admin` vs `team`) that controls which sidebar modules and data columns are visible. Same backend, different frontend presentation. |
+| **R3** | **Side-Peek Architecture** | Replace all current detail panels with a standardized Side-Peek component that slides from the right, preserves the list view underneath, and uses collapsible sections with show/hide toggles. |
+| **R4** | **Data Entry Excellence** | Rebuild all forms with relational ComboBox dropdowns, inline validation, and auto-save. Every form field should prevent bad data structurally. |
+| **R5** | **Admin Power Tools** | Build the Admin-only views: Activity Audit Log, Financial Summary, Column Visibility Settings, and Bulk Actions (archive, reassign). |
 
-**At SME scale, simplicity IS the feature.** A 20-person team does not need React Server Components, virtual DOM diffing, or a component library with 500 pre-built widgets. They need:
-- **Fast page loads** (achieved: <1s)
-- **Clean data entry forms** (achieved: Add Client/Project/Task)
-- **Visual pipeline management** (achieved: drag-and-drop Kanban)
-- **Mobile access on job sites** (achieved: responsive CSS)
+### What We Keep
+- **Python Flask Proxy** — proven, stable, zero issues
+- **Notion as SSoT** — no database migration
+- **Vercel deployment** — instant CI/CD from GitHub push
+- **Chart.js** for data visualization — lightweight, no React required
 
-**What we WILL selectively improve (without migrating):**
-1. Side-Peek detail panels instead of full-page modals
-2. ComboBox relational dropdowns instead of plain text inputs
-3. Contextual inline validation instead of generic toast errors
-4. Role-based view filtering (Admin vs Employee dashboards)
-
-This keeps the CRM lightweight, maintainable by a single developer, free of dependency vulnerabilities, and perfectly tailored to Majaz Engineering's exact operational scale.
+### What We Rebuild
+- **All frontend HTML/CSS/JS** — rebuilt with modern heuristics from day one
+- **Sidebar navigation** — role-aware, collapsible, mobile-first
+- **All data tables** — with column toggle controls for Admin
+- **All detail views** — standardized Side-Peek pattern
+- **Login system** — role-based (`admin`/`team`) instead of single shared password
 
 ---
-*Prepared by Agent Architect for the Majaz Engineering Team based on modern 2026 UI/UX CRM standards.*
+
+## 6. Design QA Checklist (Every Screen Must Pass)
+
+- [ ] A Team user can complete their most common task in ≤2 clicks
+- [ ] An Admin can access any Notion property without leaving the CRM
+- [ ] No data is permanently hidden — everything is accessible via toggle, side-peek, or Admin view
+- [ ] Destructive actions (delete, bulk change) are gated behind a confirmation dialog and only visible to Admin
+- [ ] Every list view shows ≤7 columns and has a side-peek for full details
+- [ ] All mobile touch targets are ≥44px
+- [ ] System status is visible after every action (toast, inline badge change, or loading spinner)
+- [ ] All form inputs use relational dropdowns where applicable (no free-text for linked records)
+
+---
+*Majaz CRM Design Constitution v2 — Prepared for Waseem & the Majaz Engineering Team*
