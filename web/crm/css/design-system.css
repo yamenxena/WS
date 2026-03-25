@@ -99,6 +99,46 @@
 
 
 /* ══════════════════════════════════════════════════════════════
+   OKLCH PROGRESSIVE ENHANCEMENT (D5)
+   Perceptually uniform colors — hex fallbacks preserved in :root
+   ══════════════════════════════════════════════════════════════ */
+@supports (color: oklch(0 0 0)) {
+  :root {
+    /* Accent — Gold palette */
+    --gold:           oklch(0.76 0.12 75);
+    --gold-light:     oklch(0.84 0.10 80);
+    --gold-dark:      oklch(0.62 0.13 70);
+
+    /* Status — matched lightness L=0.68 for equal visual weight */
+    --success:        oklch(0.68 0.17 145);
+    --warning:        oklch(0.68 0.17 60);
+    --danger:         oklch(0.68 0.22 25);
+    --info:           oklch(0.68 0.14 230);
+
+    /* Pipeline stages — staggered hues, uniform L=0.58 */
+    --stage-sd:       oklch(0.58 0.22 280);
+    --stage-dd:       oklch(0.58 0.14 230);
+    --stage-cd:       oklch(0.58 0.17 60);
+    --stage-as:       oklch(0.58 0.12 75);
+    --stage-done:     oklch(0.58 0.15 145);
+    --stage-progress: oklch(0.58 0.22 25);
+    --stage-hold:     oklch(0.58 0.03 240);
+    --stage-kickoff:  oklch(0.58 0.12 170);
+    --stage-bidding:  oklch(0.58 0.18 310);
+    --stage-handover: oklch(0.58 0.14 260);
+    --stage-notstart: oklch(0.58 0.03 230);
+
+    /* Lead statuses — uniform L=0.65 */
+    --lead-inquiry:     oklch(0.65 0.14 230);
+    --lead-qualified:   oklch(0.65 0.18 310);
+    --lead-proposal:    oklch(0.65 0.17 60);
+    --lead-negotiation: oklch(0.65 0.12 75);
+    --lead-won:         oklch(0.65 0.15 145);
+    --lead-lost:        oklch(0.65 0.22 25);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════════
    TYPOGRAPHY
    ══════════════════════════════════════════════════════════════ */
 html { font-size: 16px; } /* Update base rem explicitly to 16px */
