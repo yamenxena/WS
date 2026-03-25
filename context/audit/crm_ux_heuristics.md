@@ -61,4 +61,20 @@ To enforce these best practices moving forward, all new features must pass this 
 - [ ] **Mobile Touch Targets:** Are all interactive buttons and rows at least `44px` tall on mobile?
 
 ---
+
+## 4. Top UI Dependencies & GitHub Repositories for Modern CRM Design
+
+To attain the best CRM app design in 2026, leveraging established open-source structural dependencies is highly recommended. These ecosystems provide enterprise-ready accessibility, theming, and data-dense components.
+
+### Best Component Ecosystems (The "Modern Stack")
+1. **[shadcn/ui](https://github.com/shadcn-ui/ui)**: The current gold standard for React/Next.js dashboards. It provides beautifully styled, copy-paste components built on top of Radix UI (accessible primitives) and TailwindCSS. Perfect for building sophisticated CRM data tables, dropdowns, and side-peeks.
+2. **[Tremor](https://github.com/tremorlabs/tremor)**: The undeniable leader for building dashboard KPIs and CRM charts. Tremor offers React components specifically designed to make financial and operational data look incredible (Area Charts, Bar Charts, KPI trackers) using Tailwind CSS.
+3. **[Ant Design](https://github.com/ant-design/ant-design)**: With 90K+ stars, this is the most robust enterprise-class UI design language. It is heavily utilized for hyper-complex data tables with built-in filtering, sorting, and pagination, making it perfect for dense CRMs.
+
+### Top Open-Source CRM/Dashboard Templates (Reference Architectures)
+1. **[Twenty CRM](https://github.com/twentyhq/twenty)**: The fastest-growing open-source CRM. A masterclass in Notion/Airtable-style UX (editable tables, dynamic side-peeks, relational mapping) built with modern React. Study their repository for structural UI inspiration.
+2. **[TailAdmin](https://github.com/TailAdmin/TailAdmin)**: A highly-rated Tailwind CSS dashboard template supporting Vanilla HTML, React, and Vue. Excellent if the goal is to stick to a lightweight Vanilla JS/HTML setup but achieve a modern, component-based UI look.
+3. **[Atomic CRM]**: An open-source implementation using Next.js, Supabase, and shadcn/ui. It perfectly demonstrates the minimalist, developer-first dashboard aesthetic with high performance.
+
+---
 *Prepared for the Majaz Engineering Team based on modern 2026 UI/UX CRM standards.*
