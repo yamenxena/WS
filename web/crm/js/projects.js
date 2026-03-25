@@ -301,8 +301,9 @@
   };
 
   window.submitNewProject = async function() {
-    const name = document.getElementById('new-proj-name')?.value?.trim();
-    if (!name) { showToast('Project name is required', 'error'); return; }
+    const nameValid = validateRequired('new-proj-name', 'Project name is required');
+    if (!nameValid) return;
+    const name = document.getElementById('new-proj-name').value.trim();
     const data = {
       name,
       sn: document.getElementById('new-proj-sn')?.value ? parseInt(document.getElementById('new-proj-sn').value) : undefined,

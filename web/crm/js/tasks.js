@@ -221,10 +221,9 @@
   };
 
   // ── Add Task Form (Side-Peek) ──
-  window.showAddTaskForm = async function() {
-    const projRes = await API.projects();
-    const projects = projRes?.rows || [];
+  let taskProjectCombo = null;
 
+  window.showAddTaskForm = function() {
     openSidePeek('➕ New Task', `
       <details class="peek-section" open>
         <summary>Task Information</summary>
@@ -240,26 +239,44 @@
           <label class="peek-label">Duration (days)</label>
           <input id="new-task-duration" type="number" class="peek-input" placeholder="e.g. 14" />
           <label class="peek-label">Linked Project</label>
-          <select id="new-task-project" class="peek-input">
-            <option value="">None</option>
-            ${projects.map(p => `<option value="${p.id}">${p.sn ? '#'+p.sn+' ' : ''}${p.name}</option>`).join('')}
-          </select>
-          <button class="btn btn-primary" onclick="submitNewTask()" style="width:100%;margin-top:12px">Create Task → Notion</button>
+          <div id="new-task-project-combo"></div>
+          <button class="btn btn-primary" id="btn-submit-task" style="width:100%;margin-top:12px">Create Task → Notion</button>
         </div>
       </details>
     `);
+
+    // Initialize ComboBox for project relation
+    taskProjectCombo = createComboBox({
+      containerId: 'new-task-project-combo',
+      placeholder: '🔍 Search projects...',
+      fetchOptions: async () => {
+        const res = await API.projects();
+        return (res?.rows || []).map(p => ({
+          value: p.id,
+          label: p.name,
+          sub: p.sn ? `#${p.sn}` : (p.service_type || ''),
+        }));
+      },
+      formatLabel: (opt) => `${opt.label}${opt.sub ? ' (' + opt.sub + ')' : ''}`,
+    });
+
+    document.getElementById('btn-submit-task')?.addEventListener('click', submitNewTask);
   };
 
   window.submitNewTask = async function() {
-    const name = document.getElementById('new-task-name')?.value?.trim();
-    if (!name) { showToast('Task name is required', 'error'); return; }
+    // Inline validation
+    const nameValid = validateRequired('new-task-name', 'Task name is required');
+    if (!nameValid) return;
+
+    const name = document.getElementById('new-task-name').value.trim();
     const data = {
       name,
       status: document.getElementById('new-task-status')?.value || undefined,
       due_date: document.getElementById('new-task-due')?.value || undefined,
       duration: document.getElementById('new-task-duration')?.value ? parseInt(document.getElementById('new-task-duration').value) : undefined,
-      project_id: document.getElementById('new-task-project')?.value || undefined,
+      project_id: taskProjectCombo?.getValue() || undefined,
     };
+    showToast('Creating task...', 'info');
     const res = await API.createTask(data);
     if (res && res.id) {
       showToast('Task created in Notion!', 'success');

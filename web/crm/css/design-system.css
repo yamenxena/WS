@@ -1011,6 +1011,87 @@ body.role-admin .peek-section[data-role="admin"] { display: block; }
   margin-top: 4px;
 }
 
+/* ── Generic field validation (peek-input scope) ── */
+.peek-input.field-error,
+select.peek-input.field-error {
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 3px var(--danger-bg) !important;
+}
+.peek-input.field-valid {
+  border-color: var(--success) !important;
+}
+
+.field-error-msg {
+  font-size: 0.7rem;
+  color: var(--danger);
+  margin-top: -4px;
+  margin-bottom: 8px;
+}
+
+/* ── ComboBox — Searchable Relational Dropdown ── */
+.combobox {
+  position: relative;
+}
+
+.combobox-input {
+  cursor: text;
+}
+
+.combobox-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 220px;
+  overflow-y: auto;
+  background: var(--bg-primary);
+  border: 1px solid var(--glass-border);
+  border-top: none;
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  z-index: 200;
+  box-shadow: var(--shadow-lg);
+}
+
+.combobox-dropdown.open {
+  display: block;
+}
+
+.combobox-option {
+  padding: 8px 12px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  transition: background var(--duration);
+  font-size: 0.85rem;
+}
+
+.combobox-option:hover,
+.combobox-option.active {
+  background: var(--bg-hover);
+}
+
+.combobox-option-label {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.combobox-option-sub {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.combobox-loading,
+.combobox-empty {
+  padding: 12px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+}
+
 /* ── Linked Records inside Side-Peek ── */
 .peek-linked-list {
   list-style: none;

@@ -123,8 +123,11 @@
   };
 
   window.submitNewClient = async function() {
-    const name = document.getElementById('new-client-name')?.value?.trim();
-    if (!name) { showToast('Name is required', 'error'); return; }
+    const nameValid = validateRequired('new-client-name', 'Client name is required');
+    const phoneValid = validatePattern('new-client-phone', /^[\+\d\s\-()]*$/, 'Invalid phone format');
+    if (!nameValid || !phoneValid) return;
+
+    const name = document.getElementById('new-client-name').value.trim();
     const data = {
       name,
       phone: document.getElementById('new-client-phone')?.value?.trim() || undefined,
@@ -133,6 +136,7 @@
       project_type: document.getElementById('new-client-type')?.value?.trim() || undefined,
       service_interest: document.getElementById('new-client-service')?.value?.trim() || undefined,
     };
+    showToast('Creating client...', 'info');
     const res = await API.createClient(data);
     if (res && res.id) {
       showToast('Client created in Notion!', 'success');
