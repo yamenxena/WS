@@ -394,6 +394,23 @@ def transform_stage_card(page):
         "task_ids": _relation_ids(p.get("TASKS")),
     }
 
+def transform_concept_plan(page):
+    p = page["properties"]
+    cb = p.get("", {})
+    # Formula value
+    formula_val = None
+    f = p.get("Formula")
+    if f and f.get("formula"):
+        formula_val = f["formula"].get("number")
+    return {
+        "id": page["id"],
+        "name": _txt(p.get("To do")),
+        "done": cb.get("checkbox", False) if cb else False,
+        "days_since": formula_val,
+        "created": page.get("created_time", ""),
+        "last_edited": page.get("last_edited_time", ""),
+    }
+
 def transform_supplier(page):
     p = page["properties"]
     return {
@@ -729,6 +746,14 @@ def get_pipeline():
 def get_stage_cards():
     pages = notion_query(DB["stage_cards"])
     return jsonify({"rows": [transform_stage_card(p) for p in pages]})
+
+
+# ── Concept Plans ──
+@app.route("/api/concept-plans")
+@require_auth
+def get_concept_plans():
+    pages = notion_query(DB["concept_plans"])
+    return jsonify({"rows": [transform_concept_plan(p) for p in pages]})
 
 
 # ── Suppliers ──

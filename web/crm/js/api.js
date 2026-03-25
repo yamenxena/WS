@@ -99,6 +99,7 @@ const API = (() => {
     pipeline:     () => _fetch('/api/pipeline'),
     interactions: () => _fetch('/api/interactions'),
     stageCards:   () => _fetch('/api/stage-cards'),
+    conceptPlans: () => _fetch('/api/concept-plans'),
 
     updateProject: (id, data) => _patch(`/api/projects/${id}`, data),
     updateTask:    (id, data) => _patch(`/api/tasks/${id}`, data),
