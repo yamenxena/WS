@@ -30,6 +30,7 @@
       </div>
 
       <nav class="nav">
+        <!-- Overview — visible to all -->
         <div class="nav-section">
           <span class="nav-label">Overview</span>
           <a class="nav-item active" data-view="dashboard" id="nav-dashboard">
@@ -37,6 +38,7 @@
           </a>
         </div>
 
+        <!-- Core Operations — visible to all -->
         <div class="nav-section">
           <span class="nav-label">Operations</span>
           <a class="nav-item" data-view="clients" id="nav-clients">
@@ -51,33 +53,35 @@
             <span class="nav-icon">✅</span> Tasks
             <span class="nav-badge badge-danger" id="badge-tasks">—</span>
           </a>
-          <a class="nav-item" data-view="meetings" id="nav-meetings">
-            <span class="nav-icon">📅</span> Meetings
-            <span class="nav-badge badge-info" id="badge-meetings">—</span>
-          </a>
-          <a class="nav-item" data-view="pipeline" id="nav-pipeline">
-            <span class="nav-icon">🔄</span> Pipeline
-            <span class="nav-badge badge-warning" id="badge-pipeline">—</span>
-          </a>
-          <a class="nav-item" data-view="interactions" id="nav-interactions">
-            <span class="nav-icon">💬</span> Interactions
-            <span class="nav-badge badge-info" id="badge-interactions">—</span>
-          </a>
-        </div>
-
-        <div class="nav-section">
-          <span class="nav-label">Resources</span>
           <a class="nav-item" data-view="team" id="nav-team">
             <span class="nav-icon">👷</span> Team & Suppliers
           </a>
-          <a class="nav-item" data-view="reports" id="nav-reports">
-            <span class="nav-icon">📈</span> Reports
+        </div>
+
+        <!-- Admin Operations — visible to admin only -->
+        <div class="nav-section">
+          <span class="nav-label">Management</span>
+          <a class="nav-item" data-view="meetings" data-role="admin" id="nav-meetings">
+            <span class="nav-icon">📅</span> Meetings
+            <span class="nav-badge badge-info" id="badge-meetings">—</span>
           </a>
-          <a class="nav-item" data-view="concept-plans" id="nav-concept-plans">
+          <a class="nav-item" data-view="pipeline" data-role="admin" id="nav-pipeline">
+            <span class="nav-icon">🔄</span> Pipeline
+            <span class="nav-badge badge-warning" id="badge-pipeline">—</span>
+          </a>
+          <a class="nav-item" data-view="interactions" data-role="admin" id="nav-interactions">
+            <span class="nav-icon">💬</span> Interactions
+            <span class="nav-badge badge-info" id="badge-interactions">—</span>
+          </a>
+          <a class="nav-item" data-view="concept-plans" data-role="admin" id="nav-concept-plans">
             <span class="nav-icon">📋</span> Concept Plans
+          </a>
+          <a class="nav-item" data-view="reports" data-role="admin" id="nav-reports">
+            <span class="nav-icon">📈</span> Reports
           </a>
         </div>
 
+        <!-- External & System -->
         <div class="nav-section">
           <span class="nav-label">External</span>
           <a class="nav-item" href="https://docs.google.com/spreadsheets/d/1PvURHGRwsQqdmC5pp0zlKHJE3QcfgpZJlP1zxD0iztY" target="_blank" id="nav-sheets">
@@ -91,13 +95,14 @@
       </nav>
 
       <div class="sidebar-footer">
-        <span>v3.0.0</span>
+        <span>v4.0.0</span>
         <span id="current-date"></span>
       </div>
     </aside>
 
     <!-- ═══ Main Content ═══ -->
     <main class="main" id="main-content">
+
       <!-- Dashboard View -->
       <section class="view active" id="view-dashboard">
         <div class="hero">
@@ -132,6 +137,15 @@
           <input class="filter-input" type="text" id="clients-search" placeholder="🔍 Search clients..." />
           <select class="filter-select" id="clients-filter-location">
             <option value="">All Locations</option>
+          </select>
+          <select class="filter-select" id="clients-filter-lead-status">
+            <option value="">All Statuses</option>
+            <option value="Inquiry">Inquiry</option>
+            <option value="Qualified">Qualified</option>
+            <option value="Proposal">Proposal</option>
+            <option value="Negotiation">Negotiation</option>
+            <option value="Won">Won</option>
+            <option value="Lost">Lost</option>
           </select>
         </div>
         <div id="clients-content"><div class="spinner"></div></div>
@@ -259,10 +273,20 @@
       <section class="view" id="view-concept-plans">
         <div id="concept-plans-view"><div class="spinner"></div></div>
       </section>
+
     </main>
   </div>
 
-  <!-- Detail Slide-over Panel -->
+  <!-- ═══ Side-Peek Panel (Shared — used by all modules) ═══ -->
+  <aside class="side-peek" id="side-peek">
+    <div class="side-peek-header">
+      <h2 class="side-peek-title" id="side-peek-title">—</h2>
+      <button class="side-peek-close" id="side-peek-close" aria-label="Close panel">✕</button>
+    </div>
+    <div class="side-peek-body" id="side-peek-body"></div>
+  </aside>
+
+  <!-- ═══ Legacy Detail Panel (backward compat, removed in R3) ═══ -->
   <div class="detail-panel" id="detail-panel">
     <div class="detail-panel-header">
       <h2 id="detail-title">—</h2>
@@ -271,6 +295,11 @@
     <div class="detail-panel-body" id="detail-body"></div>
   </div>
 
+  <!-- Toast container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- ═══ Scripts ═══ -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="js/api.js"></script>
   <script src="js/router.js"></script>
   <script src="js/dashboard.js"></script>
