@@ -194,7 +194,7 @@ The light theme gets proper glassmorphism treatment with translucent white glass
 | 7.4 | Add light mode hover shadows (deeper than dark mode glow) |
 | 7.5 | Warm the gold accent for light mode: tune `oklch(0.55 0.12 70)` hue for better warmth |
 
-### Phase 8 — Motion & Micro-Interactions (Est: 1 session)
+### Phase 8 — Motion & Micro-Interactions ✅ COMPLETED
 
 | Task | Detail |
 |---|---|
@@ -236,11 +236,11 @@ The following tokens need to be added to `design-system.css` for v6.0.0:
 | **P5: Card Hover & Glow** | ✅ Done | `2b56468` | Gold glow, spring press, spring easing |
 | **P6: Accessibility** | ✅ Done | `2b56468` | Focus rings, skip-link, reduced-motion |
 | **P7: Light Theme Polish** | ✅ Done | `2b56468` | Glass panels, drop shadows, warm gold |
-| **P8: Motion** | ⏳ Pending | — | Stagger anims, View Transitions API |
+| **P8: Motion** | ✅ Done | — | Row stagger, View Transitions API, spring easing |
 
-**Completion: 6/8 phases done (75%)**
+**Completion: 8/8 phases done (100%)**
 
-**Remaining work:** P2 (Bento Grid) → P8 (Motion & View Transitions)
+**All phases complete.**
 
 ---
 

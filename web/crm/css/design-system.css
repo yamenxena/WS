@@ -1943,6 +1943,35 @@ select.peek-input.field-error {
 }
 .pulse { animation: pulse 1.2s var(--ease) 2; }
 
+/* P8.2 — Table row stagger entrance */
+.data-table tbody tr {
+  animation: staggerEnter 0.4s var(--transition-spring) both;
+  animation-delay: calc(var(--row-i, 0) * 40ms);
+}
+
+/* P8.6 — View Transitions API (progressive enhancement) */
+@view-transition {
+  navigation: auto;
+}
+
+.view {
+  view-transition-name: view-content;
+}
+
+::view-transition-old(view-content) {
+  animation: viewOut 0.2s var(--ease) both;
+}
+::view-transition-new(view-content) {
+  animation: viewIn 0.25s var(--ease) both;
+}
+
+@keyframes viewOut {
+  to { opacity: 0; transform: translateY(-8px); }
+}
+@keyframes viewIn {
+  from { opacity: 0; transform: translateY(8px); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

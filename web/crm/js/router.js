@@ -98,30 +98,49 @@ document.addEventListener('DOMContentLoaded', () => {
       viewName = 'dashboard';
     }
 
-    // Update nav
-    navItems.forEach(item => {
-      item.classList.toggle('active', item.dataset.view === viewName);
+    // P8.6 — View Transitions API (progressive enhancement)
+    const doSwitch = () => {
+      // Update nav
+      navItems.forEach(item => {
+        item.classList.toggle('active', item.dataset.view === viewName);
+      });
+
+      // Update views
+      views.forEach(v => {
+        v.classList.toggle('active', v.id === `view-${viewName}`);
+      });
+
+      // Close mobile sidebar
+      sidebar.classList.remove('open');
+      overlay.classList.remove('open');
+
+      // Close panels
+      closeDetail();
+      closeSidePeek();
+
+      // Scroll main to top
+      document.getElementById('main-content')?.scrollTo(0, 0);
+
+      // Trigger page load
+      const event = new CustomEvent('viewChange', { detail: { view: viewName, role } });
+      window.dispatchEvent(event);
+
+      // P8.2 — Apply row stagger after render
+      requestAnimationFrame(() => applyRowStagger());
+    };
+
+    if (document.startViewTransition) {
+      document.startViewTransition(doSwitch);
+    } else {
+      doSwitch();
+    }
+  }
+
+  // P8.2 — Set --row-i CSS variable on table rows for stagger animation
+  function applyRowStagger() {
+    document.querySelectorAll('.data-table tbody tr').forEach((row, i) => {
+      row.style.setProperty('--row-i', Math.min(i, 15)); // cap at 15 for perf (600ms max)
     });
-
-    // Update views
-    views.forEach(v => {
-      v.classList.toggle('active', v.id === `view-${viewName}`);
-    });
-
-    // Close mobile sidebar
-    sidebar.classList.remove('open');
-    overlay.classList.remove('open');
-
-    // Close panels
-    closeDetail();
-    closeSidePeek();
-
-    // Scroll main to top
-    document.getElementById('main-content')?.scrollTo(0, 0);
-
-    // Trigger page load
-    const event = new CustomEvent('viewChange', { detail: { view: viewName, role } });
-    window.dispatchEvent(event);
   }
 
   navItems.forEach(item => {
