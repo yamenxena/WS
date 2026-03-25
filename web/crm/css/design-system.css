@@ -72,6 +72,7 @@
 
   /* Layout */
   --sidebar-w:      260px;
+  --sidebar-collapsed-w: 60px;
   --side-peek-w:    520px;
   --radius-sm:      6px;
   --radius-md:      10px;
@@ -90,6 +91,11 @@
   --shadow-gold:      0 0 20px rgba(212, 168, 83, 0.15);
   --shadow-glow-gold: 0 0 30px rgba(212, 168, 83, 0.12);
   --shadow-glow-subtle: 0 0 20px rgba(255, 255, 255, 0.03);
+  --shadow-card-hover: 0 8px 32px rgba(0,0,0,0.25);
+
+  /* Focus — accessibility (P6) */
+  --focus-ring:     2px solid var(--gold);
+  --focus-offset:   2px;
 
   /* Transitions */
   --ease:           cubic-bezier(0.4, 0, 0.2, 1);
@@ -164,11 +170,12 @@
   --glass-border:   rgba(0, 0, 0, 0.08);
 
   --shadow-sm:        0 1px 3px rgba(0,0,0,0.06);
-  --shadow-md:        0 3px 12px rgba(0,0,0,0.08);
+  --shadow-md:        0 4px 24px rgba(0,0,0,0.06);
   --shadow-lg:        0 8px 24px rgba(0,0,0,0.12);
   --shadow-gold:      0 0 16px rgba(154, 108, 30, 0.10);
   --shadow-glow-gold: 0 0 24px rgba(154, 108, 30, 0.08);
-  --shadow-glow-subtle: 0 0 16px rgba(0, 0, 0, 0.03);
+  --shadow-glow-subtle: 0 1px 8px rgba(0, 0, 0, 0.04);
+  --shadow-card-hover: 0 8px 32px rgba(0,0,0,0.1);
 }
 
 @supports (color: oklch(0 0 0)) {
@@ -563,15 +570,23 @@ body.peek-open .main {
 .glass-card {
   background: var(--glass-bg);
   backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
   padding: 20px;
   margin-bottom: 20px;
+  box-shadow: var(--shadow-sm);
   transition: box-shadow var(--duration) var(--transition-spring), transform var(--duration) var(--transition-spring);
 }
 
 .glass-card:hover {
-  box-shadow: var(--shadow-glow-subtle);
+  box-shadow: var(--shadow-gold);
+  transform: translateY(-2px);
+}
+
+.glass-card:active {
+  transform: scale(0.985);
+  transition-duration: 0.1s;
 }
 
 .glass-card-header {
@@ -777,7 +792,7 @@ body.role-admin .data-table .col-admin { display: table-cell; }
 .status-badge {
   display: inline-block;
   padding: 3px 10px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -1967,3 +1982,54 @@ body.role-admin [data-role="admin"] { display: block !important; }
 .col-toggle:hover { border-color: var(--gold); color: var(--text-primary); }
 .col-toggle input[type="checkbox"] { accent-color: var(--gold); }
 
+
+/* ══════════════════════════════════════════════════════════════
+   ACCESSIBILITY — Phase P6 (Daedalus v6.0.0)
+   ══════════════════════════════════════════════════════════════ */
+
+/* Focus-visible ring for keyboard navigation */
+:focus-visible {
+  outline: var(--focus-ring);
+  outline-offset: var(--focus-offset);
+}
+
+/* Remove default outlines (restored via :focus-visible) */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Skip-to-content link */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 16px;
+  z-index: 9999;
+  padding: 12px 20px;
+  background: var(--gold);
+  color: var(--bg-primary);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: top var(--duration) var(--ease);
+}
+.skip-link:focus {
+  top: 16px;
+}
+
+/* Respect reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .glass-card:hover {
+    transform: none;
+  }
+  .stagger-in {
+    animation: none;
+    opacity: 1;
+  }
+}
