@@ -1,5 +1,6 @@
 /**
- * Majaz CRM — Tasks Page (Dynamic Board + List + Write-Back + Toasts)
+ * Majaz CRM — Tasks Page v4.0.0
+ * Dynamic Board + List + Side-Peek detail + DnD Write-Back + Toasts.
  * Columns auto-generated from Notion data — future-proof.
  */
 (() => {
@@ -48,53 +49,38 @@
     else renderList(el, filtered);
   }
 
-  // ── Known status metadata (labels + colors). Order = Notion groups. ──
+  // ── Known status metadata ──
   const KNOWN_STATUSES = [
-    // To-do group
-    { key: 'Not started',              label: 'Not Started',            color: 'var(--text-muted)' },
-    // In progress group
-    { key: 'SENT TO STRUCTURE',        label: 'Sent to Structure',      color: 'var(--warning)' },
-    { key: 'NEEDS REVIEW',             label: 'Needs Review',           color: 'var(--warning)' },
-    { key: 'In progress',              label: 'In Progress',            color: 'var(--info)' },
-    // Complete group
-    { key: 'SENT TO CLIENT',           label: 'Sent to Client',         color: 'var(--stage-as, #AB47BC)' },
-    { key: 'SUBMITTED TO AUTHORITIES', label: 'Submitted',              color: 'var(--stage-as, #AB47BC)' },
-    { key: 'Done',                     label: 'Done',                   color: 'var(--success)' },
+    { key: 'Not started',              label: 'Not Started',        color: 'var(--text-muted)' },
+    { key: 'SENT TO STRUCTURE',        label: 'Sent to Structure',  color: 'var(--warning)' },
+    { key: 'NEEDS REVIEW',             label: 'Needs Review',       color: 'var(--warning)' },
+    { key: 'In progress',              label: 'In Progress',        color: 'var(--info)' },
+    { key: 'SENT TO CLIENT',           label: 'Sent to Client',     color: 'var(--stage-as, #AB47BC)' },
+    { key: 'SUBMITTED TO AUTHORITIES', label: 'Submitted',          color: 'var(--stage-as, #AB47BC)' },
+    { key: 'Done',                     label: 'Done',               color: 'var(--success)' },
   ];
 
-  /**
-   * Build dynamic columns from data:
-   * 1. Show only KNOWN_STATUSES that exist in the current data
-   * 2. Append any unknown statuses as extra columns
-   */
   function buildColumns(rows) {
     const seenStatuses = new Set(rows.map(t => t.status).filter(Boolean));
     const columns = KNOWN_STATUSES.filter(s => seenStatuses.has(s.key));
-    // Any unknown statuses → append
     const knownKeys = new Set(KNOWN_STATUSES.map(s => s.key));
     seenStatuses.forEach(status => {
-      if (!knownKeys.has(status)) {
-        columns.push({ key: status, label: status, color: 'var(--gold)' });
-      }
+      if (!knownKeys.has(status)) columns.push({ key: status, label: status, color: 'var(--gold)' });
     });
     return columns.length ? columns : KNOWN_STATUSES;
   }
 
-  /** All unique statuses for dropdowns */
   function getAllStatuses(rows) {
     const knownKeys = new Set(KNOWN_STATUSES.map(s => s.key));
     const extras = [];
     rows.forEach(t => {
-      if (t.status && !knownKeys.has(t.status)) {
-        extras.push({ key: t.status, label: t.status, color: 'var(--gold)' });
-      }
+      if (t.status && !knownKeys.has(t.status)) extras.push({ key: t.status, label: t.status, color: 'var(--gold)' });
     });
     return [...KNOWN_STATUSES, ...extras];
   }
 
   function renderBoard(el, rows) {
     const cols = buildColumns(rows);
-
     el.innerHTML = `<div class="kanban">${cols.map(col => {
       const cards = rows.filter(t => t.status === col.key);
       return `<div class="kanban-column stagger-in" style="flex:1;max-width:none" data-status="${col.key}"
@@ -160,34 +146,51 @@
         <td>${t.duration ? t.duration+'d' : '—'}</td>
         <td>${(t.assigned_to||[]).join(', ')||'—'}</td>
         <td>
-          ${t.status !== 'Done' ? `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();markTaskDone('${t.id}','${t.name.replace(/'/g,"\\'")}')" style="font-size:0.7rem">✅ Done</button>` : '<span style="color:var(--success)">✓</span>'}
+          ${t.status !== 'Done' ? `<button class="btn btn-primary btn-sm" onclick="event.stopPropagation();markTaskDone('${t.id}','${t.name.replace(/'/g,"\\'")}')">✅ Done</button>` : '<span style="color:var(--success)">✓</span>'}
         </td>
       </tr>`).join('')}</tbody>
     </table></div></div>`;
   }
 
+  // ── Show Task Detail (Side-Peek) ──
   window.showTaskDetail = function(id) {
     const t = tasksData.find(ts => ts.id === id);
     if (!t) return;
     const allStatuses = getAllStatuses(tasksData);
 
-    openDetail(t.name, `
-      <div class="detail-section"><div class="detail-label">Status</div>
-        <div style="display:flex;align-items:center;gap:8px">
-          <select class="filter-select" id="task-status-select" style="padding:4px 8px;font-size:0.8rem">
-            ${allStatuses.map(s => `<option value="${s.key}" ${t.status===s.key?'selected':''}>${s.label}</option>`).join('')}
-          </select>
-          <button class="btn btn-primary btn-sm" id="task-save-status" style="font-size:0.7rem">Save ↗</button>
+    openSidePeek(`<span style="color:var(--gold)">${t.name}</span>`, `
+      <!-- ── Status Edit ── -->
+      <details class="peek-section" open>
+        <summary>Status</summary>
+        <div class="peek-section-body">
+          <div style="display:flex;align-items:center;gap:8px">
+            <select class="peek-input" id="task-status-select" style="flex:1">
+              ${allStatuses.map(s => `<option value="${s.key}" ${t.status===s.key?'selected':''}>${s.label}</option>`).join('')}
+            </select>
+            <button class="btn btn-primary btn-sm" id="task-save-status">Save ↗</button>
+          </div>
         </div>
-      </div>
-      <div class="detail-section"><div class="detail-label">Details</div>
-        ${t.due_date ? `<div class="detail-value">📅 Due: ${t.due_date}</div>` : ''}
-        ${t.deadline ? `<div class="detail-value" style="color:${new Date(t.deadline) < new Date() ? 'var(--danger)' : 'inherit'}">⏰ Deadline: ${t.deadline}</div>` : ''}
-        ${t.duration ? `<div class="detail-value">⏱ Duration: ${t.duration} days</div>` : ''}
-        ${(t.assigned_to||[]).length ? `<div class="detail-value">👤 Assigned: ${t.assigned_to.join(', ')}</div>` : ''}
-        <div class="detail-value">Created: ${t.created || '—'}</div>
-        ${t.last_edited ? `<div class="detail-value">Last Edited: ${t.last_edited}</div>` : ''}
-      </div>
+      </details>
+
+      <!-- ── Details ── -->
+      <details class="peek-section" open>
+        <summary>📋 Details</summary>
+        <div class="peek-section-body">
+          ${t.due_date ? `<div class="peek-row"><span class="peek-label">Due Date</span><span class="mono">📅 ${t.due_date}</span></div>` : ''}
+          ${t.deadline ? `<div class="peek-row"><span class="peek-label">Deadline</span><span class="mono" style="color:${new Date(t.deadline) < new Date() ? 'var(--danger)' : 'inherit'}">⏰ ${t.deadline}</span></div>` : ''}
+          ${t.duration ? `<div class="peek-row"><span class="peek-label">Duration</span><span>⏱ ${t.duration} days</span></div>` : ''}
+          ${(t.assigned_to||[]).length ? `<div class="peek-row"><span class="peek-label">Assigned To</span><span>👤 ${t.assigned_to.join(', ')}</span></div>` : ''}
+        </div>
+      </details>
+
+      <!-- ── Meta ── -->
+      <details class="peek-section">
+        <summary>Meta</summary>
+        <div class="peek-section-body">
+          <div class="peek-row"><span class="peek-label">Created</span><span class="mono" style="font-size:0.75rem">${t.created || '—'}</span></div>
+          ${t.last_edited ? `<div class="peek-row"><span class="peek-label">Last Edited</span><span class="mono" style="font-size:0.75rem">${t.last_edited}</span></div>` : ''}
+        </div>
+      </details>
     `);
 
     document.getElementById('task-save-status')?.addEventListener('click', async () => {
@@ -217,32 +220,33 @@
     }
   };
 
-  // ── Add Task Form ──
+  // ── Add Task Form (Side-Peek) ──
   window.showAddTaskForm = async function() {
-    // Fetch projects for the dropdown
     const projRes = await API.projects();
     const projects = projRes?.rows || [];
 
-    openDetail('➕ New Task', `
-      <div class="detail-section">
-        <div class="detail-label">Task Information</div>
-        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">Task Name *</label>
-        <input id="new-task-name" class="filter-input" style="width:100%;margin-bottom:8px" placeholder="Task name..." />
-        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">Status</label>
-        <select id="new-task-status" class="filter-select" style="width:100%;margin-bottom:8px">
-          ${KNOWN_STATUSES.map(s => `<option value="${s.key}">${s.label}</option>`).join('')}
-        </select>
-        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">Due Date</label>
-        <input id="new-task-due" type="date" class="filter-input" style="width:100%;margin-bottom:8px" />
-        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">Duration (days)</label>
-        <input id="new-task-duration" type="number" class="filter-input" style="width:100%;margin-bottom:8px" placeholder="e.g. 14" />
-        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">Linked Project</label>
-        <select id="new-task-project" class="filter-select" style="width:100%;margin-bottom:16px">
-          <option value="">None</option>
-          ${projects.map(p => `<option value="${p.id}">${p.sn ? '#'+p.sn+' ' : ''}${p.name}</option>`).join('')}
-        </select>
-        <button class="btn btn-primary" onclick="submitNewTask()" style="width:100%">Create Task → Notion</button>
-      </div>
+    openSidePeek('➕ New Task', `
+      <details class="peek-section" open>
+        <summary>Task Information</summary>
+        <div class="peek-section-body">
+          <label class="peek-label">Task Name *</label>
+          <input id="new-task-name" class="peek-input" placeholder="Task name..." />
+          <label class="peek-label">Status</label>
+          <select id="new-task-status" class="peek-input">
+            ${KNOWN_STATUSES.map(s => `<option value="${s.key}">${s.label}</option>`).join('')}
+          </select>
+          <label class="peek-label">Due Date</label>
+          <input id="new-task-due" type="date" class="peek-input" />
+          <label class="peek-label">Duration (days)</label>
+          <input id="new-task-duration" type="number" class="peek-input" placeholder="e.g. 14" />
+          <label class="peek-label">Linked Project</label>
+          <select id="new-task-project" class="peek-input">
+            <option value="">None</option>
+            ${projects.map(p => `<option value="${p.id}">${p.sn ? '#'+p.sn+' ' : ''}${p.name}</option>`).join('')}
+          </select>
+          <button class="btn btn-primary" onclick="submitNewTask()" style="width:100%;margin-top:12px">Create Task → Notion</button>
+        </div>
+      </details>
     `);
   };
 
@@ -261,7 +265,7 @@
       showToast('Task created in Notion!', 'success');
       loaded = false;
       loadTasks();
-      document.getElementById('detail-close')?.click();
+      closeSidePeek();
     } else {
       showToast('Failed to create task', 'error');
     }

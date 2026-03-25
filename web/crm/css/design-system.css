@@ -874,9 +874,56 @@ body.role-admin .btn[data-role="admin"] { display: inline-flex; }
 
 .peek-section > summary:hover { color: var(--gold); }
 
-.peek-section-content {
+.peek-section-content,
+.peek-section-body {
   padding: 0 24px 16px;
 }
+
+/* Alias row layout used by v4 JS modules */
+.peek-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.02);
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+.peek-row:last-child { border-bottom: none; }
+
+/* Alias labels used inside peek-row and as form labels */
+.peek-label {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  min-width: 110px;
+  flex-shrink: 0;
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* Alias inputs inside side-peek */
+.peek-input {
+  width: 100%;
+  background: var(--bg-primary);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-family: inherit;
+  outline: none;
+  transition: border-color var(--duration);
+  margin-bottom: 8px;
+}
+.peek-input:focus {
+  border-color: var(--gold-border);
+  box-shadow: 0 0 0 3px var(--gold-glow);
+}
+
+/* Admin-only table columns — hidden for team */
+.col-admin-only { display: table-cell; }
+body:not(.role-admin) .col-admin-only { display: none; }
 
 .peek-field {
   display: flex;

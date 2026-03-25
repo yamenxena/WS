@@ -1,5 +1,6 @@
 /**
- * Majaz CRM — Projects Page (Dynamic Kanban DnD + Table + Write-Back + Toasts)
+ * Majaz CRM — Projects Page v4.0.0
+ * Dynamic Kanban DnD + Table + Side-Peek detail + Write-Back + Toasts.
  * Columns auto-generated from Notion data — future-proof.
  */
 (() => {
@@ -57,50 +58,37 @@
     return Math.round(v * 100);
   }
 
-  // ── Known stage metadata (labels + colors). Order = display order. ──
+  // ── Known stage metadata ──
   const KNOWN_STAGES = [
-    { key: 'Not started',                  label: 'Not Started',        color: 'var(--text-muted)' },
-    { key: 'On Hold',                      label: 'On Hold',            color: 'var(--text-muted)' },
-    { key: 'Kickoff',                      label: 'Kickoff',            color: 'var(--info)' },
-    { key: '(SD) Schematic Design',        label: 'SD',                 color: 'var(--stage-sd)' },
-    { key: '(DD) Design Development',      label: 'DD',                 color: 'var(--stage-dd)' },
-    { key: '(CD) Construction Documents',  label: 'CD',                 color: 'var(--stage-cd)' },
-    { key: '(AS) Authorities Submission',   label: 'AS',                color: 'var(--stage-as)' },
-    { key: 'Bidding',                      label: 'Bidding',            color: 'var(--warning)' },
-    { key: 'Progress',                     label: 'Supervision',        color: 'var(--stage-progress)' },
-    { key: 'Completed',                    label: 'Completed',          color: 'var(--success)' },
-    { key: 'Handing Over',                 label: 'Handing Over',       color: 'var(--success)' },
-    { key: 'Done',                         label: 'Done',               color: 'var(--stage-done, var(--success))' },
+    { key: 'Not started',                  label: 'Not Started',   color: 'var(--text-muted)' },
+    { key: 'On Hold',                      label: 'On Hold',       color: 'var(--text-muted)' },
+    { key: 'Kickoff',                      label: 'Kickoff',       color: 'var(--info)' },
+    { key: '(SD) Schematic Design',        label: 'SD',            color: 'var(--stage-sd)' },
+    { key: '(DD) Design Development',      label: 'DD',            color: 'var(--stage-dd)' },
+    { key: '(CD) Construction Documents',  label: 'CD',            color: 'var(--stage-cd)' },
+    { key: '(AS) Authorities Submission',   label: 'AS',           color: 'var(--stage-as)' },
+    { key: 'Bidding',                      label: 'Bidding',       color: 'var(--warning)' },
+    { key: 'Progress',                     label: 'Supervision',   color: 'var(--stage-progress)' },
+    { key: 'Completed',                    label: 'Completed',     color: 'var(--success)' },
+    { key: 'Handing Over',                 label: 'Handing Over',  color: 'var(--success)' },
+    { key: 'Done',                         label: 'Done',          color: 'var(--stage-done, var(--success))' },
   ];
 
-  /**
-   * Build dynamic columns:
-   * 1. Start with all KNOWN_STAGES
-   * 2. If data contains unknown stages, append them as extra columns
-   * This means adding a new stage in Notion auto-creates a column.
-   */
   function buildColumns(rows) {
     const seenStages = new Set(rows.map(p => p.stage).filter(Boolean));
     const columns = KNOWN_STAGES.filter(s => seenStages.has(s.key));
-    // Any unknown stages → append with default styling
     const knownKeys = new Set(KNOWN_STAGES.map(s => s.key));
     seenStages.forEach(stage => {
-      if (!knownKeys.has(stage)) {
-        columns.push({ key: stage, label: stage, color: 'var(--gold)' });
-      }
+      if (!knownKeys.has(stage)) columns.push({ key: stage, label: stage, color: 'var(--gold)' });
     });
-    // If no data at all, show all known stages
     return columns.length ? columns : KNOWN_STAGES;
   }
 
-  /** All unique stages (known + dynamic) for dropdowns */
   function getAllStages(rows) {
     const knownKeys = new Set(KNOWN_STAGES.map(s => s.key));
     const extras = [];
     rows.forEach(p => {
-      if (p.stage && !knownKeys.has(p.stage)) {
-        extras.push({ key: p.stage, label: p.stage, color: 'var(--gold)' });
-      }
+      if (p.stage && !knownKeys.has(p.stage)) extras.push({ key: p.stage, label: p.stage, color: 'var(--gold)' });
     });
     return [...KNOWN_STAGES, ...extras];
   }
@@ -145,7 +133,7 @@
     if (!proj || proj.stage === newStage) return;
 
     const oldStage = proj.stage;
-    proj.stage = newStage; // optimistic update
+    proj.stage = newStage;
     render();
 
     showToast(`Moving "${proj.name}" to ${newStage.replace(/[()]/g,'')}...`, 'info');
@@ -156,7 +144,7 @@
       const card = document.getElementById(`card-${projectId}`);
       card?.classList.add('pulse');
     } else {
-      proj.stage = oldStage; // revert
+      proj.stage = oldStage;
       render();
       showToast(`Failed to update "${proj.name}"`, 'error');
     }
@@ -166,7 +154,7 @@
     el.innerHTML = `<div class="glass-card"><div class="data-table-wrap"><table class="data-table">
       <thead><tr>
         <th>SN</th><th>Name</th><th>Stage</th><th>Type</th>
-        <th>Value (AED)</th><th>Description</th><th>FAB ID</th><th>Completion</th><th>Tasks</th>
+        <th>Value (AED)</th><th>Description</th><th class="col-admin-only">FAB ID</th><th>Completion</th><th>Tasks</th>
       </tr></thead>
       <tbody>${rows.map(p => {
         const pct = pctValue(p);
@@ -177,7 +165,7 @@
         <td>${p.service_type||'—'}</td>
         <td class="mono">${p.value != null ? new Intl.NumberFormat('en-AE', {style:'currency',currency:'AED',maximumFractionDigits:0}).format(p.value) : '—'}</td>
         <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis">${p.description||'—'}</td>
-        <td class="mono">${p.fab_id||'—'}</td>
+        <td class="mono col-admin-only">${p.fab_id||'—'}</td>
         <td>${pct !== null ? `<div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>` : '—'}</td>
         <td style="text-align:center">${(p.task_ids||[]).length||'—'}</td>
       </tr>`;
@@ -185,6 +173,7 @@
     </table></div></div>`;
   }
 
+  // ── Show Project Detail (Side-Peek) ──
   window.showProject = async function(id) {
     const p = await API.project(id);
     if (!p) return;
@@ -192,58 +181,69 @@
     const allStages = getAllStages(projectsData);
     const fmtCurrency = v => new Intl.NumberFormat('en-AE',{style:'currency',currency:'AED',maximumFractionDigits:0}).format(v);
 
-    openDetail(p.name, `
+    openSidePeek(`<span style="color:var(--gold)">${p.name}</span>`, `
       <!-- ── Project Info ── -->
-      <div class="detail-section"><div class="detail-label">📐 Project Info</div>
-        <div class="detail-value">SN: <span class="mono" style="color:var(--gold)">#${p.sn||'—'}</span></div>
-        <div class="detail-value">Type: <span class="status-badge ${p.service_type==='DESIGN'?'status-dd':'status-as'}">${p.service_type||'—'}</span></div>
-        ${p.fab_id ? `<div class="detail-value">FAB ID: <span class="mono">${p.fab_id}</span></div>` : ''}
-        ${p.adm_id ? `<div class="detail-value">ADM ID: <span class="mono">${p.adm_id}</span></div>` : ''}
-        ${p.plot_info ? `<div class="detail-value">📍 Plot: ${p.plot_info}</div>` : ''}
-        ${pct !== null ? `<div class="detail-value">Completion: <strong style="color:var(--gold)">${pct}%</strong>
-          <div class="progress-bar" style="margin-top:4px;width:160px"><div class="progress-fill" style="width:${pct}%"></div></div>
-        </div>` : ''}
-      </div>
+      <details class="peek-section" open>
+        <summary>📐 Project Info</summary>
+        <div class="peek-section-body">
+          <div class="peek-row"><span class="peek-label">SN</span><span class="mono" style="color:var(--gold)">#${p.sn||'—'}</span></div>
+          <div class="peek-row"><span class="peek-label">Type</span><span class="status-badge ${p.service_type==='DESIGN'?'status-dd':'status-as'}">${p.service_type||'—'}</span></div>
+          ${p.fab_id ? `<div class="peek-row"><span class="peek-label">FAB ID</span><span class="mono">${p.fab_id}</span></div>` : ''}
+          ${p.adm_id ? `<div class="peek-row"><span class="peek-label">ADM ID</span><span class="mono">${p.adm_id}</span></div>` : ''}
+          ${p.plot_info ? `<div class="peek-row"><span class="peek-label">Plot</span><span>📍 ${p.plot_info}</span></div>` : ''}
+          ${pct !== null ? `<div class="peek-row"><span class="peek-label">Completion</span><span style="color:var(--gold);font-weight:600">${pct}%</span></div>
+          <div class="progress-bar" style="margin-top:4px"><div class="progress-fill" style="width:${pct}%"></div></div>` : ''}
+        </div>
+      </details>
 
-      <!-- ── Editable Fields ── -->
-      <div class="detail-section"><div class="detail-label">✏️ Edit Project</div>
-        <label style="display:block;margin:6px 0 3px;color:var(--text-muted);font-size:0.7rem">Stage</label>
-        <div style="display:flex;gap:8px;align-items:center">
-          <select class="filter-select" id="detail-stage-select" style="flex:1;padding:4px 8px;font-size:0.8rem">
+      <!-- ── Edit Project ── -->
+      <details class="peek-section" open>
+        <summary>✏️ Edit Project</summary>
+        <div class="peek-section-body">
+          <label class="peek-label">Stage</label>
+          <select class="peek-input" id="detail-stage-select">
             ${allStages.map(s => `<option value="${s.key}" ${p.stage===s.key?'selected':''}>${s.key.replace(/[()]/g,'')}</option>`).join('')}
           </select>
+          <label class="peek-label">Value (AED)</label>
+          <input id="detail-project-value" type="number" class="peek-input" value="${p.value||''}" placeholder="Contract value..." />
+          <label class="peek-label">Description</label>
+          <textarea id="detail-project-desc" class="peek-input" style="min-height:60px;resize:vertical" placeholder="Project description...">${p.description||''}</textarea>
+          <button class="btn btn-primary btn-sm" id="detail-save-project" style="width:100%;margin-top:8px">💾 Save to Notion</button>
         </div>
-        <label style="display:block;margin:8px 0 3px;color:var(--text-muted);font-size:0.7rem">Value (AED)</label>
-        <input id="detail-project-value" type="number" class="filter-input" style="width:100%;margin-bottom:6px" value="${p.value||''}" placeholder="Contract value..." />
-        <label style="display:block;margin:6px 0 3px;color:var(--text-muted);font-size:0.7rem">Description</label>
-        <textarea id="detail-project-desc" class="filter-input" style="width:100%;min-height:60px;resize:vertical;margin-bottom:10px" placeholder="Project description...">${p.description||''}</textarea>
-        <button class="btn btn-primary btn-sm" id="detail-save-project" style="width:100%">💾 Save to Notion</button>
-      </div>
+      </details>
 
       <!-- ── Client ── -->
       ${(p.client_ids||[]).length ? `
-      <div class="detail-section"><div class="detail-label">👥 Client</div>
-        <div class="detail-value" style="color:var(--gold);cursor:pointer" onclick="showClient('${p.client_ids[0]}')">
-          🔗 View linked client →
+      <details class="peek-section" open>
+        <summary>👥 Client</summary>
+        <div class="peek-section-body">
+          <div class="peek-row" style="color:var(--gold);cursor:pointer" onclick="showClient('${p.client_ids[0]}')">
+            🔗 View linked client →
+          </div>
         </div>
-      </div>` : ''}
+      </details>` : ''}
 
       <!-- ── Linked Tasks ── -->
-      ${(p.tasks||[]).length ? `
-      <div class="detail-section"><div class="detail-label">✅ Tasks (${p.tasks.length})</div>
-        ${p.tasks.map(t => `<div style="padding:8px 0;border-bottom:1px solid var(--glass-border);display:flex;justify-content:space-between;align-items:center">
-          <span style="font-size:0.85rem;color:var(--text-primary)">${t.name}</span>
-          <span class="status-badge ${stageClass(t.status)}" style="font-size:0.65rem">${t.status||'—'}</span>
-        </div>`).join('')}
-      </div>` : '<div class="detail-section"><div class="detail-label">✅ Tasks</div><div class="detail-value" style="color:var(--text-muted)">No linked tasks</div></div>'}
+      <details class="peek-section" ${(p.tasks||[]).length ? 'open' : ''}>
+        <summary>✅ Tasks (${(p.tasks||[]).length})</summary>
+        <div class="peek-section-body">
+          ${(p.tasks||[]).length ? p.tasks.map(t => `<div style="padding:6px 0;border-bottom:1px solid var(--glass-border);display:flex;justify-content:space-between;align-items:center">
+            <span style="font-size:0.85rem;color:var(--text-primary)">${t.name}</span>
+            <span class="status-badge ${stageClass(t.status)}" style="font-size:0.65rem">${t.status||'—'}</span>
+          </div>`).join('') : '<div style="color:var(--text-muted)">No linked tasks</div>'}
+        </div>
+      </details>
 
       <!-- ── Meta ── -->
-      <div class="detail-section" style="opacity:0.5"><div class="detail-label">Meta</div>
-        <div class="detail-value" style="font-size:0.7rem">Created: ${p.created || '—'}</div>
-      </div>
+      <details class="peek-section">
+        <summary>Meta</summary>
+        <div class="peek-section-body">
+          <div class="peek-row"><span class="peek-label">Created</span><span class="mono" style="font-size:0.75rem">${p.created || '—'}</span></div>
+        </div>
+      </details>
     `);
 
-    // Unified save handler — stage + value + description
+    // Unified save handler
     document.getElementById('detail-save-project')?.addEventListener('click', async () => {
       const newStage = document.getElementById('detail-stage-select').value;
       const valInput = document.getElementById('detail-project-value')?.value;
@@ -272,29 +272,31 @@
 
   // ── Add Project Form ──
   window.showAddProjectForm = function() {
-    openDetail('➕ New Project', `
-      <div class="detail-section">
-        <div class="detail-label">Project Information</div>
-        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">Project Name *</label>
-        <input id="new-proj-name" class="filter-input" style="width:100%;margin-bottom:8px" placeholder="Project name..." />
-        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">SN (Serial Number)</label>
-        <input id="new-proj-sn" type="number" class="filter-input" style="width:100%;margin-bottom:8px" placeholder="e.g. 210" />
-        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">Service Type</label>
-        <select id="new-proj-type" class="filter-select" style="width:100%;margin-bottom:8px">
-          <option value="">Select...</option>
-          <option value="DESIGN">Design</option>
-          <option value="SUPERVISION">Supervision</option>
-        </select>
-        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">Stage</label>
-        <select id="new-proj-stage" class="filter-select" style="width:100%;margin-bottom:8px">
-          ${KNOWN_STAGES.map(s => `<option value="${s.key}">${s.key.replace(/[()]/g,'')}</option>`).join('')}
-        </select>
-        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">Value (AED)</label>
-        <input id="new-proj-value" type="number" class="filter-input" style="width:100%;margin-bottom:8px" placeholder="Contract value..." />
-        <label style="display:block;margin:8px 0 4px;color:var(--text-muted);font-size:0.75rem">Description</label>
-        <textarea id="new-proj-desc" class="filter-input" style="width:100%;min-height:60px;resize:vertical;margin-bottom:16px" placeholder="Project description..."></textarea>
-        <button class="btn btn-primary" onclick="submitNewProject()" style="width:100%">Create Project → Notion</button>
-      </div>
+    openSidePeek('➕ New Project', `
+      <details class="peek-section" open>
+        <summary>Project Information</summary>
+        <div class="peek-section-body">
+          <label class="peek-label">Project Name *</label>
+          <input id="new-proj-name" class="peek-input" placeholder="Project name..." />
+          <label class="peek-label">SN (Serial Number)</label>
+          <input id="new-proj-sn" type="number" class="peek-input" placeholder="e.g. 210" />
+          <label class="peek-label">Service Type</label>
+          <select id="new-proj-type" class="peek-input">
+            <option value="">Select...</option>
+            <option value="DESIGN">Design</option>
+            <option value="SUPERVISION">Supervision</option>
+          </select>
+          <label class="peek-label">Stage</label>
+          <select id="new-proj-stage" class="peek-input">
+            ${KNOWN_STAGES.map(s => `<option value="${s.key}">${s.key.replace(/[()]/g,'')}</option>`).join('')}
+          </select>
+          <label class="peek-label">Value (AED)</label>
+          <input id="new-proj-value" type="number" class="peek-input" placeholder="Contract value..." />
+          <label class="peek-label">Description</label>
+          <textarea id="new-proj-desc" class="peek-input" style="min-height:60px;resize:vertical" placeholder="Project description..."></textarea>
+          <button class="btn btn-primary" onclick="submitNewProject()" style="width:100%;margin-top:12px">Create Project → Notion</button>
+        </div>
+      </details>
     `);
   };
 
@@ -314,7 +316,7 @@
       showToast('Project created in Notion!', 'success');
       loaded = false;
       loadProjects();
-      document.getElementById('detail-close')?.click();
+      closeSidePeek();
     } else {
       showToast('Failed to create project', 'error');
     }

@@ -1,6 +1,6 @@
 /**
- * Majaz CRM — Interactions Page
- * Renders all interaction records from Notion with type, summary, next steps.
+ * Majaz CRM — Interactions Page v4.0.0
+ * Side-peek detail view for interaction records.
  */
 (() => {
   let interactionsData = [];
@@ -52,28 +52,42 @@
   window.showInteraction = function(id) {
     const i = interactionsData.find(x => x.id === id);
     if (!i) return;
-    openDetail(i.name || 'Interaction', `
-      <div class="detail-section"><div class="detail-label">💬 Interaction Details</div>
-        <div class="detail-value">Name: <strong style="color:var(--text-primary)">${i.name || '—'}</strong></div>
-        <div class="detail-value">Type: <span class="status-badge status-as">${i.type || '—'}</span></div>
-        <div class="detail-value">Date: <span class="mono">${i.date || '—'}</span></div>
-        ${(i.logged_by||[]).length ? `<div class="detail-value">Logged By: ${i.logged_by.join(', ')}</div>` : ''}
-      </div>
-      ${i.summary ? `<div class="detail-section"><div class="detail-label">📝 Summary</div>
-        <div class="detail-value" style="line-height:1.6">${i.summary}</div>
-      </div>` : ''}
-      ${i.next_steps ? `<div class="detail-section"><div class="detail-label">🎯 Next Steps</div>
-        <div class="detail-value" style="color:var(--gold);line-height:1.6">${i.next_steps}</div>
-      </div>` : ''}
-      <div class="detail-section"><div class="detail-label">🔗 Links</div>
-        ${(i.client_ids||[]).length
-          ? i.client_ids.map(cid => `<div class="detail-value" style="color:var(--gold);cursor:pointer" onclick="showClient('${cid}')">👥 View client →</div>`).join('')
-          : ''}
-        ${(i.project_ids||[]).length
-          ? i.project_ids.map(pid => `<div class="detail-value" style="color:var(--gold);cursor:pointer" onclick="showProject('${pid}')">📐 View project →</div>`).join('')
-          : ''}
-        ${!(i.client_ids||[]).length && !(i.project_ids||[]).length ? '<div class="detail-value" style="color:var(--text-muted)">No linked records</div>' : ''}
-      </div>
+    openSidePeek(`<span style="color:var(--gold)">${i.name || 'Interaction'}</span>`, `
+      <details class="peek-section" open>
+        <summary>💬 Interaction Details</summary>
+        <div class="peek-section-body">
+          <div class="peek-row"><span class="peek-label">Name</span><span style="font-weight:500">${i.name || '—'}</span></div>
+          <div class="peek-row"><span class="peek-label">Type</span><span class="status-badge status-as">${i.type || '—'}</span></div>
+          <div class="peek-row"><span class="peek-label">Date</span><span class="mono">${i.date || '—'}</span></div>
+          ${(i.logged_by||[]).length ? `<div class="peek-row"><span class="peek-label">Logged By</span><span>${i.logged_by.join(', ')}</span></div>` : ''}
+        </div>
+      </details>
+      ${i.summary ? `
+      <details class="peek-section" open>
+        <summary>📝 Summary</summary>
+        <div class="peek-section-body">
+          <div style="line-height:1.6;color:var(--text-secondary)">${i.summary}</div>
+        </div>
+      </details>` : ''}
+      ${i.next_steps ? `
+      <details class="peek-section" open>
+        <summary>🎯 Next Steps</summary>
+        <div class="peek-section-body">
+          <div style="color:var(--gold);line-height:1.6">${i.next_steps}</div>
+        </div>
+      </details>` : ''}
+      <details class="peek-section" ${(i.client_ids||[]).length || (i.project_ids||[]).length ? 'open' : ''}>
+        <summary>🔗 Links</summary>
+        <div class="peek-section-body">
+          ${(i.client_ids||[]).length
+            ? i.client_ids.map(cid => `<div class="peek-row" style="color:var(--gold);cursor:pointer" onclick="showClient('${cid}')">👥 View client →</div>`).join('')
+            : ''}
+          ${(i.project_ids||[]).length
+            ? i.project_ids.map(pid => `<div class="peek-row" style="color:var(--gold);cursor:pointer" onclick="showProject('${pid}')">📐 View project →</div>`).join('')
+            : ''}
+          ${!(i.client_ids||[]).length && !(i.project_ids||[]).length ? '<div style="color:var(--text-muted)">No linked records</div>' : ''}
+        </div>
+      </details>
     `);
   };
 })();

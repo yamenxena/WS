@@ -1,5 +1,6 @@
 /**
- * Majaz CRM — Team & Suppliers Page (Full-Property Rendering)
+ * Majaz CRM — Team & Suppliers Page v4.0.0
+ * Side-peek detail view for team members and suppliers.
  */
 (() => {
   let loaded = false;
@@ -57,16 +58,19 @@
   window.showTeamMember = function(id) {
     const m = teamData.find(t => t.id === id);
     if (!m) return;
-    openDetail(m.name, `
-      <div class="detail-section"><div class="detail-label">👤 Team Member</div>
-        <div class="detail-value">ID: <span class="mono" style="color:var(--gold)">${m.uid||'—'}</span></div>
-        <div class="detail-value">📧 Email: ${m.email||'—'}</div>
-        <div class="detail-value">📞 Work: <span class="mono">${m.work_phone||'—'}</span></div>
-        <div class="detail-value">📱 Personal: <span class="mono">${m.personal_phone||'—'}</span></div>
-        <div class="detail-value">🎂 DOB: ${m.dob||'—'}</div>
-        <div class="detail-value">📅 Joining: ${m.joining_date||'—'}</div>
-        ${m.e_pass ? `<div class="detail-value">🪪 E-Pass: <span class="mono">${m.e_pass}</span></div>` : ''}
-      </div>
+    openSidePeek(`<span style="color:var(--gold)">${m.name}</span>`, `
+      <details class="peek-section" open>
+        <summary>👤 Team Member</summary>
+        <div class="peek-section-body">
+          <div class="peek-row"><span class="peek-label">ID</span><span class="mono" style="color:var(--gold)">${m.uid||'—'}</span></div>
+          <div class="peek-row"><span class="peek-label">Email</span><span>📧 ${m.email||'—'}</span></div>
+          <div class="peek-row"><span class="peek-label">Work Phone</span><span class="mono">📞 ${m.work_phone||'—'}</span></div>
+          <div class="peek-row"><span class="peek-label">Personal</span><span class="mono">📱 ${m.personal_phone||'—'}</span></div>
+          <div class="peek-row"><span class="peek-label">DOB</span><span>🎂 ${m.dob||'—'}</span></div>
+          <div class="peek-row"><span class="peek-label">Joining Date</span><span>📅 ${m.joining_date||'—'}</span></div>
+          ${m.e_pass ? `<div class="peek-row"><span class="peek-label">E-Pass</span><span class="mono">🪪 ${m.e_pass}</span></div>` : ''}
+        </div>
+      </details>
     `);
   };
 
@@ -95,18 +99,24 @@
   window.showSupplier = function(id) {
     const s = supplierData.find(x => x.id === id);
     if (!s) return;
-    openDetail(s.name, `
-      <div class="detail-section"><div class="detail-label">🏭 Supplier/Contractor</div>
-        <div class="detail-value">ID: <span class="mono" style="color:var(--gold)">${s.uid||'—'}</span></div>
-        <div class="detail-value">Type: <span class="status-badge ${s.type==='Supplier'?'status-dd':'status-as'}">${s.type||'—'}</span></div>
-        <div class="detail-value">Speciality: ${(s.speciality||[]).join(', ')||'—'}</div>
-      </div>
-      <div class="detail-section"><div class="detail-label">📞 Contact</div>
-        <div class="detail-value">Phone: <span class="mono">${s.phone||'—'}</span></div>
-        <div class="detail-value">Email: ${s.email||'—'}</div>
-        ${s.url ? `<div class="detail-value">Website: <a href="${s.url}" target="_blank" style="color:var(--gold)">${s.url} ↗</a></div>` : ''}
-        <div class="detail-value">Contact Person: ${s.contact_person||'—'}</div>
-      </div>
+    openSidePeek(`<span style="color:var(--gold)">${s.name}</span>`, `
+      <details class="peek-section" open>
+        <summary>🏭 Supplier/Contractor</summary>
+        <div class="peek-section-body">
+          <div class="peek-row"><span class="peek-label">ID</span><span class="mono" style="color:var(--gold)">${s.uid||'—'}</span></div>
+          <div class="peek-row"><span class="peek-label">Type</span><span class="status-badge ${s.type==='Supplier'?'status-dd':'status-as'}">${s.type||'—'}</span></div>
+          <div class="peek-row"><span class="peek-label">Speciality</span><span>${(s.speciality||[]).join(', ')||'—'}</span></div>
+        </div>
+      </details>
+      <details class="peek-section" open>
+        <summary>📞 Contact</summary>
+        <div class="peek-section-body">
+          <div class="peek-row"><span class="peek-label">Phone</span><span class="mono">${s.phone||'—'}</span></div>
+          <div class="peek-row"><span class="peek-label">Email</span><span>${s.email||'—'}</span></div>
+          ${s.url ? `<div class="peek-row"><span class="peek-label">Website</span><a href="${s.url}" target="_blank" style="color:var(--gold)">${s.url} ↗</a></div>` : ''}
+          <div class="peek-row"><span class="peek-label">Contact Person</span><span>${s.contact_person||'—'}</span></div>
+        </div>
+      </details>
     `);
   };
 })();

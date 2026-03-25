@@ -1,6 +1,6 @@
 /**
- * Majaz CRM — Work Pipeline Page
- * Renders all pipeline items from Notion with stage grouping and project links.
+ * Majaz CRM — Work Pipeline Page v4.0.0
+ * Side-peek detail view for pipeline items.
  */
 (() => {
   let pipelineData = [];
@@ -18,14 +18,15 @@
     const badge = document.getElementById('badge-pipeline');
     if (badge) badge.textContent = pipelineData.length;
 
-    // Populate stage filter dynamically
     const stages = [...new Set(pipelineData.map(p => p.stage).filter(Boolean))].sort();
     const stageSelect = document.getElementById('pipeline-filter-stage');
-    stages.forEach(s => {
-      const opt = document.createElement('option');
-      opt.value = s; opt.textContent = s;
-      stageSelect.appendChild(opt);
-    });
+    if (stageSelect && stageSelect.options.length <= 1) {
+      stages.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s; opt.textContent = s;
+        stageSelect.appendChild(opt);
+      });
+    }
 
     renderTable(pipelineData);
     document.getElementById('pipeline-search')?.addEventListener('input', applyFilters);
@@ -65,18 +66,24 @@
   window.showPipelineItem = function(id) {
     const p = pipelineData.find(x => x.id === id);
     if (!p) return;
-    openDetail(p.name || 'Pipeline Item', `
-      <div class="detail-section"><div class="detail-label">🔄 Pipeline Details</div>
-        <div class="detail-value">Task: <strong style="color:var(--text-primary)">${p.name || '—'}</strong></div>
-        <div class="detail-value">Stage: <span class="status-badge ${stageClass(p.stage)}">${p.stage || '—'}</span></div>
-        <div class="detail-value">Type: ${p.task_type || '—'}</div>
-        <div class="detail-value">Duration: <span class="mono">${p.duration != null ? p.duration + ' days' : '—'}</span></div>
-      </div>
-      <div class="detail-section"><div class="detail-label">📐 Linked Projects (${(p.project_ids||[]).length})</div>
-        ${(p.project_ids||[]).length
-          ? p.project_ids.map(pid => `<div class="detail-value" style="color:var(--gold);cursor:pointer" onclick="showProject('${pid}')">🔗 View project →</div>`).join('')
-          : '<div class="detail-value" style="color:var(--text-muted)">No linked projects</div>'}
-      </div>
+    openSidePeek(`<span style="color:var(--gold)">${p.name || 'Pipeline Item'}</span>`, `
+      <details class="peek-section" open>
+        <summary>🔄 Pipeline Details</summary>
+        <div class="peek-section-body">
+          <div class="peek-row"><span class="peek-label">Task</span><span style="font-weight:500">${p.name || '—'}</span></div>
+          <div class="peek-row"><span class="peek-label">Stage</span><span class="status-badge ${stageClass(p.stage)}">${p.stage || '—'}</span></div>
+          <div class="peek-row"><span class="peek-label">Type</span><span>${p.task_type || '—'}</span></div>
+          <div class="peek-row"><span class="peek-label">Duration</span><span class="mono">${p.duration != null ? p.duration + ' days' : '—'}</span></div>
+        </div>
+      </details>
+      <details class="peek-section" ${(p.project_ids||[]).length ? 'open' : ''}>
+        <summary>📐 Linked Projects (${(p.project_ids||[]).length})</summary>
+        <div class="peek-section-body">
+          ${(p.project_ids||[]).length
+            ? p.project_ids.map(pid => `<div class="peek-row" style="color:var(--gold);cursor:pointer" onclick="showProject('${pid}')">🔗 View project →</div>`).join('')
+            : '<div style="color:var(--text-muted)">No linked projects</div>'}
+        </div>
+      </details>
     `);
   };
 })();
