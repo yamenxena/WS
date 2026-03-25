@@ -543,6 +543,8 @@ def update_client(page_id):
         props["Next Action"] = {"rich_text": [{"text": {"content": data["next_action"]}}]}
     if "budget" in data:
         props["Budget (AED)"] = {"number": data["budget"]}
+    if "lead_status" in data:
+        props["Lead Status"] = {"status": {"name": data["lead_status"]}}
     if not props:
         return jsonify({"error": "No fields to update"}), 400
     ok, result = notion_patch_page(page_id, props)

@@ -168,8 +168,13 @@
         ${c.last_contacted ? `<div class="detail-value">Last Contacted: <span class="mono">${c.last_contacted}</span></div>` : ''}
       </div>
 
-      <!-- ── Editable: Next Action ── -->
+      <!-- ── Editable: Quick Edit ── -->
       <div class="detail-section"><div class="detail-label">✏️ Quick Edit</div>
+        <label style="display:block;margin:6px 0 3px;color:var(--text-muted);font-size:0.7rem">Lead Status</label>
+        <select id="edit-lead-status" class="filter-select" style="width:100%;margin-bottom:8px">
+          <option value="" ${!c.lead_status?'selected':''}>— Select —</option>
+          ${['Inquiry','Qualified','Proposal','Negotiation','Won','Lost'].map(s => `<option value="${s}" ${c.lead_status===s?'selected':''}>${s}</option>`).join('')}
+        </select>
         <label style="display:block;margin:6px 0 3px;color:var(--text-muted);font-size:0.7rem">Next Action</label>
         <input id="edit-next-action" class="filter-input" style="width:100%;margin-bottom:8px" value="${c.next_action || ''}" placeholder="Enter next action..." />
         <label style="display:block;margin:6px 0 3px;color:var(--text-muted);font-size:0.7rem">Budget (AED)</label>
@@ -233,8 +238,10 @@
   window.saveClientEdit = async function(id) {
     const next_action = document.getElementById('edit-next-action')?.value?.trim() || '';
     const budgetVal = document.getElementById('edit-budget')?.value;
+    const leadStatus = document.getElementById('edit-lead-status')?.value;
     const data = { next_action };
     if (budgetVal !== '' && budgetVal != null) data.budget = parseFloat(budgetVal);
+    if (leadStatus) data.lead_status = leadStatus;
     const res = await API.updateClient(id, data);
     if (res?.ok) {
       showToast('Client updated in Notion!', 'success');
