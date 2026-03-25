@@ -60,6 +60,36 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ══════════════════════════════════════════════════════════════
+  // SIDEBAR COLLAPSE TOGGLE (P1)
+  // ══════════════════════════════════════════════════════════════
+  const collapseBtn = document.getElementById('sidebar-collapse-btn');
+  const COLLAPSE_KEY = 'majaz-sidebar';
+
+  function setSidebarCollapsed(collapsed) {
+    sidebar.classList.toggle('sidebar-collapsed', collapsed);
+    document.body.classList.toggle('sidebar-is-collapsed', collapsed);
+    localStorage.setItem(COLLAPSE_KEY, collapsed ? '1' : '0');
+  }
+
+  // Restore persisted state
+  const savedCollapse = localStorage.getItem(COLLAPSE_KEY);
+  if (savedCollapse === '1' || (savedCollapse === null && window.innerWidth < 1024)) {
+    setSidebarCollapsed(true);
+  }
+
+  collapseBtn?.addEventListener('click', () => {
+    const isCollapsed = sidebar.classList.contains('sidebar-collapsed');
+    setSidebarCollapsed(!isCollapsed);
+  });
+
+  // Auto-collapse on narrow viewports
+  window.addEventListener('resize', () => {
+    if (window.innerWidth < 1024 && !sidebar.classList.contains('sidebar-collapsed')) {
+      setSidebarCollapsed(true);
+    }
+  });
+
+  // ══════════════════════════════════════════════════════════════
   // VIEW SWITCHING
   // ══════════════════════════════════════════════════════════════
   function switchView(viewName) {
