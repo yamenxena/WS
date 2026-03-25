@@ -17,7 +17,12 @@
       API.meetings(),
       API.interactions(),
     ]);
-    if (!data) return;
+    if (!data) {
+      const el = document.getElementById('reports-content');
+      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><i data-lucide="bar-chart-3" style="width:48px;height:48px;opacity:0.4"></i></div><div class="empty-state-text">Reports unavailable</div><div class="empty-state-sub">Connect to the API to view analytics and charts</div><button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="location.reload()">Retry</button></div>';
+      if (window.lucide) lucide.createIcons();
+      return;
+    }
 
     const el = document.getElementById('reports-content');
     const stages = data.stages || {};

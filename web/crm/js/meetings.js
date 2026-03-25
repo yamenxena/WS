@@ -31,7 +31,8 @@
   function renderTable(rows) {
     const el = document.getElementById('meetings-content');
     if (!rows.length) {
-      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">—</div><div class="empty-state-text">No meetings found</div></div>';
+      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><i data-lucide="calendar" style="width:48px;height:48px;opacity:0.4"></i></div><div class="empty-state-text">No meetings found</div><div class="empty-state-sub">Meetings will appear here once created in Notion</div></div>';
+      if (window.lucide) lucide.createIcons();
       return;
     }
 

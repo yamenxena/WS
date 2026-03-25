@@ -31,7 +31,8 @@
   function renderTable(rows) {
     const el = document.getElementById('interactions-content');
     if (!rows.length) {
-      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">—</div><div class="empty-state-text">No interactions found</div></div>';
+      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><i data-lucide="message-circle" style="width:48px;height:48px;opacity:0.4"></i></div><div class="empty-state-text">No interactions found</div><div class="empty-state-sub">Log calls, meetings, and emails from the client detail view</div></div>';
+      if (window.lucide) lucide.createIcons();
       return;
     }
 

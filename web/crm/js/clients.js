@@ -58,9 +58,9 @@
 
   function urgencyIcon(u) {
     if (!u) return '';
-    if (u === '🔴' || u === 'High') return '<span title="High Urgency">🔴</span>';
-    if (u === '🟡' || u === 'Medium') return '<span title="Medium Urgency">🟡</span>';
-    if (u === '🟢' || u === 'Low') return '<span title="Low Urgency">🟢</span>';
+    if (u === '🔴' || u === 'High') return '<span class="urgency-dot urgency-high" title="High Urgency"></span> High';
+    if (u === '🟡' || u === 'Medium') return '<span class="urgency-dot urgency-medium" title="Medium Urgency"></span> Medium';
+    if (u === '🟢' || u === 'Low') return '<span class="urgency-dot urgency-low" title="Low Urgency"></span> Low';
     return `<span>${u}</span>`;
   }
 
@@ -72,7 +72,8 @@
   function renderTable(rows) {
     const el = document.getElementById('clients-content');
     if (!rows.length) {
-      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon">👥</div><div class="empty-state-text">No clients found</div></div>';
+      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><i data-lucide="users" style="width:48px;height:48px;opacity:0.4"></i></div><div class="empty-state-text">No clients found</div><div class="empty-state-sub">Try adjusting your filters or adding a new client</div></div>';
+      if (window.lucide) lucide.createIcons();
       return;
     }
 
@@ -156,7 +157,7 @@
     openSidePeek(`<span style="color:var(--gold)">${c.name}</span>`, `
       <!-- ── Contact ── -->
       <details class="peek-section" open>
-        <summary>📞 Contact</summary>
+        <summary>Contact</summary>
         <div class="peek-section-body">
           <div class="peek-row"><span class="peek-label">Phone</span><span class="mono">${c.phone || '—'}</span></div>
           ${c.phone_1 ? `<div class="peek-row"><span class="peek-label">Phone 2</span><span class="mono">${c.phone_1}</span></div>` : ''}
@@ -168,7 +169,7 @@
 
       <!-- ── Profile ── -->
       <details class="peek-section" open>
-        <summary>🏢 Profile</summary>
+        <summary>Profile</summary>
         <div class="peek-section-body">
           <div class="peek-row"><span class="peek-label">Location</span><span>${c.location || '—'}</span></div>
           <div class="peek-row"><span class="peek-label">Project Type</span><span>${c.project_type || '—'}</span></div>
@@ -181,7 +182,7 @@
 
       <!-- ── Business ── -->
       <details class="peek-section" open>
-        <summary>💰 Business</summary>
+        <summary>Business</summary>
         <div class="peek-section-body">
           <div class="peek-row"><span class="peek-label">Budget</span><span class="mono" style="color:var(--gold)">${c.budget != null ? fmtCurrency(c.budget) : '—'}</span></div>
           <div class="peek-row"><span class="peek-label">CLV</span><span class="mono" style="color:var(--gold)">${c.clv != null ? fmtCurrency(c.clv) : '—'}</span></div>
@@ -203,7 +204,7 @@
 
       <!-- ── Quick Edit ── -->
       <details class="peek-section" open>
-        <summary>✏️ Quick Edit</summary>
+        <summary>Quick Edit</summary>
         <div class="peek-section-body">
           <label class="peek-label">Lead Status</label>
           <select id="edit-lead-status" class="peek-input">
@@ -214,13 +215,13 @@
           <input id="edit-next-action" class="peek-input" value="${c.next_action || ''}" placeholder="Enter next action..." />
           <label class="peek-label">Budget (AED)</label>
           <input id="edit-budget" type="number" class="peek-input" value="${c.budget || ''}" placeholder="Enter budget..." />
-          <button class="btn btn-primary btn-sm" onclick="saveClientEdit('${c.id}')" style="width:100%;margin-top:8px">💾 Save to Notion</button>
+          <button class="btn btn-primary btn-sm" onclick="saveClientEdit('${c.id}')" style="width:100%;margin-top:8px">Save to Notion</button>
         </div>
       </details>
 
       <!-- ── Info ── -->
       <details class="peek-section">
-        <summary>🎯 Assignment & Referrals</summary>
+        <summary>Assignment & Referrals</summary>
         <div class="peek-section-body">
           ${c.representative ? `<div class="peek-row"><span class="peek-label">Representative</span><span>${c.representative}</span></div>` : ''}
           ${c.referred_by ? `<div class="peek-row"><span class="peek-label">Referred By</span><span>${c.referred_by}</span></div>` : ''}
@@ -231,10 +232,10 @@
 
       <!-- ── Linked Projects ── -->
       <details class="peek-section" ${(c.project_ids||[]).length ? 'open' : ''}>
-        <summary>📐 Projects (${(c.project_ids||[]).length})</summary>
+        <summary>Projects (${(c.project_ids||[]).length})</summary>
         <div class="peek-section-body">
           ${(c.project_ids||[]).length ? c.project_ids.map(pid =>
-            `<div class="peek-row" style="color:var(--gold);cursor:pointer" onclick="showProject('${pid}')">🔗 View project →</div>`
+            `<div class="peek-row" style="color:var(--gold);cursor:pointer" onclick="showProject('${pid}')">View project →</div>`
           ).join('') : '<div style="color:var(--text-muted)">No linked projects</div>'}
         </div>
       </details>
@@ -254,21 +255,21 @@
           </select>
           <textarea id="new-int-summary" class="peek-input" style="min-height:60px;resize:vertical" placeholder="Summary..."></textarea>
           <input id="new-int-next" class="peek-input" placeholder="Next steps..." />
-          <button class="btn btn-primary btn-sm" onclick="submitInteraction('${c.id}')" style="width:100%;margin-top:8px">📝 Log → Notion</button>
+          <button class="btn btn-primary btn-sm" onclick="submitInteraction('${c.id}')" style="width:100%;margin-top:8px">Log Interaction</button>
         </div>
       </details>
 
       <!-- ── Interactions List ── -->
       ${(c.interactions||[]).length ? `
       <details class="peek-section" open>
-        <summary>💬 Interactions (${c.interactions.length})</summary>
+        <summary>Interactions (${c.interactions.length})</summary>
         <div class="peek-section-body">
           ${c.interactions.map(i => `<div style="padding:8px 0;border-bottom:1px solid var(--glass-border)">
             <div style="display:flex;justify-content:space-between;align-items:center">
               <span style="font-weight:500;color:var(--text-primary)">${i.name}</span>
               <span class="status-badge" style="font-size:0.6rem">${i.type||''}</span>
             </div>
-            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px">📅 ${i.date||'—'} ${(i.logged_by||[]).length ? `· 👤 ${i.logged_by.join(', ')}` : ''}</div>
+            <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px">${i.date||'—'} ${(i.logged_by||[]).length ? `· ${i.logged_by.join(', ')}` : ''}</div>
             ${i.summary ? `<div style="font-size:0.8rem;color:var(--text-secondary);margin-top:4px">${i.summary}</div>` : ''}
             ${i.next_steps ? `<div style="font-size:0.8rem;color:var(--gold);margin-top:4px">→ ${i.next_steps}</div>` : ''}
           </div>`).join('')}
@@ -285,7 +286,7 @@
 
       <!-- ── Archive (Admin) ── -->
       <div class="peek-section-body" data-role="admin" style="display:none">
-        <button class="btn btn-danger btn-sm" style="width:100%" onclick="archiveRecord('client','${c.id}','${c.name.replace(/'/g,"&#39;")}')">🗑 Archive Client</button>
+        <button class="btn btn-danger btn-sm" style="width:100%" onclick="archiveRecord('client','${c.id}','${c.name.replace(/'/g,"&#39;")}')">Archive Client</button>
       </div>
     `);
   };

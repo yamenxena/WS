@@ -29,7 +29,12 @@
     </div>`;
 
     const data = await API.dashboard();
-    if (!data) return;
+    if (!data) {
+      grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><div class="empty-state-icon"><i data-lucide="wifi-off" style="width:48px;height:48px;opacity:0.4"></i></div><div class="empty-state-text">Unable to reach server</div><div class="empty-state-sub">Check that the API is running, then try again</div><button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="location.reload()">Retry</button></div>';
+      chartEl.innerHTML = '';
+      if (window.lucide) lucide.createIcons();
+      return;
+    }
 
     // Update sidebar badges
     const bc = document.getElementById('badge-clients');
@@ -46,17 +51,17 @@
 
     grid.innerHTML = `
       <div class="kpi-card stagger-in">
-        <div class="kpi-icon">📐</div>
+        <div class="kpi-icon"><i data-lucide="ruler" class="nav-icon"></i></div>
         <div class="kpi-value">${data.total_projects}</div>
         <div class="kpi-label">Projects</div>
       </div>
       <div class="kpi-card stagger-in">
-        <div class="kpi-icon">👥</div>
+        <div class="kpi-icon"><i data-lucide="users" class="nav-icon"></i></div>
         <div class="kpi-value">${data.total_clients}</div>
         <div class="kpi-label">Clients</div>
       </div>
       <div class="kpi-card stagger-in">
-        <div class="kpi-icon">✅</div>
+        <div class="kpi-icon"><i data-lucide="check-circle" class="nav-icon"></i></div>
         <div class="kpi-value">${data.total_tasks}</div>
         <div class="kpi-label">Tasks</div>
       </div>
@@ -69,6 +74,9 @@
         </div>
       </div>
     `;
+
+    // Re-initialize Lucide icons in KPI cards
+    if (window.lucide) lucide.createIcons();
 
     // Pipeline chart (animated bars)
     const stages = data.stages || {};
