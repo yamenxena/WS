@@ -241,6 +241,11 @@
           <div class="peek-row"><span class="peek-label">Created</span><span class="mono" style="font-size:0.75rem">${p.created || '—'}</span></div>
         </div>
       </details>
+
+      <!-- ── Archive (Admin) ── -->
+      <div class="peek-section-body" data-role="admin" style="display:none">
+        <button class="btn btn-danger btn-sm" style="width:100%" onclick="archiveRecord('project','${p.id}','${p.name.replace(/'/g,"&#39;")}')">🗑 Archive Project</button>
+      </div>
     `);
 
     // Unified save handler

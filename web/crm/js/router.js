@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Team users cannot navigate to admin-only views
   const adminOnlyViews = new Set([
-    'meetings', 'pipeline', 'interactions', 'concept-plans', 'reports'
+    'meetings', 'pipeline', 'interactions', 'concept-plans', 'reports', 'admin-settings'
   ]);
 
   // ══════════════════════════════════════════════════════════════

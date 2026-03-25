@@ -1683,3 +1683,86 @@ select.peek-input.field-error {
   .filter-bar { flex-direction: column; }
   .filter-input { min-width: 100%; }
 }
+
+
+/* ══════════════════════════════════════════════════════════════
+   R5 — ADMIN POWER TOOLS
+   ══════════════════════════════════════════════════════════════ */
+
+/* ── btn-danger ── */
+.btn-danger {
+  background: linear-gradient(135deg, #b02020 0%, #7a0000 100%);
+  color: #fff;
+  border: 1px solid rgba(255,80,80,0.3);
+}
+.btn-danger:hover { filter: brightness(1.15); }
+
+/* ── Admin role guard — show archive buttons only for admin ── */
+body.role-admin [data-role="admin"] { display: block !important; }
+
+/* ── Confirm Dialog ── */
+.confirm-overlay {
+  position: fixed; inset: 0; z-index: 9999;
+  background: rgba(0,0,0,0.65);
+  display: flex; align-items: center; justify-content: center;
+  backdrop-filter: blur(4px);
+  animation: fadeIn 0.15s ease;
+}
+.confirm-dialog {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  padding: 28px 24px;
+  max-width: 420px; width: 90%;
+  box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+}
+.confirm-title {
+  font-size: 1.1rem; font-weight: 700;
+  color: var(--text-primary); margin: 0 0 10px;
+}
+.confirm-msg {
+  font-size: 0.875rem; color: var(--text-secondary);
+  margin: 0 0 20px; line-height: 1.5;
+}
+.confirm-actions {
+  display: flex; gap: 10px; justify-content: flex-end;
+}
+
+/* ── Activity Log ── */
+.activity-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 0; border-bottom: 1px solid var(--glass-border);
+}
+.activity-item:last-child { border-bottom: none; }
+.activity-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 2px; }
+.activity-body { min-width: 0; }
+.activity-name {
+  font-size: 0.875rem; font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.activity-meta { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+
+/* ── Settings Panel ── */
+.settings-panel { display: flex; flex-direction: column; gap: 0; }
+.settings-section { margin-bottom: 16px; }
+.settings-section-title {
+  font-size: 0.75rem; font-weight: 600; text-transform: uppercase;
+  color: var(--gold); letter-spacing: 0.07em;
+  margin-bottom: 8px;
+}
+.settings-toggles {
+  display: flex; flex-wrap: wrap; gap: 8px;
+}
+.col-toggle {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 0.8rem; color: var(--text-secondary);
+  cursor: pointer; padding: 5px 10px;
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.03);
+  transition: border-color 0.15s, color 0.15s;
+}
+.col-toggle:hover { border-color: var(--gold); color: var(--text-primary); }
+.col-toggle input[type="checkbox"] { accent-color: var(--gold); }
+

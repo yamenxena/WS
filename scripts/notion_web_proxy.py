@@ -569,6 +569,13 @@ def create_client():
 @require_auth
 def update_client(page_id):
     data = request.get_json() or {}
+    # Archive (soft-delete) — send in_trash to Notion
+    if data.get("archived"):
+        resp = requests.patch(
+            f"https://api.notion.com/v1/pages/{page_id}",
+            headers=HEADERS, json={"in_trash": True}
+        )
+        return jsonify({"ok": resp.status_code == 200})
     props = {}
     if "name" in data:
         props["Name"] = {"title": [{"text": {"content": data["name"]}}]}
@@ -648,6 +655,12 @@ def create_project():
 @require_auth
 def update_project(page_id):
     data = request.get_json() or {}
+    if data.get("archived"):
+        resp = requests.patch(
+            f"https://api.notion.com/v1/pages/{page_id}",
+            headers=HEADERS, json={"in_trash": True}
+        )
+        return jsonify({"ok": resp.status_code == 200})
     props = {}
     if "stage" in data:
         props["Stage"] = {"status": {"name": data["stage"]}}
@@ -681,6 +694,12 @@ def get_tasks():
 @require_auth
 def update_task(page_id):
     data = request.get_json() or {}
+    if data.get("archived"):
+        resp = requests.patch(
+            f"https://api.notion.com/v1/pages/{page_id}",
+            headers=HEADERS, json={"in_trash": True}
+        )
+        return jsonify({"ok": resp.status_code == 200})
     props = {}
     if "status" in data:
         props["Status"] = {"status": {"name": data["status"]}}
@@ -792,6 +811,26 @@ def get_suppliers():
 def get_team():
     pages = notion_query(DB["team"])
     return jsonify({"rows": [transform_team(p) for p in pages]})
+
+
+# ── Activity Log (Admin) — 50 most recently edited records ──
+@app.route("/api/activity")
+@require_auth
+def get_activity():
+    clients  = notion_query(DB["clients"],  sorts=[{"timestamp": "last_edited_time", "direction": "descending"}], page_size=20)
+    projects = notion_query(DB["projects"], sorts=[{"timestamp": "last_edited_time", "direction": "descending"}], page_size=20)
+    tasks    = notion_query(DB["tasks"],    sorts=[{"timestamp": "last_edited_time", "direction": "descending"}], page_size=20)
+
+    entries = []
+    for p in clients:
+        entries.append({"type": "Client",  "icon": "👥", "name": _txt(p["properties"].get("Name")),         "date": _edited(p), "id": p["id"]})
+    for p in projects:
+        entries.append({"type": "Project", "icon": "📐", "name": _txt(p["properties"].get("Project Name")), "date": _edited(p), "id": p["id"]})
+    for p in tasks:
+        entries.append({"type": "Task",    "icon": "✅", "name": _txt(p["properties"].get("Task")),         "date": _edited(p), "id": p["id"]})
+
+    entries.sort(key=lambda e: e["date"], reverse=True)
+    return jsonify({"rows": entries[:50]})
 
 
 # ══════════════════════════════════════════════════════════════

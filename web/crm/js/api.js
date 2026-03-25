@@ -107,6 +107,7 @@ const API = (() => {
     interactions: () => _get('/api/interactions'),
     stageCards:   () => _get('/api/stage-cards'),
     conceptPlans: () => _get('/api/concept-plans'),
+    activity:     () => _get('/api/activity'),
 
     // Write
     createClient:      (data) => _post('/api/clients', data),
