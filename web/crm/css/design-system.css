@@ -270,10 +270,11 @@ a:hover { color: var(--gold-light); }
 }
 .sidebar.sidebar-collapsed .sidebar-brand-lockup {
   justify-content: center;
+  flex-direction: column;
 }
 .sidebar.sidebar-collapsed .sidebar-brand-mark {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
 }
 .sidebar.sidebar-collapsed .nav { padding: 12px 4px; }
 .sidebar.sidebar-collapsed .nav-item {
@@ -346,20 +347,21 @@ a:hover { color: var(--gold-light); }
 
 .sidebar-brand-lockup {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   gap: 16px;
   width: 100%;
 }
 
 .sidebar-brand-mark {
-  width: 40px;
+  width: 140px;
   height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
   color: var(--text-primary);
   flex-shrink: 0;
+  transition: width var(--duration) var(--transition-spring);
 }
 .sidebar-brand-mark svg {
   width: 100%;
