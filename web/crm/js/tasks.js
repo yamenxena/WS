@@ -89,10 +89,9 @@
     const cols = buildColumns(rows);
     el.innerHTML = `<div class="kanban">${cols.map(col => {
       const cards = rows.filter(t => t.status === col.key);
-      return `<div class="kanban-column stagger-in" style="flex:1;max-width:none" data-status="${col.key}"
+      return `<div class="kanban-column stagger-in" style="flex:1;max-width:none" data-status="${col.key}" data-drop-status="${col.key.replace(/"/g,'&quot;')}"
         ondragover="event.preventDefault();this.classList.add('drag-over');this.querySelector('.kanban-cards').classList.add('drag-over')"
-        ondragleave="this.classList.remove('drag-over');this.querySelector('.kanban-cards').classList.remove('drag-over')"
-        ondrop="handleTaskDrop(event,'${col.key.replace(/'/g,"\\'")}');this.classList.remove('drag-over');this.querySelector('.kanban-cards').classList.remove('drag-over')">
+        ondragleave="this.classList.remove('drag-over');this.querySelector('.kanban-cards').classList.remove('drag-over')">
         <div class="kanban-col-header">
           <span class="kanban-col-title" style="color:${col.color}">${col.label}</span>
           <span class="kanban-col-count">${cards.length}</span>
@@ -102,7 +101,7 @@
             ondragstart="event.dataTransfer.setData('text/plain','${t.id}');this.classList.add('dragging')"
             ondragend="this.classList.remove('dragging')"
             onclick="showTaskDetail('${t.id}')">
-            <div class="kanban-card-title">${t.name}</div>
+            <div class="kanban-card-title">${escapeHTML(t.name)}</div>
             <div class="kanban-card-meta">
               ${t.due_date ? `<span>${t.due_date}</span>` : ''}
               ${t.deadline ? `<span style="color:${new Date(t.deadline) < new Date() ? 'var(--danger)' : 'var(--text-muted)'}">${t.deadline}</span>` : ''}
@@ -113,6 +112,16 @@
         `).join('')}</div>
       </div>`;
     }).join('')}</div>`;
+
+    // Delegated drop listener (replaces inline ondrop — P7.5)
+    el.querySelectorAll('.kanban-column[data-drop-status]').forEach(col => {
+      col.addEventListener('drop', (e) => {
+        e.preventDefault();
+        col.classList.remove('drag-over');
+        col.querySelector('.kanban-cards')?.classList.remove('drag-over');
+        handleTaskDrop(e, col.dataset.dropStatus);
+      });
+    });
   }
 
   // Drag-and-drop for task board
@@ -130,7 +139,7 @@
     task.status = newStatus;
     render();
 
-    showToast(`Moving "${task.name}" to ${newStatus}...`, 'info');
+    showToast(`Moving "${escapeHTML(task.name)}" to ${newStatus}...`, 'info');
     const result = await API.updateTask(taskId, { status: newStatus, _last_edited: task._last_edited || '' });
     _pendingTaskDnD.delete(taskId);
     if (result && result.conflict) {
@@ -154,7 +163,7 @@
         <th>Task</th><th>Status</th><th>Due Date</th><th>Deadline</th><th>Duration</th><th>Assigned To</th><th>Action</th>
       </tr></thead>
       <tbody>${rows.map(t => `<tr>
-        <td style="color:var(--text-primary);font-weight:500;cursor:pointer" onclick="showTaskDetail('${t.id}')">${t.name}</td>
+        <td style="color:var(--text-primary);font-weight:500;cursor:pointer" onclick="showTaskDetail('${t.id}')">${escapeHTML(t.name)}</td>
         <td><span class="status-badge ${stageClass(t.status)}">${t.status||'—'}</span></td>
         <td class="mono">${t.due_date||'—'}</td>
         <td class="mono" style="color:${t.deadline && new Date(t.deadline) < new Date() ? 'var(--danger)' : 'inherit'}">${t.deadline||'—'}</td>
@@ -173,7 +182,7 @@
     if (!t) return;
     const allStatuses = getAllStatuses(tasksData);
 
-    openSidePeek(`<span style="color:var(--gold)">${t.name}</span>`, `
+    openSidePeek(`<span style="color:var(--gold)">${escapeHTML(t.name)}</span>`, `
       <!-- ── Status Edit ── -->
       <details class="peek-section" open>
         <summary>Status</summary>
@@ -214,6 +223,11 @@
           <div class="peek-row"><span class="peek-label">Created</span><span class="mono" style="font-size:0.75rem">${t.created || '—'}</span></div>
         </div>
       </details>
+
+      <!-- ── Archive (Admin) ── -->
+      <div class="peek-section-body" data-role="admin" style="display:none">
+        <button class="btn btn-danger btn-sm" style="width:100%" onclick="archiveRecord('task','${t.id}','${t.name.replace(/'/g,"&#39;")}')">Archive Task</button>
+      </div>
     `);
 
     document.getElementById('task-save-status')?.addEventListener('click', async () => {
@@ -236,8 +250,12 @@
 
   window.markTaskDone = async function(id, name) {
     showToast(`Marking "${name}" as Done...`, 'info');
-    const result = await API.updateTask(id, { status: 'Done' });
-    if (result && !result.error) {
+    const t = tasksData.find(ts => ts.id === id);
+    const result = await API.updateTask(id, { status: 'Done', _last_edited: t?._last_edited || '' });
+    if (result && result.conflict) {
+      loaded = false;
+      loadTasks();
+    } else if (result && !result.error) {
       const t = tasksData.find(ts => ts.id === id);
       if (t) t.status = 'Done';
       render();

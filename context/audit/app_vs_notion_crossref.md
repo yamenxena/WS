@@ -408,8 +408,8 @@ No gaps found. Every property in the Notion schema has a corresponding proxy tra
 
 | # | Issue | Where | Fix |
 |---|-------|-------|-----|
-| G1 | **Client Quick Edit visible to team** — Budget + Lead Status + Next Action editable by non-admins | `clients.js:205-220` | Wrap edit section with `isAdmin()` guard |
-| G2 | **Project Value edit visible to team** — per D12, only admin should edit financial data | `projects.js:207-208` | Add `isAdmin()` guard on value field |
+| G1 | **Client Quick Edit visible to team** — Budget + Lead Status + Next Action editable by non-admins | `clients.js:205-220` | ✅ FIXED in v7.0.0 — `isAdmin()` guard added |
+| G2 | **Project Value edit visible to team** — per D12, only admin should edit financial data | `projects.js:207-208` | ✅ FIXED in v7.0.0 — `isAdmin()` guard added |
 | G3 | **Dashboard activity tile references `interactions.title` and `interactions.client_name`** but proxy returns `name` and no `client_name` | `dashboard.js:199-200` | Use `ix.name` instead of `ix.title`; `client_name` is N/A (shows blank) |
 | G15 | **No freshness mechanism** — `loaded = true` prevents data refresh. Employee sees stale data after admin edits in Notion (§0.4) | All JS modules | Implement S1 (refresh button) + S2 (TTL auto-refresh) |
 | G16 | **No write-conflict detection on shared-write fields** — Project.Stage and Task.Status can be written by both Notion and App with no guard (§0.5) | `proxy patch handlers` | Implement S3 (`last_edited_time` comparison → 409 Conflict) |
@@ -418,22 +418,22 @@ No gaps found. Every property in the Notion schema has a corresponding proxy tra
 
 | # | Issue | Fix |
 |---|-------|-----|
-| G4 | Task detail shows no linked project | Display `project_ids` in task side-peek |
-| G5 | Task board has no archive button | Add admin-only archive like clients/projects |
+| G4 | Task detail shows no linked project | ✅ FIXED in v7.0.0 — `project_ids` displayed in side-peek |
+| G5 | Task board has no archive button | ✅ FIXED in v7.0.0 — Admin archive added |
 | G6 | No Meeting create form | Add `+ Add Meeting` button for admin |
 | G7 | `project_s_num` fetched but never used in UI | Remove from proxy or display |
-| G8 | `assignee` (Project rollup) fetched but never displayed | Display in project table or detail |
-| G9 | `meeting_ids` + `pipeline_ids` on Projects fetched but unused | Display linked count in detail or remove |
+| G8 | `assignee` fetched but never displayed | ✅ FALSE / FIXED — Displayed in Project side-peek Team section |
+| G9 | `meeting_ids` + `pipeline_ids` fetched but unused | ✅ FALSE / FIXED — Displayed in Project side-peek Team section |
 | G10 | ~~`clients-filter-lead` ID mismatch~~ | ✅ FIXED in v6.1 — now uses `clients-filter-lead-status` |
-| G17 | **Proxy does not return `last_edited_time` in transformed JSON** — needed for S3 conflict detection | Add `_last_edited` to all transform functions |
-| G18 | **No `_last_edited` sent on PATCH requests** from app | Add `_last_edited` to all `API.updateX()` payloads |
+| G17 | **Proxy does not return `last_edited_time` in transformed JSON** | ✅ FIXED in v6.1 — Proxy handles `_last_edited` |
+| G18 | **No `_last_edited` sent on PATCH requests** from app | ✅ FIXED in v7.0.0 — `markTaskDone` updated |
 
 ### 🟢 Low
 
 | # | Issue | Fix |
 |---|-------|-----|
-| G11 | No ICP Score filter dropdown on Clients view | Add select filter |
-| G12 | No Nation filter on Clients view | Add multi-select filter |
+| G11 | No ICP Score filter dropdown on Clients view | ✅ FIXED in v7.0.0 |
+| G12 | No Nation filter on Clients view | ✅ FIXED in v7.0.0 |
 | G13 | Login page has "Skip → dev mode" link visible in production | Conditionally hide based on hostname |
 | G14 | ~~Proxy print block says `v2.0.0`~~ | ✅ FIXED in v6.1 — now says `v6.1.0` |
 

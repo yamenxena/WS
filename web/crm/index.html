@@ -171,6 +171,12 @@
             <option value="Won">Won</option>
             <option value="Lost">Lost</option>
           </select>
+          <select class="filter-select" id="clients-filter-icp">
+            <option value="">All ICP Scores</option>
+          </select>
+          <select class="filter-select" id="clients-filter-nation">
+            <option value="">All Nations</option>
+          </select>
         </div>
         <div id="clients-content"><div class="spinner"></div></div>
       </section>
@@ -243,6 +249,10 @@
       <section class="view" id="view-meetings">
         <div class="view-header">
           <h1 class="view-title">Meetings</h1>
+          <div class="view-actions">
+            <button class="btn btn-primary btn-sm" data-role="admin" onclick="showAddMeetingForm()">+ Add Meeting</button>
+            <button class="btn btn-ghost btn-sm" onclick="refreshMeetings()" title="Refresh from Notion">🔄</button>
+          </div>
         </div>
         <div class="filter-bar">
           <input class="filter-input" type="text" id="meetings-search" placeholder="Search meetings..." />

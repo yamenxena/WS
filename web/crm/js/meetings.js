@@ -84,4 +84,45 @@
       </details>
     `);
   };
+
+  // ── Create Meeting Form (Admin Only) ──
+  window.showAddMeetingForm = async function() {
+    openSidePeek(`<span style="color:var(--gold)">New Meeting</span>`, `
+      <details class="peek-section" open>
+        <summary>Meeting Details</summary>
+        <div class="peek-section-body">
+          <label class="peek-label">Meeting Name/Subject <span style="color:var(--danger)">*</span></label>
+          <input id="new-meeting-name" class="peek-input" placeholder="e.g. Kickoff with Client..." />
+          
+          <label class="peek-label">Attendees (comma-separated)</label>
+          <input id="new-meeting-attendees" class="peek-input" placeholder="e.g. John Doe, Jane Smith..." />
+          <button class="btn btn-primary" onclick="submitNewMeeting()" style="width:100%;margin-top:12px">Create Meeting → Notion</button>
+        </div>
+      </details>
+    `);
+  };
+
+  window.submitNewMeeting = async function() {
+    const nameValid = validateRequired('new-meeting-name', 'Meeting name is required');
+    if (!nameValid) return;
+
+    const name = document.getElementById('new-meeting-name').value.trim();
+    const attendeesStr = document.getElementById('new-meeting-attendees').value.trim();
+    
+    const data = {
+      name,
+      attendee: attendeesStr ? attendeesStr.split(',').map(s => s.trim()).filter(Boolean) : []
+    };
+    
+    showToast('Creating meeting...', 'info');
+    const res = await API.createMeeting(data);
+    if (res && res.id) {
+      showToast('Meeting created in Notion!', 'success');
+      loaded = false;
+      loadMeetings();
+      closeSidePeek();
+    } else {
+      showToast('Failed to create meeting', 'error');
+    }
+  };
 })();

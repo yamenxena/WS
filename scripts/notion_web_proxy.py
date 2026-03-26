@@ -204,28 +204,43 @@ def notion_query(db_id, filter_obj=None, sorts=None, page_size=100):
 
 def notion_get_page(page_id):
     """Get a single Notion page."""
-    resp = requests.get(f"https://api.notion.com/v1/pages/{page_id}", headers=HEADERS)
-    return resp.json() if resp.status_code == 200 else None
+    for attempt in range(4):
+        resp = requests.get(f"https://api.notion.com/v1/pages/{page_id}", headers=HEADERS)
+        if resp.status_code == 429:
+            time.sleep((2 ** attempt) * 0.5)
+            continue
+        return resp.json() if resp.status_code == 200 else None
+    return None
 
 
 def notion_patch_page(page_id, properties):
     """Update a Notion page's properties."""
-    resp = requests.patch(
-        f"https://api.notion.com/v1/pages/{page_id}",
-        headers=HEADERS,
-        json={"properties": properties}
-    )
-    return resp.status_code == 200, resp.json()
+    for attempt in range(4):
+        resp = requests.patch(
+            f"https://api.notion.com/v1/pages/{page_id}",
+            headers=HEADERS,
+            json={"properties": properties}
+        )
+        if resp.status_code == 429:
+            time.sleep((2 ** attempt) * 0.5)
+            continue
+        return resp.status_code == 200, resp.json()
+    return False, {}
 
 
 def notion_create_page(db_id, properties):
     """Create a new page in a Notion database."""
-    resp = requests.post(
-        "https://api.notion.com/v1/pages",
-        headers=HEADERS,
-        json={"parent": {"database_id": db_id}, "properties": properties}
-    )
-    return resp.status_code == 200, resp.json()
+    for attempt in range(4):
+        resp = requests.post(
+            "https://api.notion.com/v1/pages",
+            headers=HEADERS,
+            json={"parent": {"database_id": db_id}, "properties": properties}
+        )
+        if resp.status_code == 429:
+            time.sleep((2 ** attempt) * 0.5)
+            continue
+        return resp.status_code == 200, resp.json()
+    return False, {}
 
 
 # ══════════════════════════════════════════════════════════════
@@ -334,7 +349,6 @@ def transform_client(page):
         "lost_reason": _sel(p.get("Lost Reason")),
         "clv": _rollup(p.get("CLV")),
         "active_projects": _rollup(p.get("Active Projects")),
-        "project_s_num": _rollup(p.get("PROJECT/S NUM")),
         "project_ids": _relation_ids(p.get("PROJECTS")),
         "created": _created(page),
         "_last_edited": page.get("last_edited_time", ""),
@@ -796,6 +810,21 @@ def create_interaction():
 def get_meetings():
     pages = notion_query(DB["meetings"])
     return jsonify({"rows": [transform_meeting(p) for p in pages]})
+
+
+@app.route("/api/meetings", methods=["POST"])
+@require_auth
+def create_meeting():
+    data = request.get_json() or {}
+    props = {"Meeting Name": {"title": [{"text": {"content": data.get("name", "")}}]}}
+    if data.get("attendee"):
+        props["Attendee"] = {"multi_select": [{"name": a} for a in data["attendee"]]}
+    if data.get("project_ids"):
+        props["PROJECTS"] = {"relation": [{"id": pid} for pid in data["project_ids"]]}
+    ok, result = notion_create_page(DB["meetings"], props)
+    if ok:
+        return jsonify(transform_meeting(result)), 201
+    return jsonify({"error": result.get("message", "Failed")}), 400
 
 
 # ── Pipeline ──

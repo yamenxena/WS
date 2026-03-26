@@ -27,9 +27,8 @@ const API = (() => {
     try {
       const res = await fetch(_url(endpoint), { headers: _headers() });
       if (res.status === 401) {
-        sessionStorage.removeItem('majaz_token');
-        sessionStorage.removeItem('majaz_role');
-        window.location.href = 'login.html';
+        if (typeof showToast === 'function') showToast('Session expired — please sign in again.', 'error');
+        setTimeout(() => { sessionStorage.removeItem('majaz_token'); sessionStorage.removeItem('majaz_role'); window.location.href = 'login.html'; }, 1800);
         return null;
       }
       if (!res.ok) throw new Error(`API ${res.status}`);
@@ -48,9 +47,8 @@ const API = (() => {
         body: JSON.stringify(data)
       });
       if (res.status === 401) {
-        sessionStorage.removeItem('majaz_token');
-        sessionStorage.removeItem('majaz_role');
-        window.location.href = 'login.html';
+        if (typeof showToast === 'function') showToast('Session expired — please sign in again.', 'error');
+        setTimeout(() => { sessionStorage.removeItem('majaz_token'); sessionStorage.removeItem('majaz_role'); window.location.href = 'login.html'; }, 1800);
         return null;
       }
       return await res.json();
@@ -68,9 +66,8 @@ const API = (() => {
         body: JSON.stringify(data)
       });
       if (res.status === 401) {
-        sessionStorage.removeItem('majaz_token');
-        sessionStorage.removeItem('majaz_role');
-        window.location.href = 'login.html';
+        if (typeof showToast === 'function') showToast('Session expired — please sign in again.', 'error');
+        setTimeout(() => { sessionStorage.removeItem('majaz_token'); sessionStorage.removeItem('majaz_role'); window.location.href = 'login.html'; }, 1800);
         return null;
       }
       if (res.status === 409) {
@@ -111,6 +108,7 @@ const API = (() => {
     createProject:     (data) => _post('/api/projects', data),
     createTask:        (data) => _post('/api/tasks', data),
     createInteraction: (data) => _post('/api/interactions', data),
+    createMeeting:     (data) => _post('/api/meetings', data),
 
     // Update
     updateClient:  (id, data) => _patch(`/api/clients/${id}`, data),

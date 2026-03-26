@@ -45,20 +45,48 @@
       });
     }
 
+    // Populate ICP Score
+    const icpSelect = document.getElementById('clients-filter-icp');
+    if (icpSelect && icpSelect.options.length <= 1) {
+      const icps = [...new Set(clientsData.map(c => c.icp_score).filter(Boolean))].sort((a,b)=>b-a);
+      icps.forEach(icp => {
+        const opt = document.createElement('option');
+        opt.value = icp; opt.textContent = icp;
+        icpSelect.appendChild(opt);
+      });
+    }
+
+    // Populate Nation
+    const nationSelect = document.getElementById('clients-filter-nation');
+    if (nationSelect && nationSelect.options.length <= 1) {
+      const nations = [...new Set(clientsData.map(c => c.nation).filter(Boolean))].sort();
+      nations.forEach(n => {
+        const opt = document.createElement('option');
+        opt.value = n; opt.textContent = n;
+        nationSelect.appendChild(opt);
+      });
+    }
+
     // Search + filter
     document.getElementById('clients-search')?.addEventListener('input', applyFilters);
     document.getElementById('clients-filter-location')?.addEventListener('change', applyFilters);
     document.getElementById('clients-filter-lead-status')?.addEventListener('change', applyFilters);
+    document.getElementById('clients-filter-icp')?.addEventListener('change', applyFilters);
+    document.getElementById('clients-filter-nation')?.addEventListener('change', applyFilters);
   }
 
   function applyFilters() {
     const q = (document.getElementById('clients-search')?.value || '').toLowerCase();
     const loc = document.getElementById('clients-filter-location')?.value || '';
     const lead = document.getElementById('clients-filter-lead-status')?.value || '';
+    const icp = document.getElementById('clients-filter-icp')?.value || '';
+    const nation = document.getElementById('clients-filter-nation')?.value || '';
     let filtered = clientsData;
     if (q) filtered = filtered.filter(c => c.name.toLowerCase().includes(q) || (c.email||'').toLowerCase().includes(q) || (c.phone||'').includes(q));
     if (loc) filtered = filtered.filter(c => c.location === loc);
     if (lead) filtered = filtered.filter(c => c.lead_status === lead);
+    if (icp) filtered = filtered.filter(c => String(c.icp_score) === String(icp));
+    if (nation) filtered = filtered.filter(c => c.nation === nation);
     renderTable(filtered);
   }
 
@@ -90,7 +118,7 @@
         <th class="col-admin-only">Phone</th><th class="col-admin-only">Email</th><th>Projects</th>
       </tr></thead>
       <tbody>${rows.map(c => `<tr style="cursor:pointer" onclick="showClient('${c.id}')">
-        <td style="color:var(--text-primary);font-weight:500">${c.name}</td>
+        <td style="color:var(--text-primary);font-weight:500">${escapeHTML(c.name)}</td>
         <td>${c.location || '—'}</td>
         <td>${c.project_type || '—'}</td>
         <td>${c.service_interest || '—'}</td>
@@ -160,7 +188,7 @@
     const c = await API.client(id);
     if (!c) return;
 
-    openSidePeek(`<span style="color:var(--gold)">${c.name}</span>`, `
+    openSidePeek(`<span style="color:var(--gold)">${escapeHTML(c.name)}</span>`, `
       <!-- ── Contact ── -->
       <details class="peek-section" open>
         <summary>Contact</summary>
@@ -182,6 +210,7 @@
           <div class="peek-row"><span class="peek-label">Service</span><span>${c.service_interest || '—'}</span></div>
           <div class="peek-row"><span class="peek-label">ICP Score</span><span style="color:var(--gold);font-weight:600">${c.icp_score || '—'}</span></div>
           <div class="peek-row"><span class="peek-label">Lead Source</span><span>${c.lead_source || '—'}</span></div>
+          <div class="peek-row"><span class="peek-label">Project SNs</span><span class="mono">${c.project_s_num || '—'}</span></div>
           ${(c.nation||[]).length ? `<div class="peek-row"><span class="peek-label">Nation</span><span>${c.nation.join(', ')}</span></div>` : ''}
         </div>
       </details>
@@ -279,7 +308,7 @@
         <div class="peek-section-body">
           ${c.interactions.map(i => `<div style="padding:8px 0;border-bottom:1px solid var(--glass-border)">
             <div style="display:flex;justify-content:space-between;align-items:center">
-              <span style="font-weight:500;color:var(--text-primary)">${i.name}</span>
+              <span style="font-weight:500;color:var(--text-primary)">${escapeHTML(i.name)}</span>
               <span class="status-badge" style="font-size:0.6rem">${i.type||''}</span>
             </div>
             <div style="font-size:0.75rem;color:var(--text-muted);margin-top:2px">${i.date||'—'} ${(i.logged_by||[]).length ? `· ${i.logged_by.join(', ')}` : ''}</div>

@@ -103,10 +103,9 @@
     const cols = buildColumns(rows);
     el.innerHTML = `<div class="kanban">${cols.map(col => {
       const cards = rows.filter(p => p.stage === col.key);
-      return `<div class="kanban-column stagger-in" data-stage="${col.key}"
+      return `<div class="kanban-column stagger-in" data-stage="${col.key}" data-drop-stage="${col.key.replace(/"/g,'&quot;')}"
         ondragover="event.preventDefault();this.classList.add('drag-over');this.querySelector('.kanban-cards').classList.add('drag-over')"
-        ondragleave="this.classList.remove('drag-over');this.querySelector('.kanban-cards').classList.remove('drag-over')"
-        ondrop="handleDrop(event,'${col.key.replace(/'/g,"\\'")}');this.classList.remove('drag-over');this.querySelector('.kanban-cards').classList.remove('drag-over')">
+        ondragleave="this.classList.remove('drag-over');this.querySelector('.kanban-cards').classList.remove('drag-over')">
         <div class="kanban-col-header">
           <span class="kanban-col-title" style="color:${col.color}">${col.label}</span>
           <span class="kanban-col-count">${cards.length}</span>
@@ -118,7 +117,7 @@
             ondragstart="event.dataTransfer.setData('text/plain','${p.id}');this.classList.add('dragging')"
             ondragend="this.classList.remove('dragging')"
             onclick="showProject('${p.id}')">
-            <div class="kanban-card-title">${p.name}</div>
+            <div class="kanban-card-title">${escapeHTML(p.name)}</div>
             <div class="kanban-card-meta">
               <span>${p.service_type || '—'}</span>
               ${pct !== null ? `<span style="color:var(--gold)">${pct}%</span>` : ''}
@@ -129,6 +128,16 @@
         }).join('')}</div>
       </div>`;
     }).join('')}</div>`;
+
+    // Delegated drop listener (replaces inline ondrop — P7.4)
+    el.querySelectorAll('.kanban-column[data-drop-stage]').forEach(col => {
+      col.addEventListener('drop', (e) => {
+        e.preventDefault();
+        col.classList.remove('drag-over');
+        col.querySelector('.kanban-cards')?.classList.remove('drag-over');
+        handleDrop(e, col.dataset.dropStage);
+      });
+    });
   }
 
   // Drag-and-drop handler → write-back to Notion
@@ -146,7 +155,7 @@
     proj.stage = newStage;
     render();
 
-    showToast(`Moving "${proj.name}" to ${newStage.replace(/[()]/g,'')}...`, 'info');
+    showToast(`Moving "${escapeHTML(proj.name)}" to ${newStage.replace(/[()]/g,'')}...`, 'info');
 
     const result = await API.updateProject(projectId, { stage: newStage, _last_edited: proj._last_edited || '' });
     _pendingDnD.delete(projectId);
@@ -156,13 +165,13 @@
       loaded = false;
       loadProjects();
     } else if (result && !result.error) {
-      showToast(`"${proj.name}" stage updated in Notion!`, 'success');
+      showToast(`"${escapeHTML(proj.name)}" stage updated in Notion!`, 'success');
       const card = document.getElementById(`card-${projectId}`);
       card?.classList.add('pulse');
     } else {
       proj.stage = oldStage;
       render();
-      showToast(`Failed to update "${proj.name}"`, 'error');
+      showToast(`Failed to update "${escapeHTML(proj.name)}"`, 'error');
     }
   };
 
@@ -176,7 +185,7 @@
         const pct = pctValue(p);
         return `<tr style="cursor:pointer" onclick="showProject('${p.id}')">
         <td class="mono" style="color:var(--gold)">${p.sn||'—'}</td>
-        <td style="color:var(--text-primary);font-weight:500">${p.name}</td>
+        <td style="color:var(--text-primary);font-weight:500">${escapeHTML(p.name)}</td>
         <td><span class="status-badge ${stageClass(p.stage)}">${shortStage(p.stage)}</span></td>
         <td>${p.service_type||'—'}</td>
         <td class="mono">${p.value != null ? new Intl.NumberFormat('en-AE', {style:'currency',currency:'AED',maximumFractionDigits:0}).format(p.value) : '—'}</td>
@@ -197,7 +206,7 @@
     const allStages = getAllStages(projectsData);
     const fmtCurrency = v => new Intl.NumberFormat('en-AE',{style:'currency',currency:'AED',maximumFractionDigits:0}).format(v);
 
-    openSidePeek(`<span style="color:var(--gold)">${p.name}</span>`, `
+    openSidePeek(`<span style="color:var(--gold)">${escapeHTML(p.name)}</span>`, `
       <!-- ── Project Info ── -->
       <details class="peek-section" open>
         <summary>Project Info</summary>
@@ -211,6 +220,19 @@
           <div class="progress-bar" style="margin-top:4px"><div class="progress-fill" style="width:${pct}%"></div></div>` : ''}
         </div>
       </details>
+
+      <!-- ── Assignee + Linked Counts ── -->
+      ${(p.assignee && (Array.isArray(p.assignee) ? p.assignee.length : true)) ? `
+      <details class="peek-section" open>
+        <summary>Team</summary>
+        <div class="peek-section-body">
+          ${Array.isArray(p.assignee)
+            ? (p.assignee.length ? p.assignee.map(a => `<div class="peek-row"><span class="peek-label">Assignee</span><span>${escapeHTML(String(a))}</span></div>`).join('') : '')
+            : `<div class="peek-row"><span class="peek-label">Assignee</span><span>${escapeHTML(String(p.assignee))}</span></div>`}
+          ${(p.meeting_ids||[]).length ? `<div class="peek-row"><span class="peek-label">Meetings</span><span style="color:var(--gold)">${p.meeting_ids.length}</span></div>` : ''}
+          ${(p.pipeline_ids||[]).length ? `<div class="peek-row"><span class="peek-label">Pipeline Items</span><span style="color:var(--gold)">${p.pipeline_ids.length}</span></div>` : ''}
+        </div>
+      </details>` : ''}
 
       <!-- ── Edit Project ── -->
       <details class="peek-section" open>
@@ -227,7 +249,7 @@
           <textarea id="detail-project-desc" class="peek-input" style="min-height:60px;resize:vertical" placeholder="Project description...">${p.description||''}</textarea>
           ` : `
           ${p.value != null ? `<div class="peek-row"><span class="peek-label">Value</span><span class="mono" style="color:var(--gold)">${fmtCurrency(p.value)}</span></div>` : ''}
-          ${p.description ? `<div class="peek-row"><span class="peek-label">Description</span><span style="font-size:0.8rem;color:var(--text-muted)">${p.description}</span></div>` : ''}
+          ${p.description ? `<div class="peek-row"><span class="peek-label">Description</span><span style="font-size:0.8rem;color:var(--text-muted)">${escapeHTML(p.description)}</span></div>` : ''}
           `}
           <button class="btn btn-primary btn-sm" id="detail-save-project" style="width:100%;margin-top:8px">Save to Notion</button>
         </div>
@@ -249,7 +271,7 @@
         <summary>Tasks (${(p.tasks||[]).length})</summary>
         <div class="peek-section-body">
           ${(p.tasks||[]).length ? p.tasks.map(t => `<div style="padding:6px 0;border-bottom:1px solid var(--glass-border);display:flex;justify-content:space-between;align-items:center">
-            <span style="font-size:0.85rem;color:var(--text-primary)">${t.name}</span>
+            <span style="font-size:0.85rem;color:var(--text-primary)">${escapeHTML(t.name)}</span>
             <span class="status-badge ${stageClass(t.status)}" style="font-size:0.65rem">${t.status||'—'}</span>
           </div>`).join('') : '<div style="color:var(--text-muted)">No linked tasks</div>'}
         </div>
