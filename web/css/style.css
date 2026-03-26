@@ -110,29 +110,44 @@ body {
   border-bottom: 1px solid var(--border);
 }
 
-.logo {
+.sidebar-brand-lockup {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.logo-icon {
-  font-size: 28px;
-}
-
-.logo-name {
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
+.sidebar-brand-mark {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   color: var(--gold);
-  display: block;
+  flex-shrink: 0;
+}
+.sidebar-brand-mark svg {
+  width: 100%;
+  height: auto;
 }
 
-.logo-sub {
-  font-size: 11px;
-  color: var(--text-secondary);
-  letter-spacing: 0.12em;
+.sidebar-brand-text { display: flex; flex-direction: column; gap: 2px;}
+
+.sidebar-brand-arabic {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: 0;
+  line-height: 1;
+  text-align: right;
+  margin-top: 4px;
+}
+
+.sidebar-brand-english {
+  font-size: 0.6rem;
+  color: var(--text-secondary); /* Changed from --text-muted to --text-secondary as --text-muted is not defined */
   text-transform: uppercase;
+  letter-spacing: 0.12em;
+  line-height: 1;
 }
 
 .nav {

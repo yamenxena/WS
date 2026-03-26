@@ -71,37 +71,58 @@
       to   { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    .login-logo {
+    .login-brand-lockup {
       display: flex;
       align-items: center;
-      gap: 14px;
-      margin-bottom: 8px;
+      gap: 16px;
+      margin-bottom: 24px;
+      justify-content: center;
+      color: #FAFAFA;
     }
 
-    .login-logo img {
-      width: 48px;
+    .brand-line-left, .brand-line-right {
+      width: 2px;
       height: 48px;
-      border-radius: 10px;
-      object-fit: cover;
+      background-color: #D4A853;
+      border-radius: 2px;
     }
 
-    .login-logo-text {
+    .brand-logo-mark {
+      width: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #D4A853;
+    }
+    .brand-logo-mark svg {
+      width: 100%;
+      height: auto;
+    }
+
+    .brand-typography {
       display: flex;
       flex-direction: column;
+      justify-content: center;
+      gap: 4px;
     }
 
-    .login-logo-name {
-      font-size: 1.5rem;
+    .brand-arabic {
+      font-size: 1.45rem;
       font-weight: 700;
-      color: #D4A853;
-      letter-spacing: 0.08em;
+      letter-spacing: 0em;
+      line-height: 1;
+      margin: 0;
+      text-align: right;
     }
 
-    .login-logo-sub {
-      font-size: 0.7rem;
-      color: #5A5A6A;
-      text-transform: uppercase;
+    .brand-english {
+      font-size: 0.65rem;
+      font-weight: 600;
       letter-spacing: 0.15em;
+      color: #8A8A9A;
+      line-height: 1;
+      margin: 0;
+      text-transform: uppercase;
     }
 
     .login-welcome {
@@ -222,12 +243,20 @@
     </div>
 
     <div class="login-card">
-      <div class="login-logo">
-        <img src="../img/logo2.jpeg" alt="Majaz" />
-        <div class="login-logo-text">
-          <span class="login-logo-name">MAJAZ</span>
-          <span class="login-logo-sub">Engineering CRM</span>
+      <div class="login-brand-lockup">
+        <div class="brand-line-left"></div>
+        <div class="brand-logo-mark">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4146 2953" fill="currentColor" fill-rule="evenodd" class="majaz-logo-svg">
+            <path d="M 3515 2322 L 3516 2321 L 3517 2321 L 3518 2322 L 3519 2321 L 4143 2321 L 4145 2323 L 4145 2950 L 4143 2952 L 4136 2952 L 4135 2951 L 3518 2951 L 3517 2952 L 3515 2950 Z" />
+            <path d="M 2232 1 L 2233 0 L 4136 0 L 4137 1 L 4137 1266 L 4135 1268 L 3508 1268 L 3507 1267 L 3507 633 L 3506 632 L 3506 631 L 3505 630 L 2232 630 L 2231 629 L 2232 628 Z" />
+            <path d="M 0 1 L 1 0 L 629 0 L 630 1 L 630 629 L 629 630 L 2 630 L 0 628 L 1 627 L 0 626 L 0 8 L 1 7 L 1 5 L 0 4 Z" />
+          </svg>
         </div>
+        <div class="brand-typography">
+          <div class="brand-arabic" dir="rtl" lang="ar">مجاز للاستشارات الهندسية</div>
+          <div class="brand-english">MAJAZ ENGINEERING CONSULTANCY</div>
+        </div>
+        <div class="brand-line-right"></div>
       </div>
       <p class="login-welcome">Sign in to manage projects, clients, and tasks.</p>
 
