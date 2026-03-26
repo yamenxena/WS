@@ -267,7 +267,7 @@ a:hover { color: var(--gold-light); }
   transition: opacity 0.15s var(--ease);
 }
 .sidebar.sidebar-collapsed .sidebar-header {
-  padding: 20px 0;
+  padding: 48px 0 20px 0;
   justify-content: center;
 }
 .sidebar.sidebar-collapsed .sidebar-brand-lockup {
@@ -282,21 +282,25 @@ a:hover { color: var(--gold-light); }
   flex-direction: column;
   justify-content: space-evenly;
   padding: 8px 4px;
+  overflow: hidden;
 }
 .sidebar.sidebar-collapsed .nav-section {
   display: flex;
   flex-direction: column;
   margin-bottom: 4px;
-  gap: 4px;
+  gap: 2px;
+  flex: 1;
+  min-height: 0;
 }
 .sidebar.sidebar-collapsed .nav-item {
   justify-content: center;
-  padding: 8px 0;
+  padding: 0;
   gap: 0;
   position: relative;
   font-size: 0;
   overflow: hidden;
-  min-height: 44px;
+  flex: 1;
+  min-height: 0;
 }
 .sidebar.sidebar-collapsed .nav-item .nav-icon {
   font-size: var(--text-base);
