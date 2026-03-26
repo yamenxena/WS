@@ -31,6 +31,7 @@
     document.getElementById('projects-search')?.addEventListener('input', render);
     document.getElementById('projects-filter-stage')?.addEventListener('change', render);
     document.getElementById('projects-filter-type')?.addEventListener('change', render);
+    document.getElementById('projects-filter-assigned')?.addEventListener('change', render);
 
     render();
   }
@@ -44,10 +45,17 @@
     const q = (document.getElementById('projects-search')?.value || '').toLowerCase();
     const stage = document.getElementById('projects-filter-stage')?.value || '';
     const type = document.getElementById('projects-filter-type')?.value || '';
+    const assigned = document.getElementById('projects-filter-assigned')?.value || '';
     let filtered = projectsData;
     if (q) filtered = filtered.filter(p => p.name.toLowerCase().includes(q) || (p.description||'').toLowerCase().includes(q));
     if (stage) filtered = filtered.filter(p => p.stage === stage);
     if (type) filtered = filtered.filter(p => p.service_type === type);
+    if (assigned === 'me') {
+      const user = sessionStorage.getItem('majaz_user_id') || sessionStorage.getItem('majaz_role');
+      if (user) {
+        filtered = filtered.filter(p => Array.isArray(p.assignee) ? p.assignee.includes(user) : String(p.assignee).includes(user));
+      }
+    }
     return filtered;
   }
 
@@ -117,7 +125,7 @@
             ondragstart="event.dataTransfer.setData('text/plain','${p.id}');this.classList.add('dragging')"
             ondragend="this.classList.remove('dragging')"
             onclick="showProject('${p.id}')">
-            <div class="kanban-card-title">${escapeHTML(p.name)}</div>
+            <div class="kanban-card-title">${p.client_name ? escapeHTML(p.client_name) + ' — ' : ''}${escapeHTML(p.name)}</div>
             <div class="kanban-card-meta">
               <span>${p.service_type || '—'}</span>
               ${pct !== null ? `<span style="color:var(--gold)">${pct}%</span>` : ''}
@@ -185,7 +193,7 @@
         const pct = pctValue(p);
         return `<tr style="cursor:pointer" onclick="showProject('${p.id}')">
         <td class="mono" style="color:var(--gold)">${p.sn||'—'}</td>
-        <td style="color:var(--text-primary);font-weight:500">${escapeHTML(p.name)}</td>
+        <td style="color:var(--text-primary);font-weight:500">${p.client_name ? escapeHTML(p.client_name) + ' — ' : ''}${escapeHTML(p.name)}</td>
         <td><span class="status-badge ${stageClass(p.stage)}">${shortStage(p.stage)}</span></td>
         <td>${p.service_type||'—'}</td>
         <td class="mono">${p.value != null ? new Intl.NumberFormat('en-AE', {style:'currency',currency:'AED',maximumFractionDigits:0}).format(p.value) : '—'}</td>

@@ -9,7 +9,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="css/design-system.css" />
+  <link rel="stylesheet" href="css/components/activities.css" />
+  <link rel="stylesheet" href="css/components/sidebar.css" />
+  <link rel="stylesheet" href="css/components/tasks.css" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏗️</text></svg>" />
+  <script>
+    if (!sessionStorage.getItem('majaz_token')) {
+      window.location.href = 'login.html';
+    }
+  </script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
 <body>
@@ -23,20 +31,12 @@
   <div class="app">
     <!-- ═══ Sidebar ═══ -->
     <aside class="sidebar" id="sidebar">
-      <button class="sidebar-collapse-btn" id="sidebar-collapse-btn" aria-label="Toggle sidebar">
-        <i data-lucide="panel-left-close"></i>
-      </button>
       <div class="sidebar-header">
         <div class="sidebar-brand-lockup">
+          <button class="sidebar-collapse-btn" id="sidebar-collapse-btn" aria-label="Toggle sidebar">
+            <i data-lucide="panel-left-close"></i>
+          </button>
           <div class="sidebar-brand-mark">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 103.7 92.73" class="majaz-logo" fill="currentColor">
-              <g class="majaz-brand-main">
-                <path d="M27.26,0c0,.25,0,.5,0,.75V54.16c0,.21.06.26.3.27H103.4q.22,0,.24.27v9.93c0,.14,0,.27,0,.41s-.1.16-.18.17H16.62a.17.17,0,0,1-.18-.16c0-.18,0-.36,0-.55V.41c0-.14,0-.27,0-.41Z"/>
-                <path d="M0,92.73a1.18,1.18,0,0,0,0-.2c0-.18,0-.36,0-.54V47.16c0-.23,0-.46,0-.69a.22.22,0,0,1,.22-.21H10.69s.13.09.14.13,0,.13,0,.2V91.71c0,.34,0,.68,0,1Z"/>
-                <path d="M54.59,29.87H70.67c.13,0,.2.08.2.23s0,.41,0,.61v20.2a4.89,4.89,0,0,1,0,.54s0,.08-.09.1a.31.31,0,0,1-.13,0H60.84c-.2,0-.41,0-.61,0,0,0-.07,0-.09-.09a.25.25,0,0,1,0-.13c0-.2,0-.41,0-.61V41.41c0-.21,0-.41,0-.62A.26.26,0,0,0,60,40.7a.32.32,0,0,0-.14,0H38.49c-.15,0-.23-.09-.24-.26V30.54a5.07,5.07,0,0,1,0-.55s0-.07.08-.09a.32.32,0,0,1,.14,0H54.59Z"/>
-                <path d="M10.84,35.27v4.65c0,.19,0,.37,0,.55a.2.2,0,0,1-.17.19H.26a.19.19,0,0,1-.19-.17c0-.11,0-.22,0-.34V30.36c0-.11,0-.23,0-.34a.2.2,0,0,1,.13-.14H10.4a1.2,1.2,0,0,1,.27,0c.06,0,.14.07.14.12a2.58,2.58,0,0,1,0,.48Z"/>
-                <path d="M65.61,80.41H60.54c-.24,0-.29-.05-.3-.26V69.94c0-.28.06-.33.31-.33H70.82a.18.18,0,0,1,.18.17c0,.13,0,.27,0,.4v9.66c0,.13,0,.27,0,.41a.26.26,0,0,1-.13.14H65.61Z"/>
-              </g>
               <g class="majaz-brand-blue" fill="#2877b9">
                 <path d="M92.73,51.64h10.2c.2,0,.41,0,.61,0a.23.23,0,0,0,.13-.14,2.73,2.73,0,0,0,0-.41V41.28a2.62,2.62,0,0,0,0-.28c0-.18,0-.3-.27-.3H82.68l-.62,0a.2.2,0,0,0-.17.18c0,.19,0,.37,0,.55v9.45c0,.15,0,.31,0,.47s.08.26.24.27H92.73Z"/>
               </g>
@@ -73,8 +73,11 @@
             <span class="nav-icon"><i data-lucide="check-circle-2"></i></span> Tasks
             <span class="nav-badge badge-danger" id="badge-tasks">—</span>
           </a>
-          <a class="nav-item" data-view="team" data-tooltip="Team & Suppliers" id="nav-team">
-            <span class="nav-icon"><i data-lucide="hard-hat"></i></span> Team & Suppliers
+          <a class="nav-item" data-view="team" data-tooltip="Team" id="nav-team">
+            <span class="nav-icon"><i data-lucide="hard-hat"></i></span> Team
+          </a>
+          <a class="nav-item" data-view="suppliers" data-tooltip="Suppliers" id="nav-suppliers">
+            <span class="nav-icon"><i data-lucide="truck"></i></span> Suppliers
           </a>
         </div>
 
@@ -138,8 +141,8 @@
         <div class="hero">
           <img src="../img/Generated_Image_February_23_2026_-_10_48AM.jpeg" alt="Majaz Engineering — Modern architectural design" />
           <div class="hero-overlay">
-            <h1 class="hero-title">Welcome to Majaz CRM</h1>
-            <p class="hero-subtitle">Engineering Consultancy — Real-time project & client management</p>
+            <h1 class="hero-title">مجاز للاستشارات الهندسية</h1>
+            <p class="hero-subtitle">MAJAZ ENGINEERING CONSULTANCY — Real-time project & client management</p>
           </div>
         </div>
         <div class="bento-grid">
@@ -169,11 +172,13 @@
           <div class="view-actions">
             <button class="btn btn-primary btn-sm" data-role="admin" onclick="showAddClientForm()">+ Add Client</button>
             <button class="btn btn-ghost btn-sm" onclick="refreshClients()" title="Refresh from Notion">🔄</button>
-            <button class="btn btn-ghost btn-sm" id="clients-view-table">Table</button>
-            <button class="btn btn-ghost btn-sm" id="clients-view-kanban">Kanban</button>
           </div>
         </div>
         <div class="filter-bar">
+          <div class="tab-bar" style="margin-right: 12px; margin-bottom: 0;">
+            <button class="tab-btn active" id="clients-view-table">Table</button>
+            <button class="tab-btn" id="clients-view-kanban">Board</button>
+          </div>
           <input class="filter-input" type="text" id="clients-search" placeholder="Search clients..." />
           <select class="filter-select" id="clients-filter-location">
             <option value="">All Locations</option>
@@ -204,12 +209,18 @@
           <div class="view-actions">
             <button class="btn btn-primary btn-sm" data-role="admin" onclick="showAddProjectForm()">+ Add Project</button>
             <button class="btn btn-ghost btn-sm" onclick="refreshProjects()" title="Refresh from Notion">🔄</button>
-            <button class="btn btn-ghost btn-sm" id="projects-view-kanban">Kanban</button>
-            <button class="btn btn-ghost btn-sm" id="projects-view-table">Table</button>
           </div>
         </div>
         <div class="filter-bar">
+          <div class="tab-bar" style="margin-right: 12px; margin-bottom: 0;">
+            <button class="tab-btn active" id="projects-view-table">Table</button>
+            <button class="tab-btn" id="projects-view-kanban">Board</button>
+          </div>
           <input class="filter-input" type="text" id="projects-search" placeholder="Search projects..." />
+          <select class="filter-select" id="projects-filter-assigned">
+            <option value="">All Projects</option>
+            <option value="me">My Projects</option>
+          </select>
           <select class="filter-select" id="projects-filter-stage">
             <option value="">All Stages</option>
             <option value="Not started">Not Started</option>
@@ -241,11 +252,13 @@
           <div class="view-actions">
             <button class="btn btn-primary btn-sm" data-role="admin" onclick="showAddTaskForm()">+ Add Task</button>
             <button class="btn btn-ghost btn-sm" onclick="refreshTasks()" title="Refresh from Notion">🔄</button>
-            <button class="btn btn-ghost btn-sm" id="tasks-view-board">Board</button>
-            <button class="btn btn-ghost btn-sm" id="tasks-view-list">List</button>
           </div>
         </div>
         <div class="filter-bar">
+          <div class="tab-bar" style="margin-right: 12px; margin-bottom: 0;">
+            <button class="tab-btn active" id="tasks-view-list">List</button>
+            <button class="tab-btn" id="tasks-view-board">Board</button>
+          </div>
           <input class="filter-input" type="text" id="tasks-search" placeholder="Search tasks..." />
           <select class="filter-select" id="tasks-filter-status">
             <option value="">All Statuses</option>
@@ -301,16 +314,20 @@
         <div id="interactions-content"><div class="spinner"></div></div>
       </section>
 
-      <!-- Team & Suppliers View -->
+      <!-- Team View -->
       <section class="view" id="view-team">
         <div class="view-header">
-          <h1 class="view-title">Team & Suppliers</h1>
-        </div>
-        <div class="tab-bar" id="team-tabs">
-          <button class="tab-btn active" data-tab="team-members">Team Members</button>
-          <button class="tab-btn" data-tab="suppliers">Suppliers & Contractors</button>
+          <h1 class="view-title">Team</h1>
         </div>
         <div id="team-content"><div class="spinner"></div></div>
+      </section>
+
+      <!-- Suppliers View -->
+      <section class="view" id="view-suppliers">
+        <div class="view-header">
+          <h1 class="view-title">Suppliers & Contractors</h1>
+        </div>
+        <div id="suppliers-content"><div class="spinner"></div></div>
       </section>
 
       <!-- Reports View -->

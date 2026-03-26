@@ -8,19 +8,14 @@
   let currentTab = 'team-members';
 
   window.addEventListener('viewChange', (e) => {
-    if (e.detail.view === 'team') {
+    if (e.detail.view === 'team' || e.detail.view === 'suppliers') {
+      currentTab = e.detail.view === 'team' ? 'team-members' : 'suppliers';
       if (!loaded || (Date.now() - lastFetchTime > 60000)) loadTeam();
+      else renderCurrentTab();
     }
   });
 
   window.refreshTeam = function() { loaded = false; loadTeam(); };
-
-  window.addEventListener('tabChange', (e) => {
-    if (e.detail.tab === 'team-members' || e.detail.tab === 'suppliers') {
-      currentTab = e.detail.tab;
-      renderCurrentTab();
-    }
-  });
 
   let teamData = [], supplierData = [];
 
@@ -34,9 +29,13 @@
   }
 
   function renderCurrentTab() {
-    const el = document.getElementById('team-content');
-    if (currentTab === 'team-members') renderTeamMembers(el);
-    else renderSuppliers(el);
+    if (currentTab === 'team-members') {
+      const el = document.getElementById('team-content');
+      if (el) renderTeamMembers(el);
+    } else {
+      const el = document.getElementById('suppliers-content');
+      if (el) renderSuppliers(el);
+    }
   }
 
   function renderTeamMembers(el) {

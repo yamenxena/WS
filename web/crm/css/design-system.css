@@ -310,15 +310,12 @@ a:hover { color: var(--gold-light); }
 
 /* Collapse toggle button */
 .sidebar-collapse-btn {
-  position: absolute;
-  top: 24px;
-  right: 12px;
-  width: 28px;
-  height: 28px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: 1px solid var(--glass-border);
   background: var(--bg-surface);
-  color: var(--text-secondary);
+  color: var(--text-primary);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -326,6 +323,7 @@ a:hover { color: var(--gold-light); }
   z-index: 101;
   transition: all var(--duration) var(--transition-spring);
   box-shadow: var(--shadow-sm);
+  flex-shrink: 0;
 }
 .sidebar-collapse-btn:hover {
   color: var(--gold);
@@ -333,8 +331,8 @@ a:hover { color: var(--gold-light); }
   box-shadow: var(--shadow-gold);
 }
 .sidebar-collapse-btn svg {
-  width: 14px;
-  height: 14px;
+  width: 22px;
+  height: 22px;
   transition: transform var(--duration) var(--ease);
 }
 .sidebar.sidebar-collapsed .sidebar-collapse-btn svg {
@@ -348,8 +346,10 @@ a:hover { color: var(--gold-light); }
 
 .sidebar-brand-lockup {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
+  width: 100%;
 }
 
 .sidebar-brand-mark {
@@ -421,8 +421,8 @@ a:hover { color: var(--gold-light); }
 }
 
 .nav-item.active {
-  background: var(--gold-glow);
-  color: var(--gold);
+  background: var(--brand-blue-glow);
+  color: var(--brand-blue);
   font-weight: 600;
 }
 
@@ -434,7 +434,7 @@ a:hover { color: var(--gold-light); }
   transform: translateY(-50%);
   width: 3px;
   height: 20px;
-  background: var(--gold);
+  background: var(--brand-blue);
   border-radius: 4px;
 }
 
@@ -1075,11 +1075,11 @@ body.role-admin .data-table .col-admin { display: table-cell; }
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--gold), var(--gold-dark));
+  background: linear-gradient(135deg, var(--brand-blue), #1e5a8c);
   color: var(--bg-primary);
 }
 .btn-primary:hover {
-  box-shadow: var(--shadow-gold);
+  box-shadow: 0 4px 12px var(--brand-blue-glow);
   transform: translateY(-1px);
 }
 
@@ -1091,7 +1091,7 @@ body.role-admin .data-table .col-admin { display: table-cell; }
 .btn-ghost:hover {
   background: var(--bg-hover);
   color: var(--text-primary);
-  border-color: var(--gold-border);
+  border-color: var(--brand-blue-border);
 }
 
 .btn-danger {
@@ -1151,8 +1151,8 @@ body.role-admin .btn[data-role="admin"] { display: inline-flex; }
 }
 
 .filter-input:focus {
-  border-color: var(--gold-border);
-  box-shadow: 0 0 0 3px var(--gold-glow);
+  border-color: var(--brand-blue-border);
+  box-shadow: 0 0 0 3px var(--brand-blue-glow);
 }
 
 .filter-input::placeholder { color: var(--text-muted); }
@@ -1179,7 +1179,7 @@ body.role-admin .btn[data-role="admin"] { display: inline-flex; }
 
 .progress-fill {
   height: 100%;
-  background: var(--gold);
+  background: var(--brand-blue);
   border-radius: 3px;
   transition: width 0.5s var(--ease);
 }
@@ -1326,8 +1326,8 @@ body.role-admin .btn[data-role="admin"] { display: inline-flex; }
   margin-bottom: 8px;
 }
 .peek-input:focus {
-  border-color: var(--gold-border);
-  box-shadow: 0 0 0 3px var(--gold-glow);
+  border-color: var(--brand-blue-border);
+  box-shadow: 0 0 0 3px var(--brand-blue-glow);
 }
 
 /* Admin-only table columns — hidden for team */
@@ -1401,8 +1401,8 @@ body.role-admin .peek-section[data-role="admin"] { display: block; }
 .peek-edit-group input:focus,
 .peek-edit-group textarea:focus,
 .peek-edit-group select:focus {
-  border-color: var(--gold-border);
-  box-shadow: 0 0 0 3px var(--gold-glow);
+  border-color: var(--brand-blue-border);
+  box-shadow: 0 0 0 3px var(--brand-blue-glow);
 }
 
 .peek-edit-group textarea { resize: vertical; min-height: 60px; }
@@ -1655,8 +1655,8 @@ select.peek-input.field-error {
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
-  border-color: var(--gold-border);
-  box-shadow: 0 0 0 3px var(--gold-glow);
+  border-color: var(--brand-blue-border);
+  box-shadow: 0 0 0 3px var(--brand-blue-glow);
 }
 
 .form-group textarea { resize: vertical; min-height: 70px; }
@@ -1703,8 +1703,8 @@ select.peek-input.field-error {
 }
 
 .combobox-input:focus {
-  border-color: var(--gold-border);
-  box-shadow: 0 0 0 3px var(--gold-glow);
+  border-color: var(--brand-blue-border);
+  box-shadow: 0 0 0 3px var(--brand-blue-glow);
 }
 
 .combobox-dropdown {
@@ -1805,7 +1805,7 @@ select.peek-input.field-error {
 }
 
 .tab-btn:hover { color: var(--text-primary); }
-.tab-btn.active { color: var(--gold); border-bottom-color: var(--gold); }
+.tab-btn.active { color: var(--brand-blue); border-bottom-color: var(--brand-blue); }
 
 
 /* ══════════════════════════════════════════════════════════════
