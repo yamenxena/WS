@@ -2204,7 +2204,6 @@ select.peek-input.field-error {
 .btn-danger:hover { filter: brightness(1.15); }
 
 /* ── Admin role guard — show archive buttons only for admin ── */
-body.role-admin [data-role="admin"] { display: block !important; }
 
 /* ── Confirm Dialog ── */
 .confirm-overlay {
