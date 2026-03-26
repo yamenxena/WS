@@ -34,7 +34,7 @@
       <div class="sidebar-header">
         <div class="sidebar-brand-lockup">
           <div class="sidebar-brand-mark">
-            <img src="../img/majaz-full-logo.svg" alt="Majaz Logo" style="width:100%; height:auto;" />
+            <img src="../img/logo.svg" alt="Majaz Logo" style="width:100%; height:auto;" />
           </div>
           <button class="sidebar-collapse-btn" id="sidebar-collapse-btn" aria-label="Toggle sidebar">
             <i data-lucide="panel-left-close"></i>
@@ -47,7 +47,7 @@
         <div class="nav-section">
           <span class="nav-label">Overview</span>
           <a class="nav-item active" data-view="dashboard" data-tooltip="Dashboard" id="nav-dashboard">
-            <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span> Dashboard
+            <span class="nav-icon"><i data-lucide="layout-dashboard"></i></span> <span class="nav-text">Dashboard</span>
           </a>
         </div>
 
@@ -55,22 +55,22 @@
         <div class="nav-section">
           <span class="nav-label">Operations</span>
           <a class="nav-item" data-view="clients" data-tooltip="Clients" id="nav-clients">
-            <span class="nav-icon"><i data-lucide="users"></i></span> Clients
+            <span class="nav-icon"><i data-lucide="users"></i></span> <span class="nav-text">Clients</span>
             <span class="nav-badge badge-info" id="badge-clients">—</span>
           </a>
           <a class="nav-item" data-view="projects" data-tooltip="Projects" id="nav-projects">
-            <span class="nav-icon"><i data-lucide="folder-kanban"></i></span> Projects
+            <span class="nav-icon"><i data-lucide="folder-kanban"></i></span> <span class="nav-text">Projects</span>
             <span class="nav-badge badge-warning" id="badge-projects">—</span>
           </a>
           <a class="nav-item" data-view="tasks" data-tooltip="Tasks" id="nav-tasks">
-            <span class="nav-icon"><i data-lucide="check-circle-2"></i></span> Tasks
+            <span class="nav-icon"><i data-lucide="check-circle-2"></i></span> <span class="nav-text">Tasks</span>
             <span class="nav-badge badge-danger" id="badge-tasks">—</span>
           </a>
           <a class="nav-item" data-view="team" data-tooltip="Team" id="nav-team">
-            <span class="nav-icon"><i data-lucide="hard-hat"></i></span> Team
+            <span class="nav-icon"><i data-lucide="hard-hat"></i></span> <span class="nav-text">Team</span>
           </a>
           <a class="nav-item" data-view="suppliers" data-tooltip="Suppliers" id="nav-suppliers">
-            <span class="nav-icon"><i data-lucide="truck"></i></span> Suppliers
+            <span class="nav-icon"><i data-lucide="truck"></i></span> <span class="nav-text">Suppliers</span>
           </a>
         </div>
 
@@ -78,25 +78,25 @@
         <div class="nav-section">
           <span class="nav-label">Management</span>
           <a class="nav-item" data-view="meetings" data-role="admin" data-tooltip="Meetings" id="nav-meetings">
-            <span class="nav-icon"><i data-lucide="calendar"></i></span> Meetings
+            <span class="nav-icon"><i data-lucide="calendar"></i></span> <span class="nav-text">Meetings</span>
             <span class="nav-badge badge-info" id="badge-meetings">—</span>
           </a>
           <a class="nav-item" data-view="pipeline" data-role="admin" data-tooltip="Pipeline" id="nav-pipeline">
-            <span class="nav-icon"><i data-lucide="git-branch"></i></span> Pipeline
+            <span class="nav-icon"><i data-lucide="git-branch"></i></span> <span class="nav-text">Pipeline</span>
             <span class="nav-badge badge-warning" id="badge-pipeline">—</span>
           </a>
           <a class="nav-item" data-view="interactions" data-role="admin" data-tooltip="Interactions" id="nav-interactions">
-            <span class="nav-icon"><i data-lucide="message-square"></i></span> Interactions
+            <span class="nav-icon"><i data-lucide="message-square"></i></span> <span class="nav-text">Interactions</span>
             <span class="nav-badge badge-info" id="badge-interactions">—</span>
           </a>
           <a class="nav-item" data-view="concept-plans" data-role="admin" data-tooltip="Concept Plans" id="nav-concept-plans">
-            <span class="nav-icon"><i data-lucide="clipboard-list"></i></span> Concept Plans
+            <span class="nav-icon"><i data-lucide="clipboard-list"></i></span> <span class="nav-text">Concept Plans</span>
           </a>
           <a class="nav-item" data-view="reports" data-role="admin" data-tooltip="Reports" id="nav-reports">
-            <span class="nav-icon"><i data-lucide="bar-chart-3"></i></span> Reports
+            <span class="nav-icon"><i data-lucide="bar-chart-3"></i></span> <span class="nav-text">Reports</span>
           </a>
           <a class="nav-item" data-view="admin-settings" data-role="admin" data-tooltip="Settings" id="nav-admin-settings">
-            <span class="nav-icon"><i data-lucide="settings"></i></span> Settings
+            <span class="nav-icon"><i data-lucide="settings"></i></span> <span class="nav-text">Settings</span>
           </a>
         </div>
 
@@ -104,14 +104,14 @@
         <div class="nav-section">
           <span class="nav-label">External</span>
           <a class="nav-item" href="https://docs.google.com/spreadsheets/d/1PvURHGRwsQqdmC5pp0zlKHJE3QcfgpZJlP1zxD0iztY" target="_blank" data-tooltip="Google Sheets" id="nav-sheets">
-            <span class="nav-icon"><i data-lucide="sheet"></i></span> Google Sheets
-            <span style="margin-left:auto;opacity:0.4"><i data-lucide="external-link" style="width:14px;height:14px"></i></span>
+            <span class="nav-icon"><i data-lucide="sheet"></i></span> <span class="nav-text">Google Sheets</span>
+            <span class="nav-text" style="margin-left:auto;opacity:0.4"><i data-lucide="external-link" style="width:14px;height:14px"></i></span>
           </a>
           <a class="nav-item" id="nav-role-preview" data-role="admin" data-tooltip="Toggle Employee View" style="cursor:pointer">
-            <span class="nav-icon"><i data-lucide="eye"></i></span> <span id="role-preview-label">Preview Employee View</span>
+            <span class="nav-icon"><i data-lucide="eye"></i></span> <span class="nav-text" id="role-preview-label">Preview Employee View</span>
           </a>
           <a class="nav-item" id="nav-logout" data-tooltip="Logout" style="cursor:pointer">
-            <span class="nav-icon"><i data-lucide="log-out"></i></span> Logout
+            <span class="nav-icon"><i data-lucide="log-out"></i></span> <span class="nav-text">Logout</span>
           </a>
         </div>
       </nav>

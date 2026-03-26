@@ -256,10 +256,12 @@ a:hover { color: var(--gold-light); }
 .sidebar.sidebar-collapsed .sidebar-brand-text,
 .sidebar.sidebar-collapsed .nav-label,
 .sidebar.sidebar-collapsed .nav-badge,
+.sidebar.sidebar-collapsed .nav-text,
 .sidebar.sidebar-collapsed .sidebar-footer span:first-of-type,
 .sidebar.sidebar-collapsed .sidebar-footer span:last-of-type {
   opacity: 0;
   width: 0;
+  display: none;
   overflow: hidden;
   white-space: nowrap;
   transition: opacity 0.15s var(--ease);
@@ -283,7 +285,8 @@ a:hover { color: var(--gold-light); }
 .sidebar.sidebar-collapsed .nav { padding: 12px 4px; }
 .sidebar.sidebar-collapsed .nav-item {
   justify-content: center;
-  padding: 10px;
+  padding: 12px;
+  gap: 0;
   position: relative;
   font-size: 0;
   overflow: hidden;

@@ -20,7 +20,7 @@
   function getProjectImage(sn) {
     if (!sn) return null;
     const match = PROJECT_IMAGES.find(f => f.startsWith(String(sn).padStart(3, '0') + '-') || f.startsWith(sn + '-'));
-    return match ? `../img/projects/${encodeURIComponent(match)}` : null;
+    return match ? `../img/Projects/${encodeURIComponent(match)}` : null;
   }
 
   window.addEventListener('viewChange', (e) => {
