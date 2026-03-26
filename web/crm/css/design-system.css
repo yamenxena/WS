@@ -267,29 +267,36 @@ a:hover { color: var(--gold-light); }
   transition: opacity 0.15s var(--ease);
 }
 .sidebar.sidebar-collapsed .sidebar-header {
-  padding: 20px 12px;
+  padding: 20px 0;
   justify-content: center;
 }
 .sidebar.sidebar-collapsed .sidebar-brand-lockup {
   justify-content: center;
-  flex-direction: column;
-}
-.sidebar.sidebar-collapsed .sidebar-collapse-btn {
-  order: -1;
-  margin-bottom: 8px;
 }
 .sidebar.sidebar-collapsed .sidebar-brand-mark {
-  width: 36px;
-  height: 36px;
+  width: 48px;
+  height: auto;
 }
-.sidebar.sidebar-collapsed .nav { padding: 12px 4px; }
+.sidebar.sidebar-collapsed .nav { 
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  padding: 8px 4px;
+}
+.sidebar.sidebar-collapsed .nav-section {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 4px;
+  gap: 4px;
+}
 .sidebar.sidebar-collapsed .nav-item {
   justify-content: center;
-  padding: 12px;
+  padding: 8px 0;
   gap: 0;
   position: relative;
   font-size: 0;
   overflow: hidden;
+  min-height: 44px;
 }
 .sidebar.sidebar-collapsed .nav-item .nav-icon {
   font-size: var(--text-base);
@@ -318,8 +325,11 @@ a:hover { color: var(--gold-light); }
 
 /* Collapse toggle button */
 .sidebar-collapse-btn {
-  width: 48px;
-  height: 48px;
+  width: 32px;
+  height: 32px;
+  position: absolute;
+  right: -16px;
+  top: 24px;
   border-radius: 50%;
   border: 1px solid var(--glass-border);
   background: var(--bg-surface);
@@ -339,8 +349,8 @@ a:hover { color: var(--gold-light); }
   box-shadow: var(--shadow-gold);
 }
 .sidebar-collapse-btn svg {
-  width: 24px;
-  height: 24px;
+  width: 16px;
+  height: 16px;
   transition: transform var(--duration) var(--ease);
 }
 .sidebar.sidebar-collapsed .sidebar-collapse-btn svg {
@@ -348,15 +358,16 @@ a:hover { color: var(--gold-light); }
 }
 
 .sidebar-header {
-  padding: 20px 16px;
+  padding: 24px 16px;
   border-bottom: 1px solid var(--glass-border);
+  position: relative;
 }
 
 .sidebar-brand-lockup {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 16px;
+  justify-content: center;
   width: 100%;
 }
 
