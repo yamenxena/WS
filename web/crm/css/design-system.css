@@ -25,6 +25,11 @@
   --gold-glow:      rgba(212, 168, 83, 0.15);
   --gold-border:    rgba(212, 168, 83, 0.25);
 
+  /* Brand Blue (Majaz logo accent — static across themes) */
+  --brand-blue:     #2877b9;
+  --brand-blue-glow: rgba(40, 119, 185, 0.15);
+  --brand-blue-border: rgba(40, 119, 185, 0.25);
+
   /* Text & Fluid Typography Scale */
   --text-primary:   #F0F0F0;
   --text-secondary: #8A8A9A;
@@ -161,6 +166,10 @@
   --gold-dark:      #7A5418;
   --gold-glow:      rgba(154, 108, 30, 0.08);
   --gold-border:    rgba(154, 108, 30, 0.20);
+
+  --brand-blue:     #2877b9;
+  --brand-blue-glow: rgba(40, 119, 185, 0.10);
+  --brand-blue-border: rgba(40, 119, 185, 0.20);
 
   --text-primary:   #1F2328;
   --text-secondary: #636C76;
@@ -345,11 +354,11 @@ a:hover { color: var(--gold-light); }
 
 .sidebar-brand-mark {
   width: 40px;
-  height: 40px;
+  height: auto;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: var(--gold);
+  color: var(--text-primary);
   flex-shrink: 0;
 }
 .sidebar-brand-mark svg {

@@ -258,9 +258,62 @@ document.addEventListener('DOMContentLoaded', () => {
     else {
       sessionStorage.removeItem('majaz_token');
       sessionStorage.removeItem('majaz_role');
+      sessionStorage.removeItem('majaz_real_role');
       window.location.href = 'login.html';
     }
   });
+
+  // ══════════════════════════════════════════════════════════════
+  // ROLE PREVIEW TOGGLE (Admin only)
+  // Lets admins preview the employee (team) view without logging out.
+  // ══════════════════════════════════════════════════════════════
+  const realRole = sessionStorage.getItem('majaz_real_role');
+  const isPreviewMode = realRole === 'admin' && role === 'team';
+
+  // If in preview mode, show indicator banner and update toggle button text
+  if (isPreviewMode) {
+    const banner = document.createElement('div');
+    banner.id = 'role-preview-banner';
+    banner.innerHTML = `
+      <span>👁️ Preview Mode — Viewing as <strong>Employee</strong></span>
+      <button id="exit-preview-btn">Exit Preview</button>
+    `;
+    banner.style.cssText = `
+      position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+      background: var(--brand-blue, #2877b9); color: #fff;
+      display: flex; align-items: center; justify-content: center; gap: 16px;
+      padding: 8px 16px; font-size: 13px; font-weight: 600;
+    `;
+    document.body.prepend(banner);
+    document.body.style.paddingTop = '40px';
+
+    document.getElementById('exit-preview-btn').addEventListener('click', () => {
+      sessionStorage.setItem('majaz_role', 'admin');
+      sessionStorage.removeItem('majaz_real_role');
+      window.location.reload();
+    });
+
+    // Re-show the toggle button even in team mode (since real role is admin)
+    const previewBtn = document.getElementById('nav-role-preview');
+    if (previewBtn) {
+      previewBtn.style.display = '';
+      const label = document.getElementById('role-preview-label');
+      if (label) label.textContent = 'Exit Employee View';
+      previewBtn.addEventListener('click', () => {
+        sessionStorage.setItem('majaz_role', 'admin');
+        sessionStorage.removeItem('majaz_real_role');
+        window.location.reload();
+      });
+    }
+  } else if (role === 'admin') {
+    // Normal admin mode — wire toggle to switch into preview
+    const previewBtn = document.getElementById('nav-role-preview');
+    previewBtn?.addEventListener('click', () => {
+      sessionStorage.setItem('majaz_real_role', 'admin');
+      sessionStorage.setItem('majaz_role', 'team');
+      window.location.reload();
+    });
+  }
 
   // ══════════════════════════════════════════════════════════════
   // TOAST NOTIFICATION SYSTEM
