@@ -280,17 +280,12 @@ a:hover { color: var(--gold-light); }
 .sidebar.sidebar-collapsed .nav { 
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
-  padding: 8px 4px;
+  justify-content: flex-start;
+  padding: 12px 4px;
   overflow: hidden;
 }
 .sidebar.sidebar-collapsed .nav-section {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 4px;
-  gap: 2px;
-  flex: 1;
-  min-height: 0;
+  display: contents;
 }
 .sidebar.sidebar-collapsed .nav-item {
   justify-content: center;
@@ -301,6 +296,7 @@ a:hover { color: var(--gold-light); }
   overflow: hidden;
   flex: 1;
   min-height: 0;
+  max-height: 48px;
 }
 .sidebar.sidebar-collapsed .nav-item .nav-icon {
   font-size: var(--text-base);
