@@ -272,6 +272,10 @@ a:hover { color: var(--gold-light); }
   justify-content: center;
   flex-direction: column;
 }
+.sidebar.sidebar-collapsed .sidebar-collapse-btn {
+  order: -1;
+  margin-bottom: 8px;
+}
 .sidebar.sidebar-collapsed .sidebar-brand-mark {
   width: 36px;
   height: 36px;
@@ -311,8 +315,8 @@ a:hover { color: var(--gold-light); }
 
 /* Collapse toggle button */
 .sidebar-collapse-btn {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: 50%;
   border: 1px solid var(--glass-border);
   background: var(--bg-surface);
@@ -332,8 +336,8 @@ a:hover { color: var(--gold-light); }
   box-shadow: var(--shadow-gold);
 }
 .sidebar-collapse-btn svg {
-  width: 22px;
-  height: 22px;
+  width: 24px;
+  height: 24px;
   transition: transform var(--duration) var(--ease);
 }
 .sidebar.sidebar-collapsed .sidebar-collapse-btn svg {
@@ -602,6 +606,15 @@ body.peek-open .main {
   flex-direction: column;
   justify-content: flex-end;
   padding: 24px 32px;
+}
+
+body.theme-light .hero-overlay {
+  background: linear-gradient(
+    135deg,
+    rgba(248, 250, 252, 0.85) 0%,
+    rgba(40, 119, 185, 0.4) 60%,
+    rgba(212, 168, 83, 0.15) 100%
+  );
 }
 
 .hero-title {
@@ -910,8 +923,7 @@ body.role-admin .data-table .col-admin { display: table-cell; }
 
 .kanban-column {
   min-width: 260px;
-  max-width: 300px;
-  flex-shrink: 0;
+  flex: 1;
   background: var(--bg-surface);
   border-radius: var(--radius-lg);
   border: 1px solid var(--glass-border);

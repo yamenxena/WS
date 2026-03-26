@@ -7,6 +7,7 @@
   let clientsData = [];
   let loaded = false;
   let lastFetchTime = 0;
+  let viewMode = 'table';
 
   window.addEventListener('viewChange', (e) => {
     if (e.detail.view === 'clients') {
@@ -16,13 +17,26 @@
 
   window.refreshClients = function() { loaded = false; loadClients(); };
 
+  document.getElementById('clients-view-kanban')?.addEventListener('click', (e) => { 
+    viewMode = 'kanban'; 
+    e.currentTarget.classList.add('active');
+    document.getElementById('clients-view-table')?.classList.remove('active');
+    applyFilters(); 
+  });
+  document.getElementById('clients-view-table')?.addEventListener('click', (e) => { 
+    viewMode = 'table'; 
+    e.currentTarget.classList.add('active');
+    document.getElementById('clients-view-kanban')?.classList.remove('active');
+    applyFilters(); 
+  });
+
   async function loadClients() {
     loaded = true;
     lastFetchTime = Date.now();
     const res = await API.clients();
     if (!res) return;
     clientsData = res.rows || [];
-    renderTable(clientsData);
+    applyFilters();
 
     // Populate location filter
     const locations = [...new Set(clientsData.map(c => c.location).filter(Boolean))].sort();
@@ -87,7 +101,12 @@
     if (lead) filtered = filtered.filter(c => c.lead_status === lead);
     if (icp) filtered = filtered.filter(c => String(c.icp_score) === String(icp));
     if (nation) filtered = filtered.filter(c => c.nation === nation);
-    renderTable(filtered);
+    
+    if (viewMode === 'kanban') {
+      renderBoard(filtered);
+    } else {
+      renderTable(filtered);
+    }
   }
 
   function urgencyIcon(u) {
@@ -131,6 +150,53 @@
         <td style="color:var(--gold);text-align:center">${(c.project_ids||[]).length || '—'}</td>
       </tr>`).join('')}</tbody>
     </table></div></div>`;
+  }
+
+  function renderBoard(rows) {
+    const el = document.getElementById('clients-content');
+    if (!rows.length) {
+      el.innerHTML = '<div class="empty-state"><div class="empty-state-icon"><i data-lucide="users" style="width:48px;height:48px;opacity:0.4"></i></div><div class="empty-state-text">No clients found</div><div class="empty-state-sub">Try adjusting your filters or adding a new client</div></div>';
+      if (window.lucide) lucide.createIcons();
+      return;
+    }
+
+    const KNOWN_LEAD_STATUSES = [
+      { key: 'Inquiry', label: 'Inquiry', color: 'var(--info)' },
+      { key: 'Qualified', label: 'Qualified', color: 'var(--stage-sd)' },
+      { key: 'Proposal', label: 'Proposal', color: 'var(--stage-dd)' },
+      { key: 'Negotiation', label: 'Negotiation', color: 'var(--warning)' },
+      { key: 'Won', label: 'Won', color: 'var(--success)' },
+      { key: 'Lost', label: 'Lost', color: 'var(--danger)' }
+    ];
+
+    const seenStatuses = new Set(rows.map(c => c.lead_status).filter(Boolean));
+    const cols = KNOWN_LEAD_STATUSES.filter(s => seenStatuses.has(s.key));
+    const knownKeys = new Set(KNOWN_LEAD_STATUSES.map(s => s.key));
+    seenStatuses.forEach(status => {
+      if (!knownKeys.has(status)) cols.push({ key: status, label: status, color: 'var(--gold)' });
+    });
+    if (!cols.length) cols.push(...KNOWN_LEAD_STATUSES);
+
+    el.innerHTML = `<div class="kanban">${cols.map(col => {
+      const cards = rows.filter(c => c.lead_status === col.key);
+      return `<div class="kanban-column stagger-in" data-status="${col.key}">
+        <div class="kanban-col-header">
+          <span class="kanban-col-title" style="color:${col.color}">${col.label}</span>
+          <span class="kanban-col-count">${cards.length}</span>
+        </div>
+        <div class="kanban-cards">${cards.map((c, idx) => `
+          <div class="kanban-card stagger-entrance" style="--i: ${idx}" onclick="showClient('${c.id}')">
+            <div class="kanban-card-title">${escapeHTML(c.name)}</div>
+            <div class="kanban-card-meta">
+              <span>${c.location || '—'}</span>
+              <span>${urgencyIcon(c.urgency)}</span>
+              ${c.budget != null ? `<span style="color:var(--gold)">${fmtCurrency(c.budget)}</span>` : ''}
+              ${c.icp_score ? `<span>ICP:${c.icp_score}</span>` : ''}
+            </div>
+          </div>
+        `).join('')}</div>
+      </div>`;
+    }).join('')}</div>`;
   }
 
   // ── Add Client Modal (via Side-Peek) ──

@@ -9,6 +9,20 @@
   let lastFetchTime = 0;
   let viewMode = 'kanban';
 
+  const PROJECT_IMAGES = [
+    "010-Ibrahim Almarzoqi.png", "12-Husain AL-Ahbabi.png", "129-Alhosani Twin Villa.png",
+    "131-Salem Alreman.png", "137-Sultan Al Ahbabi.jpeg", "156-Khamis Darwish Alnoufali - RD11 - 771.jpg",
+    "158-Abu Abdulla - ROSA ALHAMADI - Alreeman.png", "163- Jumaa alnofali.png", "30-MADAM MARYAM ALBALOUSHI.png",
+    "74-MOHAMMAD ALZAABI.png", "80-KHALID AL SHEHHI.png", "81-ِAbdulaziz Alhajri- Ras Alsader.png",
+    "93-FAHED BALBAHITH.png", "95-IBRAHEEM ALHOSANI.png"
+  ];
+  
+  function getProjectImage(sn) {
+    if (!sn) return null;
+    const match = PROJECT_IMAGES.find(f => f.startsWith(String(sn).padStart(3, '0') + '-') || f.startsWith(sn + '-'));
+    return match ? `../img/projects/${encodeURIComponent(match)}` : null;
+  }
+
   window.addEventListener('viewChange', (e) => {
     if (e.detail.view === 'projects') {
       if (!loaded || (Date.now() - lastFetchTime > 60000)) loadProjects();
@@ -17,8 +31,18 @@
 
   window.refreshProjects = function() { loaded = false; loadProjects(); };
 
-  document.getElementById('projects-view-kanban')?.addEventListener('click', () => { viewMode = 'kanban'; render(); });
-  document.getElementById('projects-view-table')?.addEventListener('click', () => { viewMode = 'table'; render(); });
+  document.getElementById('projects-view-kanban')?.addEventListener('click', (e) => { 
+    viewMode = 'kanban'; 
+    e.currentTarget.classList.add('active');
+    document.getElementById('projects-view-table')?.classList.remove('active');
+    render(); 
+  });
+  document.getElementById('projects-view-table')?.addEventListener('click', (e) => { 
+    viewMode = 'table'; 
+    e.currentTarget.classList.add('active');
+    document.getElementById('projects-view-kanban')?.classList.remove('active');
+    render(); 
+  });
 
   async function loadProjects() {
     loaded = true;
@@ -120,11 +144,13 @@
         </div>
         <div class="kanban-cards">${cards.map((p, idx) => {
           const pct = pctValue(p);
+          const imgSrc = getProjectImage(p.sn);
           return `
           <div class="kanban-card stagger-entrance" style="--i: ${idx}" id="card-${p.id}" draggable="true"
-            ondragstart="event.dataTransfer.setData('text/plain','${p.id}');this.classList.add('dragging')"
+            ondragstart="event.dataTransfer.setData('text/plain', '${p.id}'); this.classList.add('dragging')"
             ondragend="this.classList.remove('dragging')"
             onclick="showProject('${p.id}')">
+            ${imgSrc ? `<img src="${imgSrc}" style="width:100%;height:140px;object-fit:cover;border-radius:var(--radius-md) var(--radius-md) 0 0;margin:-14px -14px 12px -14px;display:block;max-width:calc(100% + 28px);">` : ''}
             <div class="kanban-card-title">${p.client_name ? escapeHTML(p.client_name) + ' — ' : ''}${escapeHTML(p.name)}</div>
             <div class="kanban-card-meta">
               <span>${p.service_type || '—'}</span>
@@ -214,7 +240,11 @@
     const allStages = getAllStages(projectsData);
     const fmtCurrency = v => new Intl.NumberFormat('en-AE',{style:'currency',currency:'AED',maximumFractionDigits:0}).format(v);
 
-    openSidePeek(`<span style="color:var(--gold)">${escapeHTML(p.name)}</span>`, `
+    const imgSrc = getProjectImage(p.sn);
+    const heroImgHtml = imgSrc ? `<img src="${imgSrc}" style="width:100%;height:200px;object-fit:cover;border-radius:var(--radius-lg);margin-bottom:16px;">` : '';
+
+    openSidePeek(`<span style="color:var(--gold)">${p.sn ? '#' + p.sn : ''}</span> ${escapeHTML(p.name)}`, `
+      ${heroImgHtml}
       <!-- ── Project Info ── -->
       <details class="peek-section" open>
         <summary>Project Info</summary>

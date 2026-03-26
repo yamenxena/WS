@@ -17,8 +17,18 @@
 
   window.refreshTasks = function() { loaded = false; loadTasks(); };
 
-  document.getElementById('tasks-view-board')?.addEventListener('click', () => { viewMode = 'board'; render(); });
-  document.getElementById('tasks-view-list')?.addEventListener('click', () => { viewMode = 'list'; render(); });
+  document.getElementById('tasks-view-board')?.addEventListener('click', (e) => { 
+    viewMode = 'board'; 
+    e.currentTarget.classList.add('active');
+    document.getElementById('tasks-view-list')?.classList.remove('active');
+    render(); 
+  });
+  document.getElementById('tasks-view-list')?.addEventListener('click', (e) => { 
+    viewMode = 'list'; 
+    e.currentTarget.classList.add('active');
+    document.getElementById('tasks-view-board')?.classList.remove('active');
+    render(); 
+  });
 
   async function loadTasks() {
     loaded = true;
